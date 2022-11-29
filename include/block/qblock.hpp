@@ -30,7 +30,7 @@ class Block
 {
 	public: 
 
-    Block(Payload* pyl, const quint8& pv);
+    Block(Payload* pyl);
 
     friend QDataStream & operator < (QDataStream &out, const Block & obj);
 
@@ -43,6 +43,7 @@ class Block
     void set_parents(const std::vector<block_id>& parents_m);
 
     void set_nonce(const quint64& nonce_m);
+    void set_pv(const quint8& pv);
 
     private:
 
