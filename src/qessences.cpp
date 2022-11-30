@@ -58,7 +58,7 @@ void Transaction_Essence::serialize(QDataStream &out)const
 QJsonObject Transaction_Essence::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("networkId",QString::number(network_id_));  //check this
     var.insert("inputsCommitment",inputs_commitment_.toHexString());
 

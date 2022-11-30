@@ -30,7 +30,7 @@ void Sender_Feature::serialize(QDataStream &out)const
 QJsonObject Sender_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("sender",sender_->get_Json());
     return var;
 }
@@ -45,7 +45,7 @@ void Metadata_Feature::serialize(QDataStream &out)const
 QJsonObject Metadata_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("data",data_.toHexString());
     return var;
 }
@@ -59,7 +59,7 @@ void Tag_Feature::serialize(QDataStream &out)const
 QJsonObject Tag_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("tag",tag_.toHexString());
     return var;
 }

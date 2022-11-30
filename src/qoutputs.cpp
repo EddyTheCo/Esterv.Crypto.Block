@@ -23,17 +23,18 @@ Basic_Output::Basic_Output(quint64 amount_m, std::vector<Unlock_Condition *>  un
     unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m){};
 
 Basic_Output::Basic_Output(const QJsonValue& val):Basic_Output(
-                               val.toObject()["amount"].toInt(),
+                               val.toObject()["amount"].toString().toULongLong(),
     get_T<Unlock_Condition>(val.toObject()["unlockConditions"].toArray()),
     get_T<Feature>(val.toObject()["features"].toArray()),
     get_T<Native_Token>(val.toObject()["nativeTokens"].toArray())
-                                                      ){};
+                                                      ){
+};
 
 void Basic_Output::serialize(QDataStream &out)const
 {
     out<<type_m<<amount_;
     out<<static_cast<quint8>(native_tokens_.size());
-    if(native_tokens_.size())for(const auto& v: native_tokens_)v->serialize(out);
+    for(const auto& v: native_tokens_)v->serialize(out);
 
     out<<static_cast<quint8>(unlock_conditions_.size());
     for(const auto& v: unlock_conditions_)v->serialize(out);
@@ -43,7 +44,7 @@ void Basic_Output::serialize(QDataStream &out)const
 QJsonObject Basic_Output::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("amount",QString::number(amount_)); //fix this
     if(native_tokens_.size())
     {

@@ -55,11 +55,13 @@ void Transaction_Payload::serialize(QDataStream &out)const
 QJsonObject Transaction_Payload::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("essence",essence_->get_Json());
     QJsonArray unloArray;
     for(const auto& v: unlocks_)unloArray.push_back(v->get_Json());
+    
     var.insert("unlocks",unloArray);
+   
     return var;
 }
 

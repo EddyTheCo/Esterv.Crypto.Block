@@ -35,7 +35,7 @@ void Address_Unlock_Condition::serialize(QDataStream &out)const
 QJsonObject Address_Unlock_Condition::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("address",address_->get_Json());
     return var;
 }
@@ -57,7 +57,7 @@ void Storage_Deposit_Return_Unlock_Condition::serialize(QDataStream &out)const
 QJsonObject Storage_Deposit_Return_Unlock_Condition::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("returnAddress",return_address_->get_Json());
     var.insert("returnAmount",QString::number(return_amount_)); //check this
     return var;
@@ -75,7 +75,7 @@ void Timelock_Unlock_Condition::serialize(QDataStream &out)const
 QJsonObject Timelock_Unlock_Condition::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("unixTime",QString::number(unix_time_));
 
     return var;
@@ -96,7 +96,7 @@ void Expiration_Unlock_Condition::serialize(QDataStream &out)const
 QJsonObject Expiration_Unlock_Condition::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",type_m);
     var.insert("returnAddress",return_address_->get_Json());
     var.insert("unixTime",QString::number(unix_time_));
     return var;

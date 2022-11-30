@@ -30,7 +30,7 @@ void NFT_Address::serialize(QDataStream &out)const
 QJsonObject NFT_Address::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("nftId",addr_.toHexString());
     return var;
 }
@@ -46,7 +46,7 @@ void Alias_Address::serialize(QDataStream &out)const
 QJsonObject Alias_Address::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("aliasId",addr_.toHexString());
     return var;
 }
@@ -61,7 +61,7 @@ void Ed25519_Address::serialize(QDataStream &out)const
 QJsonObject Ed25519_Address::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",QString::number(type_m));
+    var.insert("type",(int)type_m);
     var.insert("pubKeyHash",addr_.toHexString());
     return var;
 }

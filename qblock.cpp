@@ -18,14 +18,14 @@ namespace qiota{
 		QJsonObject Block::get_Json(void)const
 		{
 			QJsonObject var;
-			var.insert("protocolVersion",protocol_version);
+			var.insert("protocolVersion",(int)protocol_version);
 			QJsonArray parentarr;
 			for(const auto& v: parents_)parentarr.push_back(v.toHexString());
 			var.insert("parents",parentarr);
-
 			if(payload_)
 			{
 				var.insert("payload",payload_->get_Json());
+				
 			}
 			else
 			{
