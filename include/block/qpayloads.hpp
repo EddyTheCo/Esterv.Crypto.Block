@@ -51,7 +51,6 @@ public:
 private:
     Essence* essence_;
     std::vector<Unlock*> unlocks_;
-    quint32 type_m;
 };
 };
 };
