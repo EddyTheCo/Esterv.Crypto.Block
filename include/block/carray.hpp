@@ -10,6 +10,7 @@ class c_array : public QByteArray
 {
 public:
     using QByteArray::QByteArray;
+    c_array(const QByteArray & var):QByteArray(QByteArray::fromRawData(var.constData(),var.size())){};
     /*
      *@brief creates a "0x" hex encoded string
      */
