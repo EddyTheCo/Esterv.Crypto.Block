@@ -28,5 +28,6 @@ QDataStream & operator << (QDataStream &out, const fl_array<max_lenght> & obj)
 
 template QDataStream & operator << <quint32> (QDataStream &out, const fl_array<quint32> & obj);
 template QDataStream & operator << <quint8> (QDataStream &out, const fl_array<quint8> & obj);
+template QDataStream & operator << <quint16> (QDataStream &out, const fl_array<quint16> & obj);
 }
 }

@@ -35,8 +35,8 @@ QJsonObject Sender_Feature::get_Json(void) const
     return var;
 }
 
-Metadata_Feature::Metadata_Feature(dataF data_m):Feature(2),data_(data_m){};
-Metadata_Feature::Metadata_Feature(const QJsonValue& val):Metadata_Feature(dataF(val.toObject()["data"])){};
+Metadata_Feature::Metadata_Feature(fl_array<quint16> data_m):Feature(2),data_(data_m){};
+Metadata_Feature::Metadata_Feature(const QJsonValue& val):Metadata_Feature(fl_array<quint16>(val.toObject()["data"])){};
 void Metadata_Feature::serialize(QDataStream &out)const
 {
     out<<type_m;
@@ -49,8 +49,8 @@ QJsonObject Metadata_Feature::get_Json(void) const
     var.insert("data",data_.toHexString());
     return var;
 }
-Tag_Feature::Tag_Feature(tagF tag_m):Feature(3),tag_(tag_m){};
-Tag_Feature::Tag_Feature(const QJsonValue& val):Tag_Feature(tagF(val.toObject()["tag"])){};
+Tag_Feature::Tag_Feature(fl_array<quint8> tag_m):Feature(3),tag_(tag_m){};
+Tag_Feature::Tag_Feature(const QJsonValue& val):Tag_Feature(fl_array<quint8>(val.toObject()["tag"])){};
 void Tag_Feature::serialize(QDataStream &out)const
 {
     out<<type_m;

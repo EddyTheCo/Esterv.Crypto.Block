@@ -36,21 +36,21 @@ Address * sender_;
 class Metadata_Feature : public Feature
 {
 public:
-    Metadata_Feature(dataF data_m);
+    Metadata_Feature(fl_array<quint16> data_m);
     Metadata_Feature(const QJsonValue& val);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
 
 private:
-dataF data_;
+fl_array<quint16> data_;
 
 };
 
 class Tag_Feature: public Feature
 {
 public:
-    Tag_Feature(tagF tag_m);
+    Tag_Feature(fl_array<quint8> tag_m);
     Tag_Feature(const QJsonValue& val);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
@@ -58,7 +58,7 @@ public:
 
 private:
 
-tagF tag_;
+fl_array<quint8> tag_;
 
 };
 };
