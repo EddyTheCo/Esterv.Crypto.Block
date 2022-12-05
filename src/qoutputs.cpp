@@ -4,22 +4,24 @@ namespace qiota{
 namespace qblocks{
 void Output::serialize(QDataStream &out)const{};
 QJsonObject Output::get_Json(void) const{return QJsonObject();};
-Output::Output(quint8 typ ,quint64 amount_m):type_m(typ),amount_(amount_m){};
-Output * Output::from_Json(const QJsonValue& val){
-    const quint8 type_=val.toObject()["type"].toInt();
-
+Output::Output(quint8 typ):type_m(typ){};
+template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val){
+    const auto type_=get_type<quint8>(val);
     switch(type_) {
       case 3:
-        return new Basic_Output(val);
+        return std::shared_ptr<Output>(new Basic_Output(val));
     default:
     return nullptr;
 
     }
 }
+template std::shared_ptr<Output> Output::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<Output> Output::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<Output> Output::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-Basic_Output::Basic_Output(quint64 amount_m, std::vector<Unlock_Condition *>  unlock_conditions_m,
-             std::vector<Feature *>  features_m,
-             std::vector<Native_Token*>  native_tokens_m):Output(3,amount_m),
+Basic_Output::Basic_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
+             const std::vector<std::shared_ptr<Feature >> & features_m,
+             const std::vector<std::shared_ptr<Native_Token>> & native_tokens_m):Output(3),amount_(amount_m),
     unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m){};
 
 Basic_Output::Basic_Output(const QJsonValue& val):Basic_Output(
@@ -29,7 +31,28 @@ Basic_Output::Basic_Output(const QJsonValue& val):Basic_Output(
     get_T<Native_Token>(val.toObject()["nativeTokens"].toArray())
                                                       ){
 };
-
+Basic_Output::Basic_Output(QDataStream &in):Output(3)
+{
+    in>>amount_;
+    quint8  native_tokens_count;
+    in>>native_tokens_count;
+    for(auto i=0;i<native_tokens_count;i++)
+    {
+        native_tokens_.push_back(Native_Token::from_<QDataStream>(in));
+    }
+    quint8 unlock_conditions_count;
+    in>>unlock_conditions_count;
+    for(auto i=0;i<unlock_conditions_count;i++)
+    {
+        unlock_conditions_.push_back(Unlock_Condition::from_<QDataStream>(in));
+    }
+    quint8 features_count;
+    in>>features_count;
+    for(auto i=0;i<features_count;i++)
+    {
+        features_.push_back(Feature::from_<QDataStream>(in));
+    }
+}
 void Basic_Output::serialize(QDataStream &out)const
 {
     out<<type_m<<amount_;

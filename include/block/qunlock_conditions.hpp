@@ -12,7 +12,7 @@ class  Unlock_Condition
 public:
 
     Unlock_Condition(quint8 typ );
-    static Unlock_Condition * from_Json(const QJsonValue& val);
+    template<class from_type>static std::shared_ptr<Unlock_Condition> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -24,14 +24,15 @@ public:
 class Address_Unlock_Condition : public Unlock_Condition
 {
 public:
-    Address_Unlock_Condition(Address* address_m);
+    Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     Address_Unlock_Condition(const QJsonValue& val);
+    Address_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
 
 private:
-Address * address_;
+std::shared_ptr<Address> address_;
 
 };
 
@@ -39,15 +40,16 @@ Address * address_;
 class Storage_Deposit_Return_Unlock_Condition : public Unlock_Condition
 {
 public:
-    Storage_Deposit_Return_Unlock_Condition(Address* return_address_m, quint64 return_amount_m);
+    Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<Address> &return_address_m, quint64 return_amount_m);
     Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val);
+    Storage_Deposit_Return_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
 
 private:
 quint64 return_amount_;
-Address* return_address_;
+std::shared_ptr<Address> return_address_;
 
 };
 
@@ -57,6 +59,7 @@ class Timelock_Unlock_Condition: public Unlock_Condition
 public:
     Timelock_Unlock_Condition(quint32 unix_time_m);
     Timelock_Unlock_Condition(const QJsonValue& val);
+    Timelock_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
@@ -69,13 +72,14 @@ quint32 unix_time_;
 class Expiration_Unlock_Condition:public Unlock_Condition
 {
 public:
-    Expiration_Unlock_Condition(quint32 unix_time_m,Address* return_address_m);
+    Expiration_Unlock_Condition(quint32 unix_time_m,const std::shared_ptr<Address> &return_address_m);
     Expiration_Unlock_Condition(const QJsonValue& val);
+    Expiration_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
 private:
-Address * return_address_;
+std::shared_ptr<Address> return_address_;
 quint32 unix_time_;
 
 };

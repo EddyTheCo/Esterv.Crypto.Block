@@ -12,7 +12,7 @@ class  Signature
 public:
 
     Signature(quint8 typ );
-    static Signature * from_Json(const QJsonValue& val);
+    template<class from_type> static std::shared_ptr<Signature> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -25,6 +25,7 @@ class Ed25519_Signature : public Signature
 public:
     Ed25519_Signature(public_key public_key_m,signature signature_m);
     Ed25519_Signature(const QJsonValue& val);
+    Ed25519_Signature(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 

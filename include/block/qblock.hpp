@@ -29,14 +29,12 @@ namespace qblocks{
 class Block
 {
 	public: 
-
-    Block(Payload* pyl);
+    Block(QDataStream &serialized_block);
+    Block(const std::shared_ptr<Payload>& pyl);
 
     friend QDataStream & operator < (QDataStream &out, const Block & obj);
 
-
-    friend QDataStream & operator << (QDataStream &out, const Block & obj);
-
+    void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void)const;
 
@@ -49,7 +47,7 @@ class Block
 
     quint8 protocol_version;
     quint64 nonce_;
-    Payload* payload_;
+    std::shared_ptr<Payload> payload_;
     std::vector<block_id> parents_;
 
 };

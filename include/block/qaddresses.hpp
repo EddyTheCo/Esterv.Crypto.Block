@@ -10,13 +10,12 @@ class  Address
 {
 public:
 
-    Address(c_array& addr_m,quint8 typ );
-    static Address * from_Json(const QJsonValue& val);
+    Address(quint8 typ );
+    template<class from_type> static std::shared_ptr<Address> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
     quint8 type_m;
-    c_array addr_;
 
 };
 
@@ -25,9 +24,12 @@ class NFT_Address : public Address
 public:
     NFT_Address(c_array addr_m);
     NFT_Address(const QJsonValue& val);
+    NFT_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
+private:
+    c_array nft_id_;
 
 };
 class Alias_Address : public Address
@@ -35,10 +37,13 @@ class Alias_Address : public Address
 public:
     Alias_Address(c_array addr_m);
     Alias_Address(const QJsonValue& val);
+    Alias_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
 
+private:
+    c_array alias_id_;
 
 };
 
@@ -47,9 +52,12 @@ class Ed25519_Address : public Address
 public:
     Ed25519_Address(c_array addr_m);
     Ed25519_Address(const QJsonValue& val);
+    Ed25519_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
+private:
+    c_array pubkeyhash_;
 
 };
 };

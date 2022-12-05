@@ -6,25 +6,26 @@ namespace qblocks{
 void Essence::serialize(QDataStream &out)const{};
 QJsonObject Essence::get_Json(void) const{return QJsonObject();};
 Essence::Essence(quint8 typ ):type_m(typ){};
-Essence * Essence::from_Json(const QJsonValue& val){
-    const quint8 type_=val.toObject()["type"].toInt();
-
+template<class from_type>  std::shared_ptr<Essence> Essence::from_(from_type& val){
+    const auto type_=get_type<quint8>(val);
     switch(type_) {
 
       case 1:
-        return new Transaction_Essence(val);
+        return std::shared_ptr<Essence>(new Transaction_Essence(val));
     default:
     return nullptr;
 
     }
 }
 
-template std::vector<Input *> get_T<Input>(const QJsonArray& val);
-template std::vector<Output *> get_T<Output>(const QJsonArray& val);
-Transaction_Essence::Transaction_Essence(quint64 network_id_m, std::vector<Input *> inputs_m,
+template std::shared_ptr<Essence> Essence::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<Essence> Essence::from_<QDataStream >(QDataStream & val);
+
+Transaction_Essence::Transaction_Essence(quint64 network_id_m, const std::vector<std::shared_ptr<Input>>& inputs_m,
                     c_array inputs_commitment_m,
-                    std::vector<Output *> outputs_m,
-                    Payload* payload_m):Essence(1),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
+                    const std::vector<std::shared_ptr<Output>>& outputs_m,
+                    const std::shared_ptr<Payload>& payload_m):Essence(1),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
     outputs_(outputs_m),payload_(payload_m)
 {};
 
@@ -34,9 +35,36 @@ Transaction_Essence::Transaction_Essence(const QJsonValue& val):
     get_T<Input>(val.toObject()["inputs"].toArray()),
     c_array(val.toObject()["inputsCommitment"]),
     get_T<Output>(val.toObject()["outputs"].toArray()),
-    Payload::from_Json(val.toObject()["payload"])
+    Payload::from_<const QJsonValue>(val.toObject()["payload"])
   ){};
+Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(1)
+{
 
+    in>>network_id_;
+    quint16 inputs_count;
+    in>>inputs_count;
+    std::vector<std::shared_ptr<Input>> inputs_m;
+    for(auto i=0;i<inputs_count;i++)
+    {
+        inputs_.push_back(Input::from_<QDataStream>(in));
+    }
+    inputs_commitment_=c_array(32,0);
+    in>>inputs_commitment_;
+    quint16 outputs_count;
+    in>>outputs_count;
+    std::vector<std::shared_ptr<Output>> outputs_m;
+    for(auto i=0;i<outputs_count;i++)
+    {
+        outputs_m.push_back(Output::from_<QDataStream>(in));
+    }
+    quint32 payload_length;
+    in>>payload_length;
+    if(payload_length)
+    {
+        payload_=Payload::from_<QDataStream>(in);
+    }
+
+};
 void Transaction_Essence::serialize(QDataStream &out)const
 {
     out<<type_m;
@@ -49,7 +77,9 @@ void Transaction_Essence::serialize(QDataStream &out)const
     if(payload_)
     {
         c_array serialized_payload;
-        payload_->serialize(*serialized_payload.get_buffer());
+        auto buffer=QDataStream(&serialized_payload,QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        payload_->serialize(buffer);
         out<<static_cast<quint32>(serialized_payload.size());
         out<<serialized_payload;
     }

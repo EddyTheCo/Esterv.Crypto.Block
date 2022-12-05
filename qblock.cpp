@@ -3,8 +3,29 @@
 namespace qiota{
 	namespace qblocks{
 
-		Block::Block(Payload* pyl):
+        Block::Block(const std::shared_ptr<Payload> &pyl):
 			payload_(pyl){};
+
+        Block::Block(QDataStream &in)
+        {
+
+            in>>protocol_version;
+            quint8  parents_count;
+            in>>parents_count;
+            for(auto i=0;i<parents_count;i++)
+            {
+                block_id block_id_=block_id(32,0);
+                in>>block_id_;
+                parents_.push_back(block_id_);
+            }
+            quint32  payload_length;
+            in>>payload_length;
+            if(payload_length)
+            {
+                payload_=Payload::from_<QDataStream>(in);
+            }
+            in>>nonce_;
+        }
 		void Block::set_pv(const quint8& pv)
 		{
 			protocol_version=pv;
@@ -44,7 +65,9 @@ namespace qiota{
 			if(obj.payload_)
 			{
 				c_array serialized_payload;
-				obj.payload_->serialize(*serialized_payload.get_buffer());
+                auto buffer=QDataStream(&serialized_payload,QIODevice::WriteOnly | QIODevice::Append);
+                buffer.setByteOrder(QDataStream::LittleEndian);
+                obj.payload_->serialize(buffer);
 				out<<static_cast<quint32>(serialized_payload.size());
 				out<<serialized_payload;
 			}
@@ -55,11 +78,10 @@ namespace qiota{
 			return out;
 		}
 
-		QDataStream & operator << (QDataStream &out, const Block & obj)
+        void Block::serialize(QDataStream &out)const
 		{
-			out<obj;
-			out<<obj.nonce_;
-			return out;
+            out<(*this);
+            out<<nonce_;
 		}
 
 	}

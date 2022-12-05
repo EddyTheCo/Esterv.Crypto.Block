@@ -4,6 +4,8 @@
 #include <QDataStream>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QJsonObject>
+#include<QIODevice>
 namespace qiota{
 namespace qblocks{
 class c_array : public QByteArray
@@ -20,13 +22,24 @@ public:
      *
      */
     friend QDataStream & operator << (QDataStream &out, const c_array & obj);
-
+    friend QDataStream & operator >> (QDataStream &in, c_array & obj);
     /*
      *@return a data stream object to append data to it
      *
      */
-    QDataStream * get_buffer(void);
 
+    template<class obj_type> void from_object(const obj_type& obj)
+    {
+        auto buffer=QDataStream(this,QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        obj.serialize(buffer);
+    }
+    template<class obj_type> obj_type to_object(void)
+    {
+        auto buffer=QDataStream(this,QIODevice::ReadOnly);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        return obj_type(buffer);
+    }
     c_array(const QJsonValue& val);
 
 
@@ -41,7 +54,24 @@ public:
      *@brief serialize the object to a datastream
      *
      */
-   template<typename m_le> friend QDataStream & operator << (QDataStream &out, const fl_array<m_le> & obj);
+    friend QDataStream & operator << (QDataStream &out, const fl_array & obj)
+    {
+
+        out<<static_cast<max_lenght>(obj.size());
+        out<<static_cast<c_array>(obj);
+        return out;
+
+    }
+    friend QDataStream & operator >> (QDataStream &in, fl_array & obj)
+    {
+        max_lenght size;
+        in>>size;
+        obj.resize(size);
+        auto var=static_cast<c_array*>(&obj);
+        in>>(*var);
+
+        return in;
+    }
 
 };
 
@@ -72,13 +102,27 @@ using dataF = fl_array<quint32>;
  **/
 using tagF = fl_array<quint8>;
 
-template<typename T>
-std::vector<T *> get_T(const QJsonArray& val)
+template<class T>
+std::vector<std::shared_ptr<T>> get_T(const QJsonArray& val)
 {
-    std::vector<T *> var;
-    for(const auto& v:val )var.push_back(T::from_Json(v));
+    std::vector<std::shared_ptr<T>> var;
+    for(const auto& v:val)var.push_back(T::from_(v));
     return var;
 }
+template<class type_type> type_type get_type(const QJsonValue& val)
+{
+    return ((type_type)val.toObject()["type"].toInt());
+}
+template<class type_type> type_type get_type(QDataStream & val)
+{
+    type_type type_;
+    val>>type_;
+    return type_;
+}
+
+
+
+
 };
 
 };

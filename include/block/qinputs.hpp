@@ -11,7 +11,7 @@ class  Input
 {
 public:
     Input(quint8 typ);
-    static Input * from_Json(const QJsonValue& val);
+    template<class from_type> static std::shared_ptr<Input> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -28,6 +28,7 @@ class UTXO_Input : public Input
 public:
     UTXO_Input(transaction_id  transaction_id_m,quint16 transaction_output_index_m);
     UTXO_Input(const QJsonValue& val);
+    UTXO_Input(QDataStream &in);
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
