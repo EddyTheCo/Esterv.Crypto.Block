@@ -10,3 +10,4 @@ target_link_libraries(tip24 PRIVATE qblock)
 add_executable(serialization serialization.cpp)
 add_test(NAME serialization COMMAND serialization)
 target_link_libraries(serialization PRIVATE qblock)
+
