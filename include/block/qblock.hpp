@@ -28,7 +28,8 @@ namespace qiota{
 namespace qblocks{
 class Block
 {
-	public: 
+public: 
+	Block(){};
     Block(QDataStream &serialized_block);
     Block(const std::shared_ptr<Payload>& pyl);
     Block(const QJsonValue& val);
