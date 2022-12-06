@@ -26,6 +26,12 @@ namespace qiota{
             }
             in>>nonce_;
         }
+        Block::Block(const QJsonValue& val):protocol_version(val.toObject()["protocolVersion"].toInt()),
+            nonce_(val.toObject()["nonce"].toInteger()), payload_(Payload::from_<const QJsonValue>(val))
+        {
+            const auto arr=val.toObject()["outputs"].toArray();
+            for(const auto& v:arr)parents_.push_back(block_id(v));
+        }
 		void Block::set_pv(const quint8& pv)
 		{
 			protocol_version=pv;
