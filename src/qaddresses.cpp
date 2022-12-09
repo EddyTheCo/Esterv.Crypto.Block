@@ -42,7 +42,7 @@ QJsonObject NFT_Address::get_Json(void) const
     return var;
 }
 
-Alias_Address::Alias_Address(c_array addr_m):Address(8){};
+Alias_Address::Alias_Address(c_array alias_id_m):Address(8),alias_id_(alias_id_m){};
 Alias_Address::Alias_Address(const QJsonValue& val):Alias_Address(c_array(val.toObject()["aliasId"])){};
 Alias_Address::Alias_Address(QDataStream &in):Address(8)
 {
@@ -63,7 +63,7 @@ QJsonObject Alias_Address::get_Json(void) const
     return var;
 }
 
-Ed25519_Address::Ed25519_Address(c_array addr_m):Address(0){};
+Ed25519_Address::Ed25519_Address(c_array pubkeyhash_m):Address(0),pubkeyhash_(pubkeyhash_m){};
 Ed25519_Address::Ed25519_Address(const QJsonValue& val):Ed25519_Address(c_array(val.toObject()["pubKeyHash"])){};
 Ed25519_Address::Ed25519_Address(QDataStream &in):Address(0)
 {
