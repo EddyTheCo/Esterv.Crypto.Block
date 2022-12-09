@@ -24,7 +24,7 @@ template std::shared_ptr<Feature> Feature::from_<QDataStream >(QDataStream & val
 template std::shared_ptr<Feature> Feature::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
 Sender_Feature::Sender_Feature(std::shared_ptr<Address> sender_m):Feature(0),sender_(sender_m){};
-Sender_Feature::Sender_Feature(const QJsonValue& val):Sender_Feature(Address::from_<const QJsonValue>(val.toObject()["sender"])){};
+Sender_Feature::Sender_Feature(const QJsonValue& val):Sender_Feature(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Sender_Feature::Sender_Feature(QDataStream &in):Feature(0),sender_(Address::from_<QDataStream>(in)){};
 void Sender_Feature::serialize(QDataStream &out)const
 {
@@ -35,7 +35,7 @@ QJsonObject Sender_Feature::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("sender",sender_->get_Json());
+    var.insert("address",sender_->get_Json());
     return var;
 }
 
