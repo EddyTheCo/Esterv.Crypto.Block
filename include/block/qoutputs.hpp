@@ -34,6 +34,9 @@ namespace qiota{
 
 				QJsonObject get_Json(void) const;
 				quint64 amount(void)const{return amount_;};
+				std::vector<std::shared_ptr<Feature>> features(void){return features_;};
+				std::vector<std::shared_ptr<Unlock_Condition>> unlock_conditions(void){return unlock_conditions_;};
+					
 
 			private:
 
