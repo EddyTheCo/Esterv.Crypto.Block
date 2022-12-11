@@ -28,7 +28,7 @@ public:
     Sender_Feature(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
-
+    std::shared_ptr<Address> sender(void)const {return sender_;}	
 private:
 std::shared_ptr<Address> sender_;
 
@@ -43,6 +43,7 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
+     fl_array<quint16> data(void)const {return data_;}	
 
 private:
 fl_array<quint16> data_;
@@ -58,6 +59,7 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
+     fl_array<quint8> tag(void)const {return tag_;}	
 
 private:
 
