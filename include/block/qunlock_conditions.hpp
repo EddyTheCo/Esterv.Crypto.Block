@@ -29,6 +29,7 @@ public:
     Address_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
+    std::shared_ptr<Address>  address(void)const{return address_;}  
 
 
 private:
@@ -45,7 +46,8 @@ public:
     Storage_Deposit_Return_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
-
+    quint64 return_amount(void)const{return return_amount_;}
+    std::shared_ptr<Address> return_address(void)const{return return_address_;}
 
 private:
 quint64 return_amount_;
@@ -62,6 +64,7 @@ public:
     Timelock_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
+    quint32 unix_time(void)const{return unix_time_;}
 
 private:
 quint32 unix_time_;
@@ -77,6 +80,7 @@ public:
     Expiration_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
+    quint32 unix_time(void)const{return unix_time_;}
 
 private:
 std::shared_ptr<Address> return_address_;
