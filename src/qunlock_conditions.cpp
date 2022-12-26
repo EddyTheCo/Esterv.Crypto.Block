@@ -91,7 +91,7 @@ QJsonObject Timelock_Unlock_Condition::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("unixTime",QString::number(unix_time_));
+    var.insert("unixTime",(int)unix_time_);
 
     return var;
 }
@@ -118,7 +118,7 @@ QJsonObject Expiration_Unlock_Condition::get_Json(void) const
     QJsonObject var;
     var.insert("type",type_m);
     var.insert("returnAddress",return_address_->get_Json());
-    var.insert("unixTime",QString::number(unix_time_));
+    var.insert("unixTime",(int)unix_time_);
     return var;
 }
 
