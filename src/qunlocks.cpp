@@ -59,7 +59,7 @@ QJsonObject Reference_Unlock::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("reference",QString::number(reference_));
+    var.insert("reference",(int)reference_);
     return var;
 }
 
@@ -78,7 +78,7 @@ QJsonObject Alias_Unlock::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("reference",QString::number(alias_reference_unlock_index_));
+    var.insert("reference",(int)alias_reference_unlock_index_);
     return var;
 }
 
@@ -98,7 +98,7 @@ QJsonObject NFT_Unlock::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("reference",QString::number(nft_reference_unlock_index_));
+    var.insert("reference",(int)nft_reference_unlock_index_);
     return var;
 }
 };
