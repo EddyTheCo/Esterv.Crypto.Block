@@ -22,6 +22,7 @@
 #include "block/qunlock_conditions.hpp"
 #include "block/qfeatures.hpp"
 #include "block/qaddresses.hpp"
+#include "block/qoutput_metadata_response.hpp"
 
 namespace qiota{
 
