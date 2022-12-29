@@ -8,8 +8,9 @@ namespace qblocks{
 
 class  Output_Metadata_Response
 {
-    Output_Metadata_Response(const QJsonValue& val);
+
 public:
+    Output_Metadata_Response(const QJsonValue& val);
     const block_id block_id_;
     const transaction_id transaction_id_;
     const quint16 output_index_;
