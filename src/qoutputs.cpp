@@ -64,6 +64,14 @@ void Basic_Output::serialize(QDataStream &out)const
     out<<static_cast<quint8>(features_.size());
     for(const auto& v: features_)v->serialize(out);
 }
+quint64 Basic_Output::min_deposit_of_output(const quint64& wkey,const quint64& wdata,const quint64& v_byte_cost)const
+{
+    quint64 offset=34*wkey+(32+4+4)*wdata;
+    c_array serializedoutput;
+    serializedoutput.from_object<Output>(*this);
+    quint64 outp=serializedoutput.size()*wdata;
+    return (outp+offset)*v_byte_cost;
+}
 QJsonObject Basic_Output::get_Json(void) const
 {
     QJsonObject var;
