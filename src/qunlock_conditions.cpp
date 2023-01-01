@@ -53,7 +53,7 @@ Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition
 {};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val):
     Storage_Deposit_Return_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["returnAddress"]),
-    val.toObject()["returnAmount"].toInt()){};
+    val.toObject()["amount"].toInt()){};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(QDataStream &in):Unlock_Condition(1),
 return_address_(Address::from_<QDataStream>(in))
 {
@@ -70,7 +70,7 @@ QJsonObject Storage_Deposit_Return_Unlock_Condition::get_Json(void) const
     QJsonObject var;
     var.insert("type",(int)type_m);
     var.insert("returnAddress",return_address_->get_Json());
-    var.insert("returnAmount",QString::number(return_amount_)); //check this
+    var.insert("amount",QString::number(return_amount_)); //check this
     return var;
 }
 
