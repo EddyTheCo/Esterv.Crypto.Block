@@ -53,7 +53,7 @@ Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition
 {};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val):
     Storage_Deposit_Return_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["returnAddress"]),
-    val.toObject()["amount"].toInt()){};
+    val.toObject()["amount"].toString().toULongLong()){};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(QDataStream &in):Unlock_Condition(1),
 return_address_(Address::from_<QDataStream>(in))
 {
@@ -77,7 +77,7 @@ QJsonObject Storage_Deposit_Return_Unlock_Condition::get_Json(void) const
 Timelock_Unlock_Condition::Timelock_Unlock_Condition(quint32 unix_time_m):Unlock_Condition(2),unix_time_(unix_time_m)
 {};
 Timelock_Unlock_Condition::Timelock_Unlock_Condition(const QJsonValue& val):
-    Timelock_Unlock_Condition(val.toObject()["unixTime"].toInt()){};
+    Timelock_Unlock_Condition(val.toObject()["unixTime"].toInteger()){};
 Timelock_Unlock_Condition::Timelock_Unlock_Condition(QDataStream &in):Unlock_Condition(2)
 {
     in>>unix_time_;
@@ -101,7 +101,7 @@ Expiration_Unlock_Condition::Expiration_Unlock_Condition(quint32 unix_time_m, co
     return_address_(return_address_m)
 {};
 Expiration_Unlock_Condition::Expiration_Unlock_Condition(const QJsonValue& val):
-    Expiration_Unlock_Condition( val.toObject()["unixTime"].toInt(), Address::from_<const QJsonValue>(val.toObject()["returnAddress"])){};
+    Expiration_Unlock_Condition( val.toObject()["unixTime"].toInteger(), Address::from_<const QJsonValue>(val.toObject()["returnAddress"])){};
 
 Expiration_Unlock_Condition::Expiration_Unlock_Condition(QDataStream &in):Unlock_Condition(3),return_address_(Address::from_<QDataStream>(in))
 {
