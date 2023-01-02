@@ -54,7 +54,7 @@ public:
     Ed25519_Address(const QJsonValue& val);
     Ed25519_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
-
+    c_array pubkeyhash(void)const{return pubkeyhash_;}
     QJsonObject get_Json(void) const;
 private:
     c_array pubkeyhash_;
