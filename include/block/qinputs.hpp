@@ -35,7 +35,6 @@ public:
 
 
 private:
-quint8 type_m;
 quint16 transaction_output_index_;
 transaction_id transaction_id_;
 
