@@ -81,7 +81,7 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
     quint32 unix_time(void)const{return unix_time_;}
-
+    std::shared_ptr<Address> return_address()const{return return_address_;}
 private:
 std::shared_ptr<Address> return_address_;
 quint32 unix_time_;
