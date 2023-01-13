@@ -13,11 +13,13 @@ class Essence;
 class Payload
 {
 public:
-    Payload(quint32 type_);
+    enum types : quint32 { Tagged_Data_typ=5, Transaction_typ=6};
+    Payload(types type_);
     template<class from_type> static std::shared_ptr<Payload> from_(from_type& val);
+    template<class derived_> std::shared_ptr<derived_> to(void)const;
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
-quint32 type_m;
+    const types type_m;
 
 };
 class Tagged_Data_Payload : public Payload

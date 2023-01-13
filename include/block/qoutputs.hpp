@@ -15,11 +15,13 @@ namespace qiota{
 		class Output
 		{
 			public:
-				Output(quint8 typ );
+            enum types : quint8 { Basic_typ=3 };
+                Output(types typ );
 				template<class from_type> static std::shared_ptr<Output> from_(from_type& val);
+                template<class derived_> std::shared_ptr<derived_> to(void)const;
 				virtual void serialize(QDataStream &out)const;
 				virtual QJsonObject get_Json(void) const;
-				quint8 type_m;
+                const types type_m;
 		};
 
 		class Basic_Output :public Output
@@ -35,13 +37,14 @@ namespace qiota{
 				QJsonObject get_Json(void) const;
 				quint64 amount(void)const{return amount_;};
                 void set_amount(quint64 amount_m){amount_=amount_m;}
-                std::shared_ptr<Unlock_Condition> get_unlock_(const quint8 typ)const
+                std::shared_ptr<Unlock_Condition> get_unlock_(const Unlock_Condition::types& typ)const
                 {
                     const auto found=std::find_if(unlock_conditions_.begin(),unlock_conditions_.end(),
                                                   [typ](const auto& it){return (it->type_m==typ);});
                     return (found==unlock_conditions_.end())?nullptr:*found;
                 }
-                std::shared_ptr<Feature> get_feature_(const quint8 typ)const
+
+                std::shared_ptr<Feature> get_feature_(const Feature::types& typ)const
                 {
                     const auto found=std::find_if(features_.begin(),features_.end(),
                                                   [typ](const auto& it){return (it->type_m==typ);});

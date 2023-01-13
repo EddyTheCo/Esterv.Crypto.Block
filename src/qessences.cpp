@@ -5,27 +5,33 @@ namespace qiota{
 namespace qblocks{
 void Essence::serialize(QDataStream &out)const{};
 QJsonObject Essence::get_Json(void) const{return QJsonObject();};
-Essence::Essence(quint8 typ ):type_m(typ){};
+Essence::Essence(types typ ):type_m(typ){};
 template<class from_type>  std::shared_ptr<Essence> Essence::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
     switch(type_) {
 
-      case 1:
+      case Transaction_typ:
         return std::shared_ptr<Essence>(new Transaction_Essence(val));
     default:
     return nullptr;
 
     }
 }
-
 template std::shared_ptr<Essence> Essence::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<Essence> Essence::from_<QDataStream >(QDataStream & val);
 
+template<class derived_> std::shared_ptr<derived_> Essence::to(void)const
+{
+    return std::shared_ptr<derived_>(new derived_(this));
+}
+
+template<> std::shared_ptr<Transaction_Essence> Essence::to(void)const;
+
 Transaction_Essence::Transaction_Essence(quint64 network_id_m, const std::vector<std::shared_ptr<Input>>& inputs_m,
                     c_array inputs_commitment_m,
                     const std::vector<std::shared_ptr<Output>>& outputs_m,
-                    const std::shared_ptr<Payload>& payload_m):Essence(1),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
+                    const std::shared_ptr<Payload>& payload_m):Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
     outputs_(outputs_m),payload_(payload_m)
 {};
 
@@ -37,7 +43,7 @@ Transaction_Essence::Transaction_Essence(const QJsonValue& val):
     get_T<Output>(val.toObject()["outputs"].toArray()),
     Payload::from_<const QJsonValue>(val.toObject()["payload"])
   ){};
-Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(1)
+Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(Transaction_typ)
 {
 
     in>>network_id_;

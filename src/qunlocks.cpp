@@ -4,33 +4,43 @@ namespace qiota{
 namespace qblocks{
 void Unlock::serialize(QDataStream &out)const{};
 QJsonObject Unlock::get_Json(void) const{return QJsonObject();};
-Unlock::Unlock(quint8 typ ):type_m(typ){};
+Unlock::Unlock(types typ ):type_m(typ){};
 
 template<typename from_type> std::shared_ptr<Unlock> Unlock::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
-    case 0:
+    case types::Signature_typ:
         return std::shared_ptr<Unlock>(new Signature_Unlock(val));
-    case 1:
+    case types::Reference_typ:
         return std::shared_ptr<Unlock>(new Reference_Unlock(val));
-    case 2:
+    case types::Alias_typ:
         return std::shared_ptr<Unlock>(new Alias_Unlock(val));
-    case 3:
+    case types::NFT_typ:
         return std::shared_ptr<Unlock>(new NFT_Unlock(val));
     default:
         return nullptr;
     }
 }
 
+
 template std::shared_ptr<Unlock> Unlock::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Unlock> Unlock::from_<QDataStream>(QDataStream & val);
 template std::shared_ptr<Unlock> Unlock::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
 
-Signature_Unlock::Signature_Unlock(const std::shared_ptr<Signature> &signature_m):Unlock(0),signature_(signature_m){};
+template<class derived_> std::shared_ptr<derived_> Unlock::to(void)const
+{
+    return std::shared_ptr<derived_>(new derived_(this));
+}
+template<> std::shared_ptr<Signature_Unlock> Unlock::to(void)const;
+template<> std::shared_ptr<Reference_Unlock> Unlock::to(void)const;
+template<> std::shared_ptr<Alias_Unlock> Unlock::to(void)const;
+template<> std::shared_ptr<NFT_Unlock> Unlock::to(void)const;
+
+Signature_Unlock::Signature_Unlock(const std::shared_ptr<Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
 Signature_Unlock::Signature_Unlock(const QJsonValue& val):Signature_Unlock(Signature::from_<const QJsonValue>(val.toObject()["signature"])){};
-Signature_Unlock::Signature_Unlock(QDataStream &in):Unlock(0),signature_(Signature::from_<QDataStream>(in)){};
+Signature_Unlock::Signature_Unlock(QDataStream &in):Unlock(types::Signature_typ),signature_(Signature::from_<QDataStream>(in)){};
 void Signature_Unlock::serialize(QDataStream &out)const
 {
     out<<type_m;
@@ -44,9 +54,9 @@ QJsonObject Signature_Unlock::get_Json(void) const
     return var;
 }
 
-Reference_Unlock::Reference_Unlock(quint16 reference_m):Unlock(1),reference_(reference_m){};
+Reference_Unlock::Reference_Unlock(quint16 reference_m):Unlock(Reference_typ),reference_(reference_m){};
 Reference_Unlock::Reference_Unlock(const QJsonValue& val):Reference_Unlock(val.toObject()["reference"].toInt()){};
-Reference_Unlock::Reference_Unlock(QDataStream &in):Unlock(1)
+Reference_Unlock::Reference_Unlock(QDataStream &in):Unlock(Reference_typ)
 {
     in>>reference_;
 }
@@ -63,9 +73,9 @@ QJsonObject Reference_Unlock::get_Json(void) const
     return var;
 }
 
-Alias_Unlock::Alias_Unlock(quint16 alias_reference_unlock_index_m):Unlock(2),alias_reference_unlock_index_(alias_reference_unlock_index_m){};
+Alias_Unlock::Alias_Unlock(quint16 alias_reference_unlock_index_m):Unlock(Alias_typ),alias_reference_unlock_index_(alias_reference_unlock_index_m){};
 Alias_Unlock::Alias_Unlock(const QJsonValue& val):Alias_Unlock(val.toObject()["reference"].toInt()){};
-Alias_Unlock::Alias_Unlock(QDataStream &in):Unlock(2)
+Alias_Unlock::Alias_Unlock(QDataStream &in):Unlock(Alias_typ)
 {
     in>>alias_reference_unlock_index_;
 }
@@ -83,9 +93,9 @@ QJsonObject Alias_Unlock::get_Json(void) const
 }
 
 
-NFT_Unlock::NFT_Unlock(quint16 nft_reference_unlock_index_m):Unlock(3),nft_reference_unlock_index_(nft_reference_unlock_index_m){};
+NFT_Unlock::NFT_Unlock(quint16 nft_reference_unlock_index_m):Unlock(NFT_typ),nft_reference_unlock_index_(nft_reference_unlock_index_m){};
 NFT_Unlock::NFT_Unlock(const QJsonValue& val):NFT_Unlock(val.toObject()["reference"].toInt()){};
-NFT_Unlock::NFT_Unlock(QDataStream &in):Unlock(3)
+NFT_Unlock::NFT_Unlock(QDataStream &in):Unlock(NFT_typ)
 {
     in>>nft_reference_unlock_index_;
 }

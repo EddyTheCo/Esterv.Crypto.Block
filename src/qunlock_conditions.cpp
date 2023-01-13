@@ -4,18 +4,18 @@ namespace qiota{
 namespace qblocks{
 void Unlock_Condition::serialize(QDataStream &out)const{};
 QJsonObject Unlock_Condition::get_Json(void) const{return QJsonObject();};
-Unlock_Condition::Unlock_Condition(quint8 typ ):type_m(typ){};
+Unlock_Condition::Unlock_Condition(types typ ):type_m(typ){};
 template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
-    case 3:
+    case types::Expiration_typ:
       return std::shared_ptr<Unlock_Condition>(new Expiration_Unlock_Condition(val));
-      case 2:
+      case types::Timelock_typ:
         return std::shared_ptr<Unlock_Condition>(new Timelock_Unlock_Condition(val));
-      case 1:
+      case types::Storage_Deposit_Return_typ:
         return std::shared_ptr<Unlock_Condition>(new Storage_Deposit_Return_Unlock_Condition(val));
-      case 0:
+      case types::Address_typ:
         return std::shared_ptr<Unlock_Condition>(new Address_Unlock_Condition(val));
         default:
         return nullptr;
@@ -27,10 +27,20 @@ template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonVa
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-Address_Unlock_Condition::Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):Unlock_Condition(0),address_(address_m){};
+template<class derived_> std::shared_ptr<derived_> Unlock_Condition::to(void)const
+{
+    return std::shared_ptr<derived_>(new derived_(this));
+}
+template<> std::shared_ptr<Address_Unlock_Condition> Unlock_Condition::to(void)const;
+template<> std::shared_ptr<Storage_Deposit_Return_Unlock_Condition> Unlock_Condition::to(void)const;
+template<> std::shared_ptr<Timelock_Unlock_Condition> Unlock_Condition::to(void)const;
+template<> std::shared_ptr<Expiration_Unlock_Condition> Unlock_Condition::to(void)const;
+
+
+Address_Unlock_Condition::Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):Unlock_Condition(Address_typ),address_(address_m){};
 Address_Unlock_Condition::Address_Unlock_Condition(const QJsonValue& val):
     Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
-Address_Unlock_Condition::Address_Unlock_Condition(QDataStream &in):Unlock_Condition(0),address_(Address::from_<QDataStream>(in)){};
+Address_Unlock_Condition::Address_Unlock_Condition(QDataStream &in):Unlock_Condition(Address_typ),address_(Address::from_<QDataStream>(in)){};
 
 void Address_Unlock_Condition::serialize(QDataStream &out)const
 {
@@ -47,14 +57,14 @@ QJsonObject Address_Unlock_Condition::get_Json(void) const
 
 
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<Address> &return_address_m, quint64 return_amount_m)
-    :Unlock_Condition(1),
+    :Unlock_Condition(Storage_Deposit_Return_typ),
     return_address_(return_address_m),
     return_amount_(return_amount_m)
 {};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val):
     Storage_Deposit_Return_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["returnAddress"]),
     val.toObject()["amount"].toString().toULongLong()){};
-Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(QDataStream &in):Unlock_Condition(1),
+Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(QDataStream &in):Unlock_Condition(Storage_Deposit_Return_typ),
 return_address_(Address::from_<QDataStream>(in))
 {
     in>>return_amount_;
@@ -74,11 +84,11 @@ QJsonObject Storage_Deposit_Return_Unlock_Condition::get_Json(void) const
     return var;
 }
 
-Timelock_Unlock_Condition::Timelock_Unlock_Condition(quint32 unix_time_m):Unlock_Condition(2),unix_time_(unix_time_m)
+Timelock_Unlock_Condition::Timelock_Unlock_Condition(quint32 unix_time_m):Unlock_Condition(Timelock_typ),unix_time_(unix_time_m)
 {};
 Timelock_Unlock_Condition::Timelock_Unlock_Condition(const QJsonValue& val):
     Timelock_Unlock_Condition(val.toObject()["unixTime"].toInteger()){};
-Timelock_Unlock_Condition::Timelock_Unlock_Condition(QDataStream &in):Unlock_Condition(2)
+Timelock_Unlock_Condition::Timelock_Unlock_Condition(QDataStream &in):Unlock_Condition(Timelock_typ)
 {
     in>>unix_time_;
 }
@@ -97,13 +107,14 @@ QJsonObject Timelock_Unlock_Condition::get_Json(void) const
 }
 
 
-Expiration_Unlock_Condition::Expiration_Unlock_Condition(quint32 unix_time_m, const std::shared_ptr<Address> &return_address_m):Unlock_Condition(3),unix_time_(unix_time_m),
+Expiration_Unlock_Condition::Expiration_Unlock_Condition(quint32 unix_time_m, const std::shared_ptr<Address> &return_address_m):
+    Unlock_Condition(Expiration_typ),unix_time_(unix_time_m),
     return_address_(return_address_m)
 {};
 Expiration_Unlock_Condition::Expiration_Unlock_Condition(const QJsonValue& val):
     Expiration_Unlock_Condition( val.toObject()["unixTime"].toInteger(), Address::from_<const QJsonValue>(val.toObject()["returnAddress"])){};
 
-Expiration_Unlock_Condition::Expiration_Unlock_Condition(QDataStream &in):Unlock_Condition(3),return_address_(Address::from_<QDataStream>(in))
+Expiration_Unlock_Condition::Expiration_Unlock_Condition(QDataStream &in):Unlock_Condition(Expiration_typ),return_address_(Address::from_<QDataStream>(in))
 {
     in>>unix_time_;
 }

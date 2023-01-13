@@ -10,14 +10,17 @@ namespace qblocks{
 class  Unlock
 {
 public:
+    enum types : quint8 { Signature_typ, Reference_typ, Alias_typ, NFT_typ };
 
-    Unlock(quint8 typ );
+
+    Unlock(types typ );
     template<typename from_type> static std::shared_ptr<Unlock> from_(from_type& val);
+    template<class derived_> std::shared_ptr<derived_> to(void)const;
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
-    quint8 type_m;
+    const types type_m;
 
 };
 
@@ -29,7 +32,6 @@ public:
     Signature_Unlock(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
-
 
 private:
  std::shared_ptr<Signature> signature_;

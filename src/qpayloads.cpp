@@ -4,14 +4,14 @@ namespace qiota{
 namespace qblocks{
 void Payload::serialize(QDataStream &out)const{};
 QJsonObject Payload::get_Json(void) const{return QJsonObject();};
-Payload::Payload(quint32 type_):type_m(type_){};
+Payload::Payload(types type_):type_m(type_){};
 template<class from_type> std::shared_ptr<Payload> Payload::from_(from_type& val){
 
     const auto type_=get_type<quint32>(val);
     switch(type_) {
-    case 6:
+    case Transaction_typ:
         return std::shared_ptr<Payload>(new Transaction_Payload(val));
-     case 5:
+     case Tagged_Data_typ:
         return std::shared_ptr<Payload>(new Tagged_Data_Payload(val));
     default:
     return nullptr;
@@ -23,10 +23,17 @@ template std::shared_ptr<Payload> Payload::from_<const QJsonValue>(const QJsonVa
 template std::shared_ptr<Payload> Payload::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-Tagged_Data_Payload::Tagged_Data_Payload(const tagF tag_m, const dataF data_m):Payload(5),tag_(tag_m),data_(data_m){};
+template<class derived_> std::shared_ptr<derived_> Payload::to(void)const
+{
+    return std::shared_ptr<derived_>(new derived_(this));
+}
+template<> std::shared_ptr<Transaction_Payload> Payload::to(void)const;
+template<> std::shared_ptr<Tagged_Data_Payload> Payload::to(void)const;
+
+Tagged_Data_Payload::Tagged_Data_Payload(const tagF tag_m, const dataF data_m):Payload(Tagged_Data_typ),tag_(tag_m),data_(data_m){};
 Tagged_Data_Payload::Tagged_Data_Payload(const QJsonValue& val):
     Tagged_Data_Payload(tagF(val.toObject()["tag"]),dataF(val.toObject()["data"])){};
-Tagged_Data_Payload::Tagged_Data_Payload(QDataStream &in):Payload(5)
+Tagged_Data_Payload::Tagged_Data_Payload(QDataStream &in):Payload(Tagged_Data_typ)
 {
     qDebug()<<"inside Tagged_Data_Payload";
     in>>tag_;
@@ -49,13 +56,13 @@ QJsonObject Tagged_Data_Payload::get_Json(void) const
 }
 
 Transaction_Payload::Transaction_Payload(const std::shared_ptr<Essence>& essence_m,const std::vector<std::shared_ptr<Unlock>>& unlocks_m):essence_(essence_m),
-    unlocks_(unlocks_m),Payload(6){};
+    unlocks_(unlocks_m),Payload(Transaction_typ){};
 
 Transaction_Payload::Transaction_Payload(const QJsonValue& val):
     Transaction_Payload(Essence::from_<const QJsonValue>(val.toObject()["essence"]),
     get_T<Unlock>(val.toObject()["unlocks"].toArray())
     ){};
-Transaction_Payload::Transaction_Payload(QDataStream &in):Payload(6),essence_(Essence::from_<QDataStream>(in))
+Transaction_Payload::Transaction_Payload(QDataStream &in):Payload(Transaction_typ),essence_(Essence::from_<QDataStream>(in))
 {
     quint16  unlocks_count;
     in>>unlocks_count;

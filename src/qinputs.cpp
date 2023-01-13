@@ -3,14 +3,14 @@ namespace qiota{
 namespace qblocks{
 void Input::serialize(QDataStream &out)const{};
 QJsonObject Input::get_Json(void) const{return QJsonObject();};
-Input::Input(quint8 typ ):type_m(typ){};
+Input::Input(types typ ):type_m(typ){};
 
 template<class from_type> std::shared_ptr<Input> Input::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
 
-      case 0:
+      case UTXO_typ:
         return std::shared_ptr<Input>(new UTXO_Input(val));
     default:
     return nullptr;
@@ -21,11 +21,17 @@ template std::shared_ptr<Input> Input::from_<const QJsonValue>(const QJsonValue&
 template std::shared_ptr<Input> Input::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Input> Input::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-UTXO_Input::UTXO_Input(transaction_id transaction_id_m,quint16 transaction_output_index_m):Input(0),transaction_id_(transaction_id_m),
+template<class derived_> std::shared_ptr<derived_> Input::to(void)const
+{
+    return std::shared_ptr<derived_>(new derived_(this));
+}
+template<> std::shared_ptr<UTXO_Input> Input::to(void)const;
+
+UTXO_Input::UTXO_Input(transaction_id transaction_id_m,quint16 transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
 transaction_output_index_(transaction_output_index_m){};
 UTXO_Input::UTXO_Input(const QJsonValue& val):UTXO_Input(transaction_id(val.toObject()["transactionId"]),
     val.toObject()["transactionOutputIndex"].toInt()){};
-UTXO_Input::UTXO_Input(QDataStream &in):Input(0)
+UTXO_Input::UTXO_Input(QDataStream &in):Input(UTXO_typ)
 {
     transaction_id_=transaction_id(32,0);
     in>>transaction_id_;

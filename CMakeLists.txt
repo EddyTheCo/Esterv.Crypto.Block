@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 include(local_conf.cmake OPTIONAL)
-project(QtIotaBlock VERSION 0.1 DESCRIPTION "QT   library  with block types on IOTA network " LANGUAGES CXX)
 
+project(QtIotaBlock VERSION 0.2 DESCRIPTION "QT   library  with block types on IOTA network " LANGUAGES CXX)
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
