@@ -14,7 +14,6 @@ public:
     Address(types typ );
     template<class from_type> static std::shared_ptr<Address> from_(from_type& val);
 
-    template<class derived_> std::shared_ptr<derived_> to(void)const;
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;

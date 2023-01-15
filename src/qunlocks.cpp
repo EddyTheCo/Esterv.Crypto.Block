@@ -29,14 +29,6 @@ template std::shared_ptr<Unlock> Unlock::from_<QDataStream>(QDataStream & val);
 template std::shared_ptr<Unlock> Unlock::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
 
-template<class derived_> std::shared_ptr<derived_> Unlock::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<Signature_Unlock> Unlock::to(void)const;
-template<> std::shared_ptr<Reference_Unlock> Unlock::to(void)const;
-template<> std::shared_ptr<Alias_Unlock> Unlock::to(void)const;
-template<> std::shared_ptr<NFT_Unlock> Unlock::to(void)const;
 
 Signature_Unlock::Signature_Unlock(const std::shared_ptr<Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
 Signature_Unlock::Signature_Unlock(const QJsonValue& val):Signature_Unlock(Signature::from_<const QJsonValue>(val.toObject()["signature"])){};

@@ -24,13 +24,7 @@ template std::shared_ptr<Address> Address::from_<const QJsonValueRef>(const QJso
 template std::shared_ptr<Address> Address::from_<QDataStream>(QDataStream & val);
 
 
-template<class derived_> std::shared_ptr<derived_> Address::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<NFT_Address> Address::to(void)const;
-template<> std::shared_ptr<Alias_Address> Address::to(void)const;
-template<> std::shared_ptr<Ed25519_Address> Address::to(void)const;
+
 
 NFT_Address::NFT_Address(c_array nft_id_m):Address(NFT_typ),nft_id_(nft_id_m){};
 NFT_Address::NFT_Address(const QJsonValue& val):NFT_Address(c_array(val.toObject()["nftId"])){};

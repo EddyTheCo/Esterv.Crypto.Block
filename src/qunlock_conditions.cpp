@@ -27,14 +27,7 @@ template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonVa
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-template<class derived_> std::shared_ptr<derived_> Unlock_Condition::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<Address_Unlock_Condition> Unlock_Condition::to(void)const;
-template<> std::shared_ptr<Storage_Deposit_Return_Unlock_Condition> Unlock_Condition::to(void)const;
-template<> std::shared_ptr<Timelock_Unlock_Condition> Unlock_Condition::to(void)const;
-template<> std::shared_ptr<Expiration_Unlock_Condition> Unlock_Condition::to(void)const;
+
 
 
 Address_Unlock_Condition::Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):Unlock_Condition(Address_typ),address_(address_m){};

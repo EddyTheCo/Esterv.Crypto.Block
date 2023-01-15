@@ -15,7 +15,6 @@ public:
 
     Unlock(types typ );
     template<typename from_type> static std::shared_ptr<Unlock> from_(from_type& val);
-    template<class derived_> std::shared_ptr<derived_> to(void)const;
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;

@@ -19,11 +19,7 @@ template std::shared_ptr<Signature> Signature::from_<const QJsonValue>(const QJs
 template std::shared_ptr<Signature> Signature::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Signature> Signature::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-template<class derived_> std::shared_ptr<derived_> Signature::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<Ed25519_Signature> Signature::to(void)const;
+
 
 Ed25519_Signature::Ed25519_Signature(public_key public_key_m,signature signature_m):Signature(Ed25519_typ),public_key_(public_key_m),signature_(signature_m){};
 Ed25519_Signature::Ed25519_Signature(const QJsonValue& val):

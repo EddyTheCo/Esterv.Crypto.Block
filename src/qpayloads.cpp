@@ -23,12 +23,7 @@ template std::shared_ptr<Payload> Payload::from_<const QJsonValue>(const QJsonVa
 template std::shared_ptr<Payload> Payload::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-template<class derived_> std::shared_ptr<derived_> Payload::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<Transaction_Payload> Payload::to(void)const;
-template<> std::shared_ptr<Tagged_Data_Payload> Payload::to(void)const;
+
 
 Tagged_Data_Payload::Tagged_Data_Payload(const tagF tag_m, const dataF data_m):Payload(Tagged_Data_typ),tag_(tag_m),data_(data_m){};
 Tagged_Data_Payload::Tagged_Data_Payload(const QJsonValue& val):

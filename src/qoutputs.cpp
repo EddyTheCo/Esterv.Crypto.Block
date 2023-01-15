@@ -19,11 +19,7 @@ template std::shared_ptr<Output> Output::from_<const QJsonValue>(const QJsonValu
 template std::shared_ptr<Output> Output::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Output> Output::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
-template<class derived_> std::shared_ptr<derived_> Output::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
-template<> std::shared_ptr<Basic_Output> Address::to(void)const;
+
 
 
 Basic_Output::Basic_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,

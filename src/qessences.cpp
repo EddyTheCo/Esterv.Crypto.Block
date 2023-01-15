@@ -21,12 +21,7 @@ template std::shared_ptr<Essence> Essence::from_<const QJsonValue>(const QJsonVa
 template std::shared_ptr<Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<Essence> Essence::from_<QDataStream >(QDataStream & val);
 
-template<class derived_> std::shared_ptr<derived_> Essence::to(void)const
-{
-    return std::shared_ptr<derived_>(new derived_(this));
-}
 
-template<> std::shared_ptr<Transaction_Essence> Essence::to(void)const;
 
 Transaction_Essence::Transaction_Essence(quint64 network_id_m, const std::vector<std::shared_ptr<Input>>& inputs_m,
                     c_array inputs_commitment_m,
