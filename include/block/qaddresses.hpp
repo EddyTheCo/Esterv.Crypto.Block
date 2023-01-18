@@ -32,7 +32,7 @@ public:
     QJsonObject get_Json(void) const;
 
 private:
-    c_array nft_id_;
+    NFT_ID nft_id_;
 
 };
 class Alias_Address : public Address
