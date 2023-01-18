@@ -10,7 +10,7 @@ namespace qblocks{
 class  Feature
 {
 public:
-    enum types : quint8 { Sender_typ=0, Metadata_typ=2, Tag_typ=3};
+    enum types : quint8 { Sender_typ=0, Issuer_typ=1 , Metadata_typ=2 , Tag_typ=3};
     Feature(types typ );
     template<class from_type>static std::shared_ptr<Feature> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
@@ -31,6 +31,19 @@ public:
     std::shared_ptr<Address> sender(void)const {return sender_;}	
 private:
 std::shared_ptr<Address> sender_;
+
+};
+class Issuer_Feature : public Feature
+{
+public:
+    Issuer_Feature(std::shared_ptr<Address> issuer_m);
+    Issuer_Feature(const QJsonValue& val);
+    Issuer_Feature(QDataStream &in);
+    void serialize(QDataStream &out)const;
+    QJsonObject get_Json(void) const;
+    std::shared_ptr<Address> issuer(void)const {return issuer_;}
+private:
+std::shared_ptr<Address> issuer_;
 
 };
 

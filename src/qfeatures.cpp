@@ -40,6 +40,22 @@ QJsonObject Sender_Feature::get_Json(void) const
     return var;
 }
 
+Issuer_Feature::Issuer_Feature(std::shared_ptr<Address> issuer_m):Feature(Issuer_typ),issuer_(issuer_m){};
+Issuer_Feature::Issuer_Feature(const QJsonValue& val):Issuer_Feature(Address::from_<const QJsonValue>(val.toObject()["address"])){};
+Issuer_Feature::Issuer_Feature(QDataStream &in):Feature(Issuer_typ),issuer_(Address::from_<QDataStream>(in)){};
+void Issuer_Feature::serialize(QDataStream &out)const
+{
+    out<<type_m;
+    issuer_->serialize(out);
+}
+QJsonObject Issuer_Feature::get_Json(void) const
+{
+    QJsonObject var;
+    var.insert("type",(int)type_m);
+    var.insert("address",issuer_->get_Json());
+    return var;
+}
+
 Metadata_Feature::Metadata_Feature(fl_array<quint16> data_m):Feature(Metadata_typ),data_(data_m){};
 Metadata_Feature::Metadata_Feature(const QJsonValue& val):Metadata_Feature(fl_array<quint16>(val.toObject()["data"])){};
 Metadata_Feature::Metadata_Feature(QDataStream &in):Feature(Metadata_typ){
