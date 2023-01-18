@@ -27,7 +27,7 @@ template std::shared_ptr<Address> Address::from_<QDataStream>(QDataStream & val)
 
 
 NFT_Address::NFT_Address(c_array nft_id_m):Address(NFT_typ),nft_id_(nft_id_m){};
-NFT_Address::NFT_Address(const QJsonValue& val):NFT_Address(c_array(val.toObject()["nftId"])){};
+NFT_Address::NFT_Address(const QJsonValue& val):NFT_Address(NFT_ID(val.toObject()["nftId"])){};
 NFT_Address::NFT_Address(QDataStream &in):Address(NFT_typ)
 {
     nft_id_=c_array(32,0);
