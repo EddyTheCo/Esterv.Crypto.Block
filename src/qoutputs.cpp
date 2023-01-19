@@ -3,12 +3,7 @@
 namespace qiota{
 namespace qblocks{
 
-Output_ID Output::id(void)const
-{
-    c_array serial;
-    serial.from_object(*this);
-    return Output_ID(QCryptographicHash::hash(serial,QCryptographicHash::Blake2b_256));
-}
+
 void Output::serialize(QDataStream &out)const{};
 QJsonObject Output::get_Json(void) const
 {
@@ -115,9 +110,10 @@ NFT_Output::NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unloc
            unlock_conditions_m,
            features_m,
            native_tokens_m),immutable_features_(immutable_features_m),
-    nft_id_(NFT_ID(QCryptographicHash::hash(id(),QCryptographicHash::Blake2b_256)))
+    nft_id_(NFT_ID(32,0))
 {
 
+order_by_type<Feature>(immutable_features_);
 };
 
 
@@ -151,9 +147,11 @@ QJsonObject NFT_Output::get_Json(void) const
 }
 void NFT_Output::serialize(QDataStream &out)const
 {
+
     out<<type_m<<amount_;
     serialize_native_tokens(out);
     out<<nft_id_;
+
     serialize_unlock_conditions(out);
     serialize_features_(out);
     serialize_immutable_features_(out);

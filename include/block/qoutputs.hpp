@@ -27,7 +27,7 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
-    Output_ID id(void)const;
+
     quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost)const;
 
     void serialize_native_tokens(QDataStream &out)const
