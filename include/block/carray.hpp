@@ -87,6 +87,7 @@ using transaction_id = c_array;
 using public_key = c_array;
 using signature = c_array;
 using NFT_ID =c_array;
+using Output_ID =c_array;
 /*
  *
  *
@@ -121,7 +122,7 @@ template<class type_type> type_type get_type(QDataStream & val)
 }
 
 template<class size_type,class obj_type> void serialize_list(QDataStream &out,
-const std::vector<std::shared_ptr<obj_type>> & ptr_vector)
+                                                             const std::vector<std::shared_ptr<obj_type>> & ptr_vector)
 {
     out<<static_cast<size_type>(ptr_vector.size());
     for(const auto& v: ptr_vector)v->serialize(out);
@@ -138,7 +139,15 @@ template<class size_type,class obj_type> std::vector<std::shared_ptr<obj_type>> 
     }
     return ptr_vector;
 }
+template<class obj_type> void order_by_type(std::vector<std::shared_ptr<obj_type>> &ptr_vector)
+{
+    std::sort(ptr_vector.begin(), ptr_vector.end(), [](auto a, auto b)
+    {
+        return a->type_m < b->type_m;
+    });
+}
 
 };
 
 };
+
