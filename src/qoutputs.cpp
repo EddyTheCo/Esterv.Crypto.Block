@@ -1,7 +1,14 @@
 #include"block/qoutputs.hpp"
-
+#include <QCryptographicHash>
 namespace qiota{
 namespace qblocks{
+
+Output_ID Output::id(void)const
+{
+    c_array serial;
+    serial.from_object(*this);
+    return Output_ID(QCryptographicHash::hash(serial,QCryptographicHash::Blake2b_256));
+}
 void Output::serialize(QDataStream &out)const{};
 QJsonObject Output::get_Json(void) const
 {
@@ -30,7 +37,12 @@ Output::Output(types typ, quint64 amount_m,
                const std::vector<std::shared_ptr<Unlock_Condition> > &unlock_conditions_m,
                const std::vector<std::shared_ptr<Feature> > &features_m,
                const std::vector<std::shared_ptr<Native_Token> > &native_tokens_m):type_m(typ),
-    amount_(amount_m), unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m){};
+    amount_(amount_m), unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m)
+{
+    order_by_type<Unlock_Condition>(unlock_conditions_);
+    order_by_type<Feature>(features_);
+
+};
 template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val){
     const auto type_=get_type<types>(val);
     switch(type_) {
@@ -98,10 +110,15 @@ QJsonObject Basic_Output::get_Json(void) const
 NFT_Output::NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
                        const std::vector<std::shared_ptr<Feature >> & features_m,
                        const std::vector<std::shared_ptr<Native_Token>> & native_tokens_m,
-                       std::vector<std::shared_ptr<Feature>> immutable_features_m):Output(types::NFT_typ,amount_m,
-                                                                                          unlock_conditions_m,
-                                                                                          features_m,
-                                                                                          native_tokens_m),immutable_features_(immutable_features_m){};
+                       std::vector<std::shared_ptr<Feature>> immutable_features_m):
+    Output(types::NFT_typ,amount_m,
+           unlock_conditions_m,
+           features_m,
+           native_tokens_m),immutable_features_(immutable_features_m),
+    nft_id_(NFT_ID(QCryptographicHash::hash(id(),QCryptographicHash::Blake2b_256)))
+{
+
+};
 
 
 NFT_Output::NFT_Output(const QJsonValue& val):Output(types::NFT_typ,val),
@@ -131,6 +148,15 @@ QJsonObject NFT_Output::get_Json(void) const
     }
     var.insert("nftId",nft_id_.toHexString());
     return var;
+}
+void NFT_Output::serialize(QDataStream &out)const
+{
+    out<<type_m<<amount_;
+    serialize_native_tokens(out);
+    out<<nft_id_;
+    serialize_unlock_conditions(out);
+    serialize_features_(out);
+    serialize_immutable_features_(out);
 }
 
 };

@@ -27,6 +27,7 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
+    Output_ID id(void)const;
     quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost)const;
 
     void serialize_native_tokens(QDataStream &out)const
@@ -88,6 +89,10 @@ public:
     NFT_Output(const QJsonValue& val);
     NFT_Output(QDataStream &in);
     void serialize(QDataStream &out)const;
+    void serialize_immutable_features_(QDataStream &out)const
+    {
+        serialize_list<quint8>(out,immutable_features_);
+    }
     QJsonObject get_Json(void) const;
     std::vector<std::shared_ptr<Feature>> immutable_features_;
     auto nft_id(void)const{return nft_id_;}
