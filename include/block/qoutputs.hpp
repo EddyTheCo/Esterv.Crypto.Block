@@ -96,6 +96,12 @@ public:
     QJsonObject get_Json(void) const;
     std::vector<std::shared_ptr<Feature>> immutable_features_;
     auto nft_id(void)const{return nft_id_;}
+    std::shared_ptr<Feature> get_immutable_feature_(const Feature::types& typ)const
+    {
+        const auto found=std::find_if(immutable_features_.begin(),immutable_features_.end(),
+                                      [typ](const auto& it){return (it->type_m==typ);});
+        return (found==immutable_features_.end())?nullptr:*found;
+    }
 private:
     NFT_ID nft_id_;
 
