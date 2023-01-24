@@ -15,9 +15,13 @@ public:
     const transaction_id transaction_id_;
     const quint16 output_index_;
     const bool is_spent_;
+    const Output_ID outputid_;
     //const quint32 milestone_index_spent_;
     //const quint32 milestone_timestamp_spent_;
     //const transaction_id transaction_id_spent;
+
+private:
+    Output_ID set_outputid(void) const;
 };
 
 
