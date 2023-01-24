@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include<QIODevice>
+#include <QCryptographicHash>
 namespace qiota{
 namespace qblocks{
 class c_array : public QByteArray
@@ -23,6 +24,22 @@ public:
      */
     friend QDataStream & operator << (QDataStream &out, const c_array & obj);
     friend QDataStream & operator >> (QDataStream &in, c_array & obj);
+    /*
+     *@brief append data to the end  but for objects with no serialize function
+     */
+    template<class obj_type> void append(const obj_type& obj)
+    {
+        auto buffer=QDataStream(this,QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        buffer<<obj;
+    }
+    /*
+     *@brief get the hash of the content
+     */
+    template<QCryptographicHash::Algorithm hashty> c_array hash(void)const
+    {
+        return c_array(QCryptographicHash::hash(*this,hashty));
+    }
     /*
      *@return a data stream object to append data to it
      *
