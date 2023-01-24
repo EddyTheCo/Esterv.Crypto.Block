@@ -14,6 +14,8 @@ template<class from_type> std::shared_ptr<Feature> Feature::from_(from_type& val
         return std::shared_ptr<Feature>(new Tag_Feature(val));
     case Sender_typ:
         return std::shared_ptr<Feature>(new Sender_Feature(val));
+    case Issuer_typ:
+        return std::shared_ptr<Feature>(new Issuer_Feature(val));
     default:
     return nullptr;
 

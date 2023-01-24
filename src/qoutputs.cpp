@@ -43,6 +43,8 @@ template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val)
     switch(type_) {
     case Basic_typ:
         return std::shared_ptr<Output>(new Basic_Output(val));
+    case NFT_typ:
+        return std::shared_ptr<Output>(new NFT_Output(val));
     default:
         return nullptr;
 
