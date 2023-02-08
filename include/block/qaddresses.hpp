@@ -17,7 +17,7 @@ public:
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
-
+    virtual  c_array addr(void)const{return c_array(32,0);}
     const types type_m;
 
 };
@@ -30,6 +30,7 @@ public:
     NFT_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
+    c_array addr(void)const{return nft_id_;}
 
 private:
     NFT_ID nft_id_;
@@ -42,8 +43,9 @@ public:
     Alias_Address(const QJsonValue& val);
     Alias_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
-
     QJsonObject get_Json(void) const;
+
+    c_array addr(void)const{return alias_id_;}
 
 private:
     c_array alias_id_;
@@ -57,7 +59,7 @@ public:
     Ed25519_Address(const QJsonValue& val);
     Ed25519_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
-    c_array pubkeyhash(void)const{return pubkeyhash_;}
+    c_array addr(void)const{return pubkeyhash_;}
     QJsonObject get_Json(void) const;
 private:
     c_array pubkeyhash_;
