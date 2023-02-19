@@ -18,6 +18,7 @@ public:
      *@brief creates a "0x" hex encoded string
      */
     QString toHexString(void)const;
+    static c_array fromHexString(QString hash);
     /*
      *@brief serialize the object to a datastream
      *
