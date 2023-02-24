@@ -13,11 +13,17 @@ public:
 
     Address(types typ );
     template<class from_type> static std::shared_ptr<Address> from_(from_type& val);
-
+    static std::shared_ptr<Address> from_(QByteArray& val);
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
-    virtual  c_array addr(void)const{return c_array(32,0);}
+    virtual  c_array addr_hash(void)const{return c_array(32,0);}
+    c_array addr(void)const{
+        c_array addr;
+        auto buffer=QDataStream(&addr,QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        serialize(buffer);
+        return addr;}
     const types type_m;
 
 };
@@ -30,7 +36,8 @@ public:
     NFT_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
-    c_array addr(void)const{return nft_id_;}
+    c_array addr_hash(void)const{return nft_id_;}
+
 
 private:
     NFT_ID nft_id_;
