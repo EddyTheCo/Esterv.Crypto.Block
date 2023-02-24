@@ -23,8 +23,12 @@ template std::shared_ptr<Address> Address::from_<const QJsonValue>(const QJsonVa
 template std::shared_ptr<Address> Address::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<Address> Address::from_<QDataStream>(QDataStream & val);
 
-
-
+std::shared_ptr<Address> Address::from_(QByteArray& val)
+{
+    auto buffer=QDataStream(&val,QIODevice::ReadOnly);
+    buffer.setByteOrder(QDataStream::LittleEndian);
+    return qblocks::Address::from_<QDataStream>(buffer);
+}
 
 NFT_Address::NFT_Address(c_array nft_id_m):Address(NFT_typ),nft_id_(nft_id_m){};
 NFT_Address::NFT_Address(const QJsonValue& val):NFT_Address(NFT_ID(val.toObject()["nftId"])){};
