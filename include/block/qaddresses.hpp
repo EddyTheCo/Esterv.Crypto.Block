@@ -14,6 +14,12 @@ public:
     Address(types typ );
     template<class from_type> static std::shared_ptr<Address> from_(from_type& val);
     static std::shared_ptr<Address> from_(QByteArray& val);
+    static std::shared_ptr<Address> from_(c_array& val)
+    {
+        auto var=QByteArray(val.constData(),val.size());
+        return from_(var);
+    };
+
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
