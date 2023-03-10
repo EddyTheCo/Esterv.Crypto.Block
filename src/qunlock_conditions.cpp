@@ -26,7 +26,7 @@ template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::f
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValueRef>(const QJsonValueRef& val);
-
+template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
 

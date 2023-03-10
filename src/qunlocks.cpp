@@ -27,7 +27,7 @@ template<typename from_type> std::shared_ptr<Unlock> Unlock::from_(from_type& va
 template std::shared_ptr<Unlock> Unlock::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Unlock> Unlock::from_<QDataStream>(QDataStream & val);
 template std::shared_ptr<Unlock> Unlock::from_<const QJsonValueRef>(const QJsonValueRef& val);
-
+template std::shared_ptr<Unlock> Unlock::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
 Signature_Unlock::Signature_Unlock(const std::shared_ptr<Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};

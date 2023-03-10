@@ -13,6 +13,8 @@ template<class from_type> std::shared_ptr<Native_Token> Native_Token::from_(from
 template std::shared_ptr<Native_Token> Native_Token::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Native_Token> Native_Token::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Native_Token> Native_Token::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<Native_Token> Native_Token::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+
 Native_Token::Native_Token(QDataStream &in)
 {
     in>>token_id_;

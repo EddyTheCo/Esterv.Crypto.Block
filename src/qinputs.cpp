@@ -20,6 +20,7 @@ template<class from_type> std::shared_ptr<Input> Input::from_(from_type& val){
 template std::shared_ptr<Input> Input::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Input> Input::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Input> Input::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<Input> Input::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
 UTXO_Input::UTXO_Input(transaction_id transaction_id_m,quint16 transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),

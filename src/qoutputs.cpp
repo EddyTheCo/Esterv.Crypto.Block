@@ -53,6 +53,7 @@ template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val)
 template std::shared_ptr<Output> Output::from_<const QJsonValue>(const QJsonValue& val);
 template std::shared_ptr<Output> Output::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Output> Output::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<Output> Output::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 quint64 Output::min_deposit_of_output(const quint64& wkey,const quint64& wdata,const quint64& v_byte_cost)const
 {
