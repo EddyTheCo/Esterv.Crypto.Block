@@ -1,10 +1,10 @@
 #include"block/qnative_tokens.hpp"
 namespace qiota{
 namespace qblocks{
-Native_Token::Native_Token(const token_id& token_id_m,const c_array amount_m):token_id_(token_id_m),
+Native_Token::Native_Token(const token_id& token_id_m,const quint256 amount_m):token_id_(token_id_m),
 amount_(amount_m){};
 Native_Token::Native_Token(const QJsonValue& val):token_id_(token_id(val.toObject()["tokenId"])),
-    amount_(c_array(val.toObject()["amount"])){};
+    amount_(c_array::fromHexString(val.toObject()["amount"].toString())){};
 
 template<class from_type> std::shared_ptr<Native_Token> Native_Token::from_(from_type& val){
     return std::shared_ptr<Native_Token>(new Native_Token(val));
@@ -31,7 +31,7 @@ QJsonObject Native_Token::get_Json(void) const
 {
     QJsonObject var;
     var.insert("tokenId",token_id_.toHexString());
-    var.insert("amount_",token_id_.toHexString());
+    var.insert("amount_",amount_.toHexString());
     return var;
 }
 
