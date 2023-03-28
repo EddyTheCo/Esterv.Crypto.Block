@@ -62,6 +62,175 @@ public:
 
 
 };
+class quint256 : public c_array
+{
+    public:
+    using c_array::c_array;
+    quint256():c_array(32,0){};
+
+    quint256 operator+=(quint256 other)
+    {
+
+        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+
+        auto otherb=QDataStream(&other,QIODevice::ReadOnly);
+        otherb.setByteOrder(QDataStream::LittleEndian);
+
+        quint32 t,o;
+        quint64 carry = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            thisb>>t;
+            otherb>>o;
+
+            quint64 n = carry + t + o;
+            thisb<<(n & 0xffffffff);
+            carry = n >> 32;
+        }
+        return *this;
+    }
+    quint256 operator++()
+    {
+        int i = 0;
+        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+        quint64 t;
+        thisb>>t;
+        t++;
+        while (i < 4 && t == 0)
+        {
+            i++;
+            thisb<<t;
+            thisb>>t;
+            t++;
+        }
+        return *this;
+    }
+    quint256 operator++(int)
+    {
+
+        const quint256 ret = *this;
+        ++(*this);
+        return ret;
+    }
+    quint256 operator--()
+    {
+
+        int i = 0;
+        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+        quint64 t;
+        thisb>>t;
+        t--;
+        while (i < 4 && t == std::numeric_limits<quint64>::max())
+        {
+            i++;
+            thisb<<t;
+            thisb>>t;
+            t--;
+        }
+        return *this;
+    }
+
+    quint256 operator--(int)
+    {
+        // postfix operator
+        const quint256 ret = *this;
+        --(*this);
+        return ret;
+    }
+    quint256 operator-()
+    {
+
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+
+        quint256 other;
+        auto otherb=QDataStream(&other,QIODevice::WriteOnly);
+        otherb.setByteOrder(QDataStream::LittleEndian);
+
+        quint64 t;
+        for (int i = 0; i < 4; i++)
+        {
+            thisb>>t;
+            otherb<<(~t);
+        }
+        ++other;
+        return other;
+    }
+    quint256 operator-=(quint256 b)
+    {
+        *this += -b;
+        return *this;
+    }
+    quint256& operator=(quint64 b)
+    {
+        auto thisb=QDataStream(this,QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+        thisb<<b;
+        for (int i = 0; i < 3; i++)
+            thisb<<(quint64)0;
+        return *this;
+    }
+    quint256 operator*=(quint32 b32)
+    {
+        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+        quint32 t;
+        quint64 carry = 0;
+        for (int i = 0; i < 8; i++) {
+            thisb>>t;
+            quint64 n = carry + (quint64)b32 * t;
+            thisb<<(n & 0xffffffff);
+            carry = n >> 32;
+        }
+        return *this;
+    }
+    quint256 operator+=(quint64 b64)
+    {
+        quint256 b;
+        b = b64;
+        *this += b;
+        return *this;
+    }
+    quint256 operator-=(quint64 b64)
+    {
+        quint256 b;
+        b = b64;
+        *this += -b;
+        return *this;
+    }
+    int CompareTo(quint256 other)
+    {
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+
+        auto otherb=QDataStream(&other,QIODevice::ReadOnly);
+        otherb.setByteOrder(QDataStream::LittleEndian);
+        quint64 t,o;
+        for (int i = 3; i >= 0; i--) {
+            thisb>>t;
+            otherb>>o;
+            if (t < o)
+                return -1;
+            if (t > o)
+                return 1;
+        }
+        return 0;
+    }
+
+    friend inline quint256 operator+(quint256 a, const quint256 b) { return a += b; }
+    friend inline quint256 operator-(quint256 a, const quint256 b) { return a -= b; }
+
+
+    friend inline bool operator>(quint256 a, quint256 b) { return a.CompareTo(b) > 0; }
+    friend inline bool operator<(quint256 a, quint256 b) { return a.CompareTo(b) < 0; }
+    friend inline bool operator>=(quint256 a, quint256 b) { return a.CompareTo(b) >= 0; }
+    friend inline bool operator<=(quint256 a, quint256 b) { return a.CompareTo(b) <= 0; }
+
+
+};
 
 template<typename max_lenght>
 class fl_array : public c_array
