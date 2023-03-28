@@ -42,6 +42,7 @@ Output::Output(types typ, quint64 amount_m,
 {
     order_by_type<Unlock_Condition>(unlock_conditions_);
     order_by_type<Feature>(features_);
+    order_by_type<Feature>(immutable_features_);
 
 };
 template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val){
@@ -51,6 +52,8 @@ template<class from_type>  std::shared_ptr<Output> Output::from_(from_type& val)
         return std::shared_ptr<Output>(new Basic_Output(val));
     case NFT_typ:
         return std::shared_ptr<Output>(new NFT_Output(val));
+    case Foundry_typ:
+        return std::shared_ptr<Output>(new Foundry_Output(val));
     default:
         return nullptr;
 
@@ -122,10 +125,7 @@ NFT_Output::NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unloc
            native_tokens_m,
            immutable_features_m),
     nft_id_(NFT_ID(32,0))
-{
-
-order_by_type<Feature>(immutable_features_);
-};
+{};
 
 
 NFT_Output::NFT_Output(const QJsonValue& val):Output(types::NFT_typ,val),
@@ -161,6 +161,53 @@ void NFT_Output::serialize(QDataStream &out)const
     serialize_features_(out);
     serialize_immutable_features_(out);
 }
+
+Foundry_Output::Foundry_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
+                               const std::shared_ptr<Token_Scheme>& token_scheme_m, const quint32& serial_number_m,
+                       const std::vector<std::shared_ptr<Feature >> & features_m,
+                       const std::vector<std::shared_ptr<Native_Token>> & native_tokens_m,
+                       std::vector<std::shared_ptr<Feature>> immutable_features_m):
+    Output(types::Foundry_typ,amount_m,
+           unlock_conditions_m,
+           features_m,
+           native_tokens_m,
+           immutable_features_m),
+    token_scheme_(token_scheme_m),serial_number_(serial_number_m)
+{};
+Foundry_Output::Foundry_Output(const QJsonValue& val):Output(types::Foundry_typ,val),
+    token_scheme_(Token_Scheme::from_(val)),serial_number_(val.toObject()["serialNumber"].toInteger())
+{}
+
+Foundry_Output::Foundry_Output(QDataStream &in):Output(types::Foundry_typ)
+{
+    in>>amount_;
+    native_tokens_=deserialize_list<quint8,Native_Token>(in);
+    in>>serial_number_;
+    token_scheme_=Token_Scheme::from_<QDataStream>(in);
+    unlock_conditions_=deserialize_list<quint8,Unlock_Condition>(in);
+    features_=deserialize_list<quint8,Feature>(in);
+    immutable_features_=deserialize_list<quint8,Feature>(in);
+}
+
+QJsonObject Foundry_Output::get_Json(void) const
+{
+    auto var=this->Output::get_Json();
+    var.insert("serialNumber",(int)serial_number_);
+    var.insert("tokenScheme",token_scheme_->get_Json());
+    return var;
+}
+void Foundry_Output::serialize(QDataStream &out)const
+{
+
+    out<<type_m<<amount_;
+    serialize_native_tokens(out);
+    out<<serial_number_;
+    token_scheme_->serialize(out);
+    serialize_unlock_conditions(out);
+    serialize_features_(out);
+    serialize_immutable_features_(out);
+}
+
 
 };
 

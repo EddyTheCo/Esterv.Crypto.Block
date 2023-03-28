@@ -16,7 +16,7 @@ namespace qblocks{
 class Output
 {
 public:
-    enum types : quint8 { Basic_typ=3,NFT_typ=6 };
+    enum types : quint8 { Basic_typ=3,NFT_typ=6,Foundry_typ=5 };
     Output(types typ,quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
            const std::vector<std::shared_ptr<Feature>>& features_m={},
            const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
@@ -116,7 +116,7 @@ class Foundry_Output :public Output
 {
 public:
     Foundry_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-                   const std::shared_ptr<Token_Scheme>& token_scheme_m,
+                   const std::shared_ptr<Token_Scheme>& token_scheme_m, const quint32& serial_number_m,
                const std::vector<std::shared_ptr<Feature>>& features_m,
                const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m,
                std::vector<std::shared_ptr<Feature>> immutable_features_m=std::vector<std::shared_ptr<Feature>>{});
@@ -126,10 +126,10 @@ public:
 
     QJsonObject get_Json(void) const;
 
-    auto nft_id(void)const{return nft_id_;}
 
 private:
-    NFT_ID nft_id_;
+    std::shared_ptr<Token_Scheme> token_scheme_;
+    quint32 serial_number_;
 
 
 };
