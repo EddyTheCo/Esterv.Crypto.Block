@@ -26,13 +26,19 @@ QJsonObject Output::get_Json(void) const
         for(const auto& v: features_)fearr.push_back(v->get_Json());
         var.insert("features",fearr);
     }
+    if(immutable_features_.size())
+    {
+        QJsonArray fearr;
+        for(const auto& v: immutable_features_)fearr.push_back(v->get_Json());
+        var.insert("immutableFeatures",fearr);
+    }
     return var;
 };
 Output::Output(types typ, quint64 amount_m,
                const std::vector<std::shared_ptr<Unlock_Condition> > &unlock_conditions_m,
                const std::vector<std::shared_ptr<Feature> > &features_m,
-               const std::vector<std::shared_ptr<Native_Token> > &native_tokens_m):type_m(typ),
-    amount_(amount_m), unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m)
+               const std::vector<std::shared_ptr<Native_Token> > &native_tokens_m, const std::vector<std::shared_ptr<Feature> > &immutable_features_m):type_m(typ),
+    amount_(amount_m), unlock_conditions_(unlock_conditions_m),features_(features_m),native_tokens_(native_tokens_m),immutable_features_(immutable_features_m)
 {
     order_by_type<Unlock_Condition>(unlock_conditions_);
     order_by_type<Feature>(features_);
@@ -67,7 +73,8 @@ quint64 Output::min_deposit_of_output(const quint64& wkey,const quint64& wdata,c
 Output::Output(types typ,const QJsonValue& val):Output(typ,val.toObject()["amount"].toString().toULongLong(),
     get_T<Unlock_Condition>(val.toObject()["unlockConditions"].toArray()),
     get_T<Feature>(val.toObject()["features"].toArray()),
-    get_T<Native_Token>(val.toObject()["nativeTokens"].toArray())
+    get_T<Native_Token>(val.toObject()["nativeTokens"].toArray()),
+    get_T<Feature>(val.toObject()["immutableFeatures"].toArray())
   ){
 };
 
@@ -112,7 +119,8 @@ NFT_Output::NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unloc
     Output(types::NFT_typ,amount_m,
            unlock_conditions_m,
            features_m,
-           native_tokens_m),immutable_features_(immutable_features_m),
+           native_tokens_m,
+           immutable_features_m),
     nft_id_(NFT_ID(32,0))
 {
 
@@ -121,7 +129,6 @@ order_by_type<Feature>(immutable_features_);
 
 
 NFT_Output::NFT_Output(const QJsonValue& val):Output(types::NFT_typ,val),
-    immutable_features_(get_T<Feature>(val.toObject()["immutableFeatures"].toArray())),
     nft_id_(NFT_ID(val.toObject()["nftId"]))
 {}
 
@@ -139,12 +146,7 @@ NFT_Output::NFT_Output(QDataStream &in):Output(types::NFT_typ)
 QJsonObject NFT_Output::get_Json(void) const
 {
     auto var=this->Output::get_Json();
-    if(immutable_features_.size())
-    {
-        QJsonArray fearr;
-        for(const auto& v: immutable_features_)fearr.push_back(v->get_Json());
-        var.insert("immutableFeatures",fearr);
-    }
+
     var.insert("nftId",nft_id_.toHexString());
     return var;
 }
