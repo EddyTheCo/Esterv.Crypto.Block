@@ -16,7 +16,7 @@ namespace qblocks{
 class Output
 {
 public:
-    enum types : quint8 { Basic_typ=3,NFT_typ=6,Foundry_typ=5 };
+    enum types : quint8 { Basic_typ=3,NFT_typ=6,Foundry_typ=5,Alias_typ=4 };
     Output(types typ,quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
            const std::vector<std::shared_ptr<Feature>>& features_m={},
            const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
@@ -134,6 +134,27 @@ private:
 
 };
 
+class Alias_Output :public Output
+{
+public:
+    Alias_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
+                    const quint32& state_index_m, const quint32& foundry_counter_m,
+                 fl_array<quint16> state_metadata_m="",
+                 const std::vector<std::shared_ptr<Feature>>& features_m={},
+                 const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
+               std::vector<std::shared_ptr<Feature>> immutable_features_m={});
+    Alias_Output(const QJsonValue& val);
+    Alias_Output(QDataStream &in);
+    void serialize(QDataStream &out)const;
+
+    QJsonObject get_Json(void) const;
+    auto alias_id(void)const{return alias_id_;}
+
+private:
+    Alias_ID alias_id_;
+    quint32 state_index_,foundry_counter_;
+    fl_array<quint16> state_metadata_;
+};
 
 };
 

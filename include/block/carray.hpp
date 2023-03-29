@@ -274,6 +274,7 @@ using transaction_id = c_array;
 using public_key = c_array;
 using signature = c_array;
 using NFT_ID =c_array;
+using Alias_ID =c_array;
 using Output_ID =c_array;
 /*
  *
