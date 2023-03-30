@@ -17,6 +17,11 @@ template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::f
         return std::shared_ptr<Unlock_Condition>(new Storage_Deposit_Return_Unlock_Condition(val));
       case types::Address_typ:
         return std::shared_ptr<Unlock_Condition>(new Address_Unlock_Condition(val));
+      case types::State_Controller_Address_typ:
+        return std::shared_ptr<Unlock_Condition>(new State_Controller_Address_Unlock_Condition(val));
+    case types::Governor_Address_typ:
+      return std::shared_ptr<Unlock_Condition>(new Governor_Address_Unlock_Condition(val));
+
         default:
         return nullptr;
 
@@ -48,7 +53,44 @@ QJsonObject Address_Unlock_Condition::get_Json(void) const
     return var;
 }
 
+State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+    Unlock_Condition(State_Controller_Address_typ),address_(address_m){};
+State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(const QJsonValue& val):
+    State_Controller_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
+State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(QDataStream &in):
+    Unlock_Condition(State_Controller_Address_typ),address_(Address::from_<QDataStream>(in)){};
 
+void State_Controller_Address_Unlock_Condition::serialize(QDataStream &out)const
+{
+    out<<type_m;
+    address_->serialize(out);
+}
+QJsonObject State_Controller_Address_Unlock_Condition::get_Json(void) const
+{
+    QJsonObject var;
+    var.insert("type",(int)type_m);
+    var.insert("address",address_->get_Json());
+    return var;
+}
+Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+    Unlock_Condition(Governor_Address_typ),address_(address_m){};
+Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const QJsonValue& val):
+    Governor_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
+Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(QDataStream &in):
+    Unlock_Condition(State_Controller_Address_typ),address_(Address::from_<QDataStream>(in)){};
+
+void Governor_Address_Unlock_Condition::serialize(QDataStream &out)const
+{
+    out<<type_m;
+    address_->serialize(out);
+}
+QJsonObject Governor_Address_Unlock_Condition::get_Json(void) const
+{
+    QJsonObject var;
+    var.insert("type",(int)type_m);
+    var.insert("address",address_->get_Json());
+    return var;
+}
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<Address> &return_address_m, quint64 return_amount_m)
     :Unlock_Condition(Storage_Deposit_Return_typ),
     return_address_(return_address_m),
