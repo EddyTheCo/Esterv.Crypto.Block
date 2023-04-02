@@ -5,6 +5,13 @@ namespace qblocks{
 
 
 void Output::serialize(QDataStream &out)const{};
+void Output::set_id(const c_array& id){};
+void Output::consume(void)
+{
+    features_.clear();
+    native_tokens_.clear();
+    unlock_conditions_.clear();
+};
 QJsonObject Output::get_Json(void) const
 {
     QJsonObject var;

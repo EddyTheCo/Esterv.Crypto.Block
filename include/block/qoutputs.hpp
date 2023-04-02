@@ -28,9 +28,10 @@ public:
     template<class from_type> static std::shared_ptr<Output> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
-
-
+    virtual void set_id(const c_array& id);
+    virtual void consume(void);
     quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost)const;
+
 
     void serialize_native_tokens(QDataStream &out)const
     {
@@ -43,6 +44,10 @@ public:
     void serialize_features_(QDataStream &out)const
     {
         serialize_list<quint8>(out,features_);
+    }
+    void serialize_immutable_features_(QDataStream &out)const
+    {
+        serialize_list<quint8>(out,immutable_features_);
     }
 
     std::shared_ptr<Unlock_Condition> get_unlock_(const Unlock_Condition::types& typ)const
@@ -64,10 +69,7 @@ public:
                                       [typ](const auto& it){return (it->type_m==typ);});
         return (found==immutable_features_.end())?nullptr:*found;
     }
-    void serialize_immutable_features_(QDataStream &out)const
-    {
-        serialize_list<quint8>(out,immutable_features_);
-    }
+
 
     const types type_m;
     quint64 amount_;
@@ -103,7 +105,7 @@ public:
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
-
+    void set_id(const c_array& id){nft_id_=id;};
     auto nft_id(void)const{return nft_id_;}
 
 private:
@@ -131,7 +133,6 @@ private:
     std::shared_ptr<Token_Scheme> token_scheme_;
     quint32 serial_number_;
 
-
 };
 
 class Alias_Output :public Output
@@ -148,8 +149,9 @@ public:
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
+    void set_id(const c_array& id){alias_id_=id;};
     auto alias_id(void)const{return alias_id_;}
-
+    void state_transition(){state_index_++;}
 private:
     Alias_ID alias_id_;
     quint32 state_index_,foundry_counter_;
