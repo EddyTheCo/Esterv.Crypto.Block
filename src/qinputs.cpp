@@ -23,13 +23,13 @@ template std::shared_ptr<Input> Input::from_<const QJsonValueRef>(const QJsonVal
 template std::shared_ptr<Input> Input::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
-UTXO_Input::UTXO_Input(transaction_id transaction_id_m,quint16 transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
+UTXO_Input::UTXO_Input(Transaction_ID transaction_id_m,quint16 transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
 transaction_output_index_(transaction_output_index_m){};
-UTXO_Input::UTXO_Input(const QJsonValue& val):UTXO_Input(transaction_id(val.toObject()["transactionId"]),
+UTXO_Input::UTXO_Input(const QJsonValue& val):UTXO_Input(Transaction_ID(val.toObject()["transactionId"]),
     val.toObject()["transactionOutputIndex"].toInt()){};
 UTXO_Input::UTXO_Input(QDataStream &in):Input(UTXO_typ)
 {
-    transaction_id_=transaction_id(32,0);
+    transaction_id_=Transaction_ID(32,0);
     in>>transaction_id_;
     in>>transaction_output_index_;
 };

@@ -1,9 +1,9 @@
 #include"block/qnative_tokens.hpp"
 namespace qiota{
 namespace qblocks{
-Native_Token::Native_Token(const token_id& token_id_m,const quint256 amount_m):token_id_(token_id_m),
+Native_Token::Native_Token(const Token_ID &token_id_m, const quint256 amount_m):token_id_(token_id_m),
 amount_(amount_m){};
-Native_Token::Native_Token(const QJsonValue& val):token_id_(token_id(val.toObject()["tokenId"])),
+Native_Token::Native_Token(const QJsonValue& val):token_id_(Token_ID(val.toObject()["tokenId"])),
     amount_(c_array::fromHexString(val.toObject()["amount"].toString())){};
 
 template<class from_type> std::shared_ptr<Native_Token> Native_Token::from_(from_type& val){

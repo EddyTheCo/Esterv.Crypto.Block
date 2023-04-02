@@ -27,7 +27,7 @@ public:
 class UTXO_Input : public Input
 {
 public:
-    UTXO_Input(transaction_id  transaction_id_m,quint16 transaction_output_index_m);
+    UTXO_Input(Transaction_ID  transaction_id_m,quint16 transaction_output_index_m);
     UTXO_Input(const QJsonValue& val);
     UTXO_Input(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -37,7 +37,7 @@ public:
 
 private:
 quint16 transaction_output_index_;
-transaction_id transaction_id_;
+Transaction_ID transaction_id_;
 
 };
 

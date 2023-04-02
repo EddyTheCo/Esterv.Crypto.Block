@@ -11,8 +11,8 @@ class  Output_Metadata_Response
 
 public:
     Output_Metadata_Response(const QJsonValue& val);
-    const block_id block_id_;
-    const transaction_id transaction_id_;
+    const Block_ID block_id_;
+    const Transaction_ID transaction_id_;
     const quint16 output_index_;
     const bool is_spent_;
     const Output_ID outputid_;

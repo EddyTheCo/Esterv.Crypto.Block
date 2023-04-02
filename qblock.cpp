@@ -14,7 +14,7 @@ namespace qiota{
             in>>parents_count;
             for(auto i=0;i<parents_count;i++)
             {
-                block_id block_id_=block_id(32,0);
+                auto block_id_=Block_ID(32,0);
                 in>>block_id_;
                 parents_.push_back(block_id_);
             }
@@ -30,13 +30,13 @@ namespace qiota{
             nonce_(val.toObject()["nonce"].toInteger()), payload_(Payload::from_<const QJsonValue>(val))
         {
             const auto arr=val.toObject()["outputs"].toArray();
-            for(const auto& v:arr)parents_.push_back(block_id(v));
+            for(const auto& v:arr)parents_.push_back(Block_ID(v));
         }
 		void Block::set_pv(const quint8& pv)
 		{
 			protocol_version=pv;
 		}
-		void Block::set_parents(const std::vector<block_id>& parents_m){
+        void Block::set_parents(const std::vector<Block_ID> &parents_m){
 			parents_ = std::move(parents_m);
 		}
 		void Block::set_nonce(const quint64& nonce_m){

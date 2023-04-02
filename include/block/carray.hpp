@@ -266,21 +266,22 @@ public:
 /**
  * @brief The block_id is the BLAKE2b-256 hash of the entire serialized block.
  */
-using block_id = c_array;
+using Block_ID = c_array;
 /**
  * @brief The BLAKE2b-256 hash of the transaction payload containing the referenced output.
  */
-using transaction_id = c_array;
+using Transaction_ID = c_array;
 using public_key = c_array;
 using signature = c_array;
 using NFT_ID =c_array;
 using Alias_ID =c_array;
 using Output_ID =c_array;
+using Token_ID = c_array;
 /*
  *
  *
  */
-using token_id = c_array;
+
 /**
  * @brief Binary data. A leading uint32 denotes its length.
  */

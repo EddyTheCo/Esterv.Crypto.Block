@@ -37,7 +37,7 @@ public:
 class NFT_Address : public Address
 {
 public:
-    NFT_Address(c_array addr_m);
+    NFT_Address(c_array nft_id_m);
     NFT_Address(const QJsonValue& val);
     NFT_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -52,13 +52,13 @@ private:
 class Alias_Address : public Address
 {
 public:
-    Alias_Address(c_array addr_m);
+    Alias_Address(c_array alias_id_m);
     Alias_Address(const QJsonValue& val);
     Alias_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
-    c_array addr(void)const{return alias_id_;}
+    c_array addr_hash(void)const{return alias_id_;}
 
 private:
     c_array alias_id_;
@@ -68,11 +68,11 @@ private:
 class Ed25519_Address : public Address
 {
 public:
-    Ed25519_Address(c_array addr_m);
+    Ed25519_Address(c_array pubkeyhash_m);
     Ed25519_Address(const QJsonValue& val);
     Ed25519_Address(QDataStream &in);
     void serialize(QDataStream &out)const;
-    c_array addr(void)const{return pubkeyhash_;}
+    c_array addr_hash(void)const{return pubkeyhash_;}
     QJsonObject get_Json(void) const;
 private:
     c_array pubkeyhash_;

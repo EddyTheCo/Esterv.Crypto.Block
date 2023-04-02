@@ -41,7 +41,7 @@ public:
 
     QJsonObject get_Json(void)const;
 
-    void set_parents(const std::vector<block_id>& parents_m);
+    void set_parents(const std::vector<Block_ID>& parents_m);
 
     void set_nonce(const quint64& nonce_m);
     void set_pv(const quint8& pv);
@@ -51,7 +51,7 @@ public:
     quint8 protocol_version;
     quint64 nonce_;
     std::shared_ptr<Payload> payload_;
-    std::vector<block_id> parents_;
+    std::vector<Block_ID> parents_;
 
 };
 
