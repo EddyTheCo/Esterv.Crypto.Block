@@ -29,6 +29,7 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
     virtual void set_id(const c_array& id);
+    virtual c_array get_id(void)const{return c_array(32,0);};
     virtual void consume(void);
     quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost)const;
 
@@ -106,7 +107,7 @@ public:
 
     QJsonObject get_Json(void) const;
     void set_id(const c_array& id){nft_id_=id;};
-    auto nft_id(void)const{return nft_id_;}
+    c_array get_id(void)const{return nft_id_;}
 
 private:
     NFT_ID nft_id_;
@@ -127,11 +128,10 @@ public:
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
-
-
-private:
     std::shared_ptr<Token_Scheme> token_scheme_;
     quint32 serial_number_;
+private:
+
 
 };
 
@@ -150,12 +150,13 @@ public:
 
     QJsonObject get_Json(void) const;
     void set_id(const c_array& id){alias_id_=id;};
-    auto alias_id(void)const{return alias_id_;}
-    void state_transition(){state_index_++;}
-private:
-    Alias_ID alias_id_;
+    c_array get_id(void)const{return alias_id_;}
     quint32 state_index_,foundry_counter_;
     fl_array<quint16> state_metadata_;
+private:
+    Alias_ID alias_id_;
+
+
 };
 
 };
