@@ -11,7 +11,7 @@ class  Unlock_Condition
 {
 public:
     enum types : quint8 { Address_typ=0, Storage_Deposit_Return_typ=1, Timelock_typ=2, Expiration_typ=3,State_Controller_Address_typ=4,
-                          Governor_Address_typ=5 };
+                          Governor_Address_typ=5, Immutable_Alias_Address_typ=6};
     Unlock_Condition(types typ );
     template<class from_type>static std::shared_ptr<Unlock_Condition> from_(from_type& val);
 
@@ -113,6 +113,22 @@ public:
     Governor_Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     Governor_Address_Unlock_Condition(const QJsonValue& val);
     Governor_Address_Unlock_Condition(QDataStream &in);
+    void serialize(QDataStream &out)const;
+    QJsonObject get_Json(void) const;
+
+    std::shared_ptr<Address>  address(void)const{return address_;}
+
+
+private:
+std::shared_ptr<Address> address_;
+
+};
+class Immutable_Alias_Address_Unlock_Condition:public Unlock_Condition
+{
+public:
+    Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
+    Immutable_Alias_Address_Unlock_Condition(const QJsonValue& val);
+    Immutable_Alias_Address_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 

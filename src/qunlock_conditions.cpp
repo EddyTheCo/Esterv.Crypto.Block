@@ -10,19 +10,20 @@ template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::f
 
     switch(type_) {
     case types::Expiration_typ:
-      return std::shared_ptr<Unlock_Condition>(new Expiration_Unlock_Condition(val));
-      case types::Timelock_typ:
+        return std::shared_ptr<Unlock_Condition>(new Expiration_Unlock_Condition(val));
+    case types::Timelock_typ:
         return std::shared_ptr<Unlock_Condition>(new Timelock_Unlock_Condition(val));
-      case types::Storage_Deposit_Return_typ:
+    case types::Storage_Deposit_Return_typ:
         return std::shared_ptr<Unlock_Condition>(new Storage_Deposit_Return_Unlock_Condition(val));
-      case types::Address_typ:
+    case types::Address_typ:
         return std::shared_ptr<Unlock_Condition>(new Address_Unlock_Condition(val));
-      case types::State_Controller_Address_typ:
+    case types::State_Controller_Address_typ:
         return std::shared_ptr<Unlock_Condition>(new State_Controller_Address_Unlock_Condition(val));
     case types::Governor_Address_typ:
-      return std::shared_ptr<Unlock_Condition>(new Governor_Address_Unlock_Condition(val));
-
-        default:
+        return std::shared_ptr<Unlock_Condition>(new Governor_Address_Unlock_Condition(val));
+    case types::Immutable_Alias_Address_typ:
+        return std::shared_ptr<Unlock_Condition>(new Immutable_Alias_Address_Unlock_Condition(val));
+    default:
         return nullptr;
 
     }
@@ -77,7 +78,7 @@ Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const std::
 Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const QJsonValue& val):
     Governor_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(QDataStream &in):
-    Unlock_Condition(State_Controller_Address_typ),address_(Address::from_<QDataStream>(in)){};
+    Unlock_Condition(Governor_Address_typ),address_(Address::from_<QDataStream>(in)){};
 
 void Governor_Address_Unlock_Condition::serialize(QDataStream &out)const
 {
@@ -91,16 +92,35 @@ QJsonObject Governor_Address_Unlock_Condition::get_Json(void) const
     var.insert("address",address_->get_Json());
     return var;
 }
+Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+    Unlock_Condition(Immutable_Alias_Address_typ),address_(address_m){};
+Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(const QJsonValue& val):
+    Immutable_Alias_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
+Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(QDataStream &in):
+    Unlock_Condition(Immutable_Alias_Address_typ),address_(Address::from_<QDataStream>(in)){};
+
+void Immutable_Alias_Address_Unlock_Condition::serialize(QDataStream &out)const
+{
+    out<<type_m;
+    address_->serialize(out);
+}
+QJsonObject Immutable_Alias_Address_Unlock_Condition::get_Json(void) const
+{
+    QJsonObject var;
+    var.insert("type",(int)type_m);
+    var.insert("address",address_->get_Json());
+    return var;
+}
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<Address> &return_address_m, quint64 return_amount_m)
     :Unlock_Condition(Storage_Deposit_Return_typ),
-    return_address_(return_address_m),
-    return_amount_(return_amount_m)
+      return_address_(return_address_m),
+      return_amount_(return_amount_m)
 {};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val):
     Storage_Deposit_Return_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["returnAddress"]),
     val.toObject()["amount"].toString().toULongLong()){};
 Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(QDataStream &in):Unlock_Condition(Storage_Deposit_Return_typ),
-return_address_(Address::from_<QDataStream>(in))
+    return_address_(Address::from_<QDataStream>(in))
 {
     in>>return_amount_;
 }
