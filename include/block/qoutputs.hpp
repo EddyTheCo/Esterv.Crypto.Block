@@ -54,20 +54,20 @@ public:
     std::shared_ptr<Unlock_Condition> get_unlock_(const Unlock_Condition::types& typ)const
     {
         const auto found=std::find_if(unlock_conditions_.begin(),unlock_conditions_.end(),
-                                      [typ](const auto& it){return (it->type_m==typ);});
+                                      [typ](const auto& it){return (it->type()==typ);});
         return (found==unlock_conditions_.end())?nullptr:*found;
     }
 
     std::shared_ptr<Feature> get_feature_(const Feature::types& typ)const
     {
         const auto found=std::find_if(features_.begin(),features_.end(),
-                                      [typ](const auto& it){return (it->type_m==typ);});
+                                      [typ](const auto& it){return (it->type()==typ);});
         return (found==features_.end())?nullptr:*found;
     }
     std::shared_ptr<Feature> get_immutable_feature_(const Feature::types& typ)const
     {
         const auto found=std::find_if(immutable_features_.begin(),immutable_features_.end(),
-                                      [typ](const auto& it){return (it->type_m==typ);});
+                                      [typ](const auto& it){return (it->type()==typ);});
         return (found==immutable_features_.end())?nullptr:*found;
     }
 
@@ -126,6 +126,13 @@ public:
     Foundry_Output(const QJsonValue& val);
     Foundry_Output(QDataStream &in);
     void serialize(QDataStream &out)const;
+    c_array get_id(void)const{
+        c_array var;
+        var=unlock_conditions_.front()->address()->addr();
+        var.append(serial_number_);
+        var.append(token_scheme_->type_m);
+        return var;
+    }
 
     QJsonObject get_Json(void) const;
     std::shared_ptr<Token_Scheme> token_scheme_;
