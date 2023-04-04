@@ -12,14 +12,18 @@ class  Unlock_Condition
 public:
     enum types : quint8 { Address_typ=0, Storage_Deposit_Return_typ=1, Timelock_typ=2, Expiration_typ=3,State_Controller_Address_typ=4,
                           Governor_Address_typ=5, Immutable_Alias_Address_typ=6};
-    Unlock_Condition(types typ );
+    Unlock_Condition(types typ, std::shared_ptr<Address> address_m=nullptr );
     template<class from_type>static std::shared_ptr<Unlock_Condition> from_(from_type& val);
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
-    const types type_m;
+    std::shared_ptr<Address>  address(void)const{return address_;}
+    types type(void)const{return type_m;}
 
+private:
+    const types type_m;
+    std::shared_ptr<Address> address_;
 
 };
 
@@ -29,13 +33,6 @@ public:
     Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     Address_Unlock_Condition(const QJsonValue& val);
     Address_Unlock_Condition(QDataStream &in);
-    void serialize(QDataStream &out)const;
-    QJsonObject get_Json(void) const;
-    std::shared_ptr<Address>  address(void)const{return address_;}  
-
-
-private:
-std::shared_ptr<Address> address_;
 
 };
 
@@ -49,11 +46,9 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
     quint64 return_amount(void)const{return return_amount_;}
-    std::shared_ptr<Address> return_address(void)const{return return_address_;}
 
 private:
-quint64 return_amount_;
-std::shared_ptr<Address> return_address_;
+    quint64 return_amount_;
 
 };
 
@@ -69,7 +64,7 @@ public:
     quint32 unix_time(void)const{return unix_time_;}
 
 private:
-quint32 unix_time_;
+    quint32 unix_time_;
 
 };
 
@@ -83,10 +78,9 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
     quint32 unix_time(void)const{return unix_time_;}
-    std::shared_ptr<Address> return_address()const{return return_address_;}
+
 private:
-std::shared_ptr<Address> return_address_;
-quint32 unix_time_;
+    quint32 unix_time_;
 
 };
 
@@ -96,14 +90,6 @@ public:
     State_Controller_Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     State_Controller_Address_Unlock_Condition(const QJsonValue& val);
     State_Controller_Address_Unlock_Condition(QDataStream &in);
-    void serialize(QDataStream &out)const;
-    QJsonObject get_Json(void) const;
-
-    std::shared_ptr<Address>  address(void)const{return address_;}
-
-
-private:
-std::shared_ptr<Address> address_;
 
 };
 
@@ -113,15 +99,6 @@ public:
     Governor_Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     Governor_Address_Unlock_Condition(const QJsonValue& val);
     Governor_Address_Unlock_Condition(QDataStream &in);
-    void serialize(QDataStream &out)const;
-    QJsonObject get_Json(void) const;
-
-    std::shared_ptr<Address>  address(void)const{return address_;}
-
-
-private:
-std::shared_ptr<Address> address_;
-
 };
 class Immutable_Alias_Address_Unlock_Condition:public Unlock_Condition
 {
@@ -129,14 +106,6 @@ public:
     Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<Address>& address_m);
     Immutable_Alias_Address_Unlock_Condition(const QJsonValue& val);
     Immutable_Alias_Address_Unlock_Condition(QDataStream &in);
-    void serialize(QDataStream &out)const;
-    QJsonObject get_Json(void) const;
-
-    std::shared_ptr<Address>  address(void)const{return address_;}
-
-
-private:
-std::shared_ptr<Address> address_;
 
 };
 };

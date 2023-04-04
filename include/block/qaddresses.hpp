@@ -11,7 +11,8 @@ class  Address
 public:
     enum types : quint8 { NFT_typ=16, Alias_typ=8, Ed25519_typ=0};
 
-    Address(types typ );
+    Address(types typ, c_array addrhash_m );
+    Address(types typ,QDataStream &in);
     template<class from_type> static std::shared_ptr<Address> from_(from_type& val);
     static std::shared_ptr<Address> from_(QByteArray& val);
     static std::shared_ptr<Address> from_(c_array& val)
@@ -23,14 +24,19 @@ public:
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
-    virtual  c_array addr_hash(void)const{return c_array(32,0);}
+    c_array addrhash(void)const{return addrhash_;}
     c_array addr(void)const{
         c_array addr;
         auto buffer=QDataStream(&addr,QIODevice::WriteOnly | QIODevice::Append);
         buffer.setByteOrder(QDataStream::LittleEndian);
         serialize(buffer);
         return addr;}
+
+    types type(void)const{return type_m;}
+
+private:
     const types type_m;
+    c_array addrhash_;
 
 };
 
@@ -40,13 +46,8 @@ public:
     NFT_Address(c_array nft_id_m);
     NFT_Address(const QJsonValue& val);
     NFT_Address(QDataStream &in);
-    void serialize(QDataStream &out)const;
+
     QJsonObject get_Json(void) const;
-    c_array addr_hash(void)const{return nft_id_;}
-
-
-private:
-    NFT_ID nft_id_;
 
 };
 class Alias_Address : public Address
@@ -55,13 +56,8 @@ public:
     Alias_Address(c_array alias_id_m);
     Alias_Address(const QJsonValue& val);
     Alias_Address(QDataStream &in);
-    void serialize(QDataStream &out)const;
+
     QJsonObject get_Json(void) const;
-
-    c_array addr_hash(void)const{return alias_id_;}
-
-private:
-    c_array alias_id_;
 
 };
 
@@ -71,12 +67,10 @@ public:
     Ed25519_Address(c_array pubkeyhash_m);
     Ed25519_Address(const QJsonValue& val);
     Ed25519_Address(QDataStream &in);
-    void serialize(QDataStream &out)const;
-    c_array addr_hash(void)const{return pubkeyhash_;}
+
     QJsonObject get_Json(void) const;
-private:
-    c_array pubkeyhash_;
 
 };
+
 };
 };

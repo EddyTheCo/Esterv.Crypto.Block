@@ -16,8 +16,10 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
-    const types type_m;
+    types type(void)const{return type_m;}
 
+private:
+    const types type_m;
 };
 
 class Sender_Feature : public Feature
