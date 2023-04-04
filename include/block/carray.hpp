@@ -67,12 +67,37 @@ class quint256 : public c_array
     public:
     using c_array::c_array;
     quint256():c_array(32,0){};
+    QString toHexString(void)const{
+        c_array var(0);
+        bool ind=false;
+        std::for_each(this->rbegin(),this->rend(),[&](const auto& v)
+        {
 
+            if(v)ind=true;
+            if(ind)
+            {
+                var.push_back(v);
+            }
+        });
+        if(!var.size()) return QString("0x0");
+        return QString("0x")+QString(var.toHex());
+    }
+
+    quint256(quint64 b):quint256()
+    {
+        auto thisb=QDataStream(this,QIODevice::WriteOnly);
+        thisb.setByteOrder(QDataStream::LittleEndian);
+        thisb<<b;
+    }
     quint256 operator+=(quint256 other)
     {
 
-        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
         thisb.setByteOrder(QDataStream::LittleEndian);
+
+        quint256 nthis;
+        auto nthisb=QDataStream(&nthis,QIODevice::WriteOnly);
+        nthisb.setByteOrder(QDataStream::LittleEndian);
 
         auto otherb=QDataStream(&other,QIODevice::ReadOnly);
         otherb.setByteOrder(QDataStream::LittleEndian);
@@ -83,28 +108,34 @@ class quint256 : public c_array
         {
             thisb>>t;
             otherb>>o;
-
             quint64 n = carry + t + o;
-            thisb<<(n & 0xffffffff);
+            const quint32 v=(n & 0xffffffff);
+            nthisb<<(quint32)(n & 0xffffffff);
             carry = n >> 32;
         }
+        (*this)=nthis;
         return *this;
     }
     quint256 operator++()
     {
         int i = 0;
-        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
         thisb.setByteOrder(QDataStream::LittleEndian);
+        quint256 nthis;
+        auto nthisb=QDataStream(&nthis,QIODevice::WriteOnly);
+        nthisb.setByteOrder(QDataStream::LittleEndian);
+
         quint64 t;
         thisb>>t;
         t++;
         while (i < 4 && t == 0)
         {
             i++;
-            thisb<<t;
+            nthisb<<t;
             thisb>>t;
             t++;
         }
+        (*this)=nthis;
         return *this;
     }
     quint256 operator++(int)
@@ -118,18 +149,23 @@ class quint256 : public c_array
     {
 
         int i = 0;
-        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
         thisb.setByteOrder(QDataStream::LittleEndian);
+        quint256 nthis;
+        auto nthisb=QDataStream(&nthis,QIODevice::WriteOnly);
+        nthisb.setByteOrder(QDataStream::LittleEndian);
+
         quint64 t;
         thisb>>t;
         t--;
         while (i < 4 && t == std::numeric_limits<quint64>::max())
         {
             i++;
-            thisb<<t;
+            nthisb<<t;
             thisb>>t;
             t--;
         }
+        (*this)=nthis;
         return *this;
     }
 
@@ -169,22 +205,27 @@ class quint256 : public c_array
         auto thisb=QDataStream(this,QIODevice::WriteOnly);
         thisb.setByteOrder(QDataStream::LittleEndian);
         thisb<<b;
-        for (int i = 0; i < 3; i++)
-            thisb<<(quint64)0;
         return *this;
     }
     quint256 operator*=(quint32 b32)
     {
-        auto thisb=QDataStream(this,QIODevice::ReadOnly|QIODevice::WriteOnly);
+        auto thisb=QDataStream(this,QIODevice::ReadOnly);
         thisb.setByteOrder(QDataStream::LittleEndian);
+
+        quint256 nthis;
+        auto nthisb=QDataStream(&nthis,QIODevice::WriteOnly);
+        nthisb.setByteOrder(QDataStream::LittleEndian);
+
         quint32 t;
         quint64 carry = 0;
         for (int i = 0; i < 8; i++) {
             thisb>>t;
             quint64 n = carry + (quint64)b32 * t;
-            thisb<<(n & 0xffffffff);
+            nthisb<<(quint32)(n & 0xffffffff);
             carry = n >> 32;
         }
+
+        (*this)=nthis;
         return *this;
     }
     quint256 operator+=(quint64 b64)
@@ -332,7 +373,7 @@ template<class obj_type> void order_by_type(std::vector<std::shared_ptr<obj_type
 {
     std::sort(ptr_vector.begin(), ptr_vector.end(), [](auto a, auto b)
     {
-        return a->type_m < b->type_m;
+        return a->type() < b->type();
     });
 }
 
