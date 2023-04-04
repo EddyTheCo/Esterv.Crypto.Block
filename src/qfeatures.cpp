@@ -31,13 +31,13 @@ Sender_Feature::Sender_Feature(const QJsonValue& val):Sender_Feature(Address::fr
 Sender_Feature::Sender_Feature(QDataStream &in):Feature(Sender_typ),sender_(Address::from_<QDataStream>(in)){};
 void Sender_Feature::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     sender_->serialize(out);
 }
 QJsonObject Sender_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("address",sender_->get_Json());
     return var;
 }
@@ -47,13 +47,13 @@ Issuer_Feature::Issuer_Feature(const QJsonValue& val):Issuer_Feature(Address::fr
 Issuer_Feature::Issuer_Feature(QDataStream &in):Feature(Issuer_typ),issuer_(Address::from_<QDataStream>(in)){};
 void Issuer_Feature::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     issuer_->serialize(out);
 }
 QJsonObject Issuer_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("address",issuer_->get_Json());
     return var;
 }
@@ -65,13 +65,13 @@ Metadata_Feature::Metadata_Feature(QDataStream &in):Feature(Metadata_typ){
 };
 void Metadata_Feature::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<data_;
 }
 QJsonObject Metadata_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("data",data_.toHexString());
     return var;
 }
@@ -82,13 +82,13 @@ Tag_Feature::Tag_Feature(QDataStream &in):Feature(Tag_typ){
 };
 void Tag_Feature::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<tag_;
 }
 QJsonObject Tag_Feature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("tag",tag_.toHexString());
     return var;
 }
