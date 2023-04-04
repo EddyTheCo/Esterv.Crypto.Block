@@ -31,7 +31,7 @@ QJsonObject Native_Token::get_Json(void) const
 {
     QJsonObject var;
     var.insert("tokenId",token_id_.toHexString());
-    var.insert("amount_",amount_.toHexString());
+    var.insert("amount",amount_.toHexString());
     return var;
 }
 
