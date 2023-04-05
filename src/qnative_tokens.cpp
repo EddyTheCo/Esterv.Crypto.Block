@@ -17,6 +17,7 @@ template std::shared_ptr<Native_Token> Native_Token::from_<QJsonValueConstRef co
 
 Native_Token::Native_Token(QDataStream &in)
 {
+    token_id_=c_array(38,0);
     in>>token_id_;
     in>>amount_;
 };
