@@ -44,22 +44,25 @@ Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(Transaction_ty
     in>>network_id_;
     quint16 inputs_count;
     in>>inputs_count;
-    std::vector<std::shared_ptr<Input>> inputs_m;
     for(auto i=0;i<inputs_count;i++)
     {
         inputs_.push_back(Input::from_<QDataStream>(in));
     }
     inputs_commitment_=c_array(32,0);
     in>>inputs_commitment_;
+
     quint16 outputs_count;
     in>>outputs_count;
-    std::vector<std::shared_ptr<Output>> outputs_m;
+
+
     for(auto i=0;i<outputs_count;i++)
     {
-        outputs_m.push_back(Output::from_<QDataStream>(in));
+        outputs_.push_back(Output::from_<QDataStream>(in));
     }
+
     quint32 payload_length;
     in>>payload_length;
+
     if(payload_length)
     {
         payload_=Payload::from_<QDataStream>(in);
