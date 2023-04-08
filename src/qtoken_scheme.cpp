@@ -28,9 +28,9 @@ Simple_Token_Scheme::Simple_Token_Scheme(quint256  minted_tokens_m,quint256 melt
     :Token_Scheme(Simple_typ),minted_tokens_(minted_tokens_m),melted_tokens_(melted_tokens_m),maximum_supply_(maximum_supply_m)
 {};
 Simple_Token_Scheme::Simple_Token_Scheme(const QJsonValue& val):
-    Simple_Token_Scheme(c_array::fromHexString(val.toObject()["mintedTokens"].toString()),
-    c_array::fromHexString(val.toObject()["meltedTokens"].toString()),
-    c_array::fromHexString(val.toObject()["maximumSupply"].toString())){};
+    Simple_Token_Scheme(quint256(val.toObject()["mintedTokens"].toString()),
+    quint256(val.toObject()["meltedTokens"].toString()),
+    quint256(val.toObject()["maximumSupply"].toString())){};
 
 Simple_Token_Scheme::Simple_Token_Scheme(QDataStream &in):Token_Scheme(Simple_typ)
 {
@@ -49,9 +49,9 @@ QJsonObject Simple_Token_Scheme::get_Json(void) const
 {
     QJsonObject var;
     var.insert("type",(int)type_m);
-    var.insert("mintedTokens",minted_tokens_.toHexString());
-    var.insert("meltedTokens",melted_tokens_.toHexString());
-    var.insert("maximumSupply",maximum_supply_.toHexString());
+    var.insert("mintedTokens",minted_tokens_.toHex());
+    var.insert("meltedTokens",melted_tokens_.toHex());
+    var.insert("maximumSupply",maximum_supply_.toHex());
     return var;
 }
 };

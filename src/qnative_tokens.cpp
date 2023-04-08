@@ -4,7 +4,7 @@ namespace qblocks{
 Native_Token::Native_Token(const Token_ID &token_id_m, const quint256 amount_m):token_id_(token_id_m),
 amount_(amount_m){};
 Native_Token::Native_Token(const QJsonValue& val):token_id_(Token_ID(val.toObject()["id"])),
-    amount_(c_array::fromHexString(val.toObject()["amount"].toString())){};
+    amount_(quint256(val.toObject()["amount"].toString())){};
 
 template<class from_type> std::shared_ptr<Native_Token> Native_Token::from_(from_type& val){
     return std::shared_ptr<Native_Token>(new Native_Token(val));
@@ -32,7 +32,7 @@ QJsonObject Native_Token::get_Json(void) const
 {
     QJsonObject var;
     var.insert("id",token_id_.toHexString());
-    var.insert("amount",amount_.toHexString());
+    var.insert("amount",amount_.toHex());
     return var;
 }
 
