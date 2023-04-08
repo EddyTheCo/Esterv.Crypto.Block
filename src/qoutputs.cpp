@@ -3,6 +3,9 @@
 namespace qiota{
 namespace qblocks{
 
+const  QHash<Output::types,QString > Output::typesstr=
+{{Basic_typ,"basic"},{NFT_typ,"nft"},{Foundry_typ,"foundry"},{Alias_typ,"alias"}};
+
 
 void Output::serialize(QDataStream &out)const{};
 void Output::set_id(const c_array& id){};
@@ -11,6 +14,11 @@ void Output::consume(void)
     features_.clear();
     native_tokens_.clear();
     unlock_conditions_.clear();
+};
+void Foundry_Output::consume(void)
+{
+    features_.clear();
+    native_tokens_.clear();
 };
 QJsonObject Output::get_Json(void) const
 {

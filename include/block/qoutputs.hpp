@@ -71,7 +71,7 @@ public:
         return (found==immutable_features_.end())?nullptr:*found;
     }
 
-
+    const static QHash<types,QString > typesstr;
     const types type_m;
     quint64 amount_;
     std::vector<std::shared_ptr<Unlock_Condition>> unlock_conditions_;
@@ -133,7 +133,7 @@ public:
         var.append(token_scheme_->type_m);
         return var;
     }
-
+    void consume(void);
     QJsonObject get_Json(void) const;
     std::shared_ptr<Token_Scheme> token_scheme_;
     quint32 serial_number_;
