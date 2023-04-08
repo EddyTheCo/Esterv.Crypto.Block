@@ -95,8 +95,7 @@ Output::Output(types typ,const QJsonValue& val):Output(typ,val.toObject()["amoun
     get_T<Feature>(val.toObject()["features"].toArray()),
     get_T<Native_Token>(val.toObject()["nativeTokens"].toArray()),
     get_T<Feature>(val.toObject()["immutableFeatures"].toArray())
-  ){
-};
+  ){};
 
 Basic_Output::Basic_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
                            const std::vector<std::shared_ptr<Feature >> & features_m,
@@ -192,7 +191,7 @@ Foundry_Output::Foundry_Output(quint64 amount_m, const std::vector<std::shared_p
     token_scheme_(token_scheme_m),serial_number_(serial_number_m)
 {};
 Foundry_Output::Foundry_Output(const QJsonValue& val):Output(types::Foundry_typ,val),
-    token_scheme_(Token_Scheme::from_(val)),serial_number_(val.toObject()["serialNumber"].toInteger())
+    token_scheme_(Token_Scheme::from_<const QJsonValue>(val.toObject()["tokenScheme"])),serial_number_(val.toObject()["serialNumber"].toInteger())
 {}
 
 Foundry_Output::Foundry_Output(QDataStream &in):Output(types::Foundry_typ)
