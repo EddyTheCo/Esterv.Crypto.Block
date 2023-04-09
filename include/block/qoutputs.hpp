@@ -71,13 +71,17 @@ public:
         return (found==immutable_features_.end())?nullptr:*found;
     }
 
-    const static QHash<types,QString > typesstr;
-    const types type_m;
+
     quint64 amount_;
     std::vector<std::shared_ptr<Unlock_Condition>> unlock_conditions_;
     std::vector<std::shared_ptr<Feature>> features_;
     std::vector<std::shared_ptr<Feature>> immutable_features_;
     std::vector<std::shared_ptr<Native_Token>> native_tokens_;
+    types type(void)const{return type_m;}
+    const static QHash<types,QString > typesstr;
+private:
+    const types type_m;
+
 
 };
 
@@ -130,7 +134,7 @@ public:
         c_array var;
         var=unlock_conditions_.front()->address()->addr();
         var.append(serial_number_);
-        var.append(token_scheme_->type_m);
+        var.append(token_scheme_->type());
         return var;
     }
     void consume(void);

@@ -16,6 +16,8 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
+    types type(void)const{return type_m;}
+private:
     const types type_m;
 
 };
@@ -31,13 +33,12 @@ public:
     UTXO_Input(const QJsonValue& val);
     UTXO_Input(QDataStream &in);
     void serialize(QDataStream &out)const;
-
     QJsonObject get_Json(void) const;
 
 
 private:
-quint16 transaction_output_index_;
-Transaction_ID transaction_id_;
+    quint16 transaction_output_index_;
+    Transaction_ID transaction_id_;
 
 };
 

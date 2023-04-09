@@ -25,6 +25,9 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
+    types type(void)const{return type_m;}
+    QByteArray get_hash(void)const;
+private:
     const types type_m;
 
 };

@@ -11,15 +11,17 @@ class  Feature
 {
 public:
     enum types : quint8 { Sender_typ=0, Issuer_typ=1 , Metadata_typ=2 , Tag_typ=3};
-    Feature(types typ );
+    Feature(types typ);
     template<class from_type>static std::shared_ptr<Feature> from_(from_type& val);
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
     types type(void)const{return type_m;}
+    const static QHash<types,QString> typesstr;
 
 private:
     const types type_m;
+
 };
 
 class Sender_Feature : public Feature
@@ -30,9 +32,9 @@ public:
     Sender_Feature(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
-    std::shared_ptr<Address> sender(void)const {return sender_;}	
+    std::shared_ptr<Address> sender(void)const {return sender_;}
 private:
-std::shared_ptr<Address> sender_;
+    std::shared_ptr<Address> sender_;
 
 };
 class Issuer_Feature : public Feature
@@ -45,7 +47,7 @@ public:
     QJsonObject get_Json(void) const;
     std::shared_ptr<Address> issuer(void)const {return issuer_;}
 private:
-std::shared_ptr<Address> issuer_;
+    std::shared_ptr<Address> issuer_;
 
 };
 
@@ -58,10 +60,10 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
-     fl_array<quint16> data(void)const {return data_;}	
+    fl_array<quint16> data(void)const {return data_;}
 
 private:
-fl_array<quint16> data_;
+    fl_array<quint16> data_;
 
 };
 
@@ -74,11 +76,10 @@ public:
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
-     fl_array<quint8> tag(void)const {return tag_;}	
+    fl_array<quint8> tag(void)const {return tag_;}
 
 private:
-
-fl_array<quint8> tag_;
+    fl_array<quint8> tag_;
 
 };
 };

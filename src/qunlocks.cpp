@@ -35,13 +35,13 @@ Signature_Unlock::Signature_Unlock(const QJsonValue& val):Signature_Unlock(Signa
 Signature_Unlock::Signature_Unlock(QDataStream &in):Unlock(types::Signature_typ),signature_(Signature::from_<QDataStream>(in)){};
 void Signature_Unlock::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     signature_->serialize(out);
 }
 QJsonObject Signature_Unlock::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("signature",signature_->get_Json());
     return var;
 }
@@ -54,13 +54,13 @@ Reference_Unlock::Reference_Unlock(QDataStream &in):Unlock(Reference_typ)
 }
 void Reference_Unlock::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<reference_;
 }
 QJsonObject Reference_Unlock::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("reference",(int)reference_);
     return var;
 }
@@ -73,13 +73,13 @@ Alias_Unlock::Alias_Unlock(QDataStream &in):Unlock(Alias_typ)
 }
 void Alias_Unlock::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<alias_reference_unlock_index_;
 }
 QJsonObject Alias_Unlock::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("reference",(int)alias_reference_unlock_index_);
     return var;
 }
@@ -93,13 +93,13 @@ NFT_Unlock::NFT_Unlock(QDataStream &in):Unlock(NFT_typ)
 }
 void NFT_Unlock::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<nft_reference_unlock_index_;
 }
 QJsonObject NFT_Unlock::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("reference",(int)nft_reference_unlock_index_);
     return var;
 }

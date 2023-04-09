@@ -40,7 +40,7 @@ Simple_Token_Scheme::Simple_Token_Scheme(QDataStream &in):Token_Scheme(Simple_ty
 };
 void Simple_Token_Scheme::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<minted_tokens_;
     out<<melted_tokens_;
     out<<maximum_supply_;
@@ -48,7 +48,7 @@ void Simple_Token_Scheme::serialize(QDataStream &out)const
 QJsonObject Simple_Token_Scheme::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("mintedTokens",minted_tokens_.toHex());
     var.insert("meltedTokens",melted_tokens_.toHex());
     var.insert("maximumSupply",maximum_supply_.toHex());

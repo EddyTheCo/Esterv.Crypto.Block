@@ -118,7 +118,7 @@ Basic_Output::Basic_Output(QDataStream &in):Output(types::Basic_typ)
 }
 void Basic_Output::serialize(QDataStream &out)const
 {
-    out<<type_m<<amount_;
+    out<<type()<<amount_;
     serialize_native_tokens(out);
     serialize_unlock_conditions(out);
     serialize_features_(out);
@@ -169,7 +169,7 @@ QJsonObject NFT_Output::get_Json(void) const
 void NFT_Output::serialize(QDataStream &out)const
 {
 
-    out<<type_m<<amount_;
+    out<<type()<<amount_;
     serialize_native_tokens(out);
     out<<nft_id_;
 
@@ -215,7 +215,7 @@ QJsonObject Foundry_Output::get_Json(void) const
 void Foundry_Output::serialize(QDataStream &out)const
 {
 
-    out<<type_m<<amount_;
+    out<<type()<<amount_;
     serialize_native_tokens(out);
     out<<serial_number_;
     token_scheme_->serialize(out);
@@ -269,7 +269,7 @@ QJsonObject Alias_Output::get_Json(void) const
 void Alias_Output::serialize(QDataStream &out)const
 {
 
-    out<<type_m<<amount_;
+    out<<type()<<amount_;
     serialize_native_tokens(out);
     out<<alias_id_<<state_index_<<state_metadata_<<foundry_counter_;
     serialize_unlock_conditions(out);

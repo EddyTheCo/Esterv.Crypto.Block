@@ -6,14 +6,20 @@ namespace qblocks{
 void Essence::serialize(QDataStream &out)const{};
 QJsonObject Essence::get_Json(void) const{return QJsonObject();};
 Essence::Essence(types typ ):type_m(typ){};
+QByteArray Essence::get_hash(void)const
+{
+    c_array serializedEssence;
+    serializedEssence.from_object<Essence>(*this);
+    return QCryptographicHash::hash(serializedEssence, QCryptographicHash::Blake2b_256);
+}
 template<class from_type>  std::shared_ptr<Essence> Essence::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
     switch(type_) {
 
-      case Transaction_typ:
+    case Transaction_typ:
         return std::shared_ptr<Essence>(new Transaction_Essence(val));
     default:
-    return nullptr;
+        return nullptr;
 
     }
 }
@@ -24,9 +30,9 @@ template std::shared_ptr<Essence> Essence::from_<QDataStream >(QDataStream & val
 
 
 Transaction_Essence::Transaction_Essence(quint64 network_id_m, const std::vector<std::shared_ptr<Input>>& inputs_m,
-                    c_array inputs_commitment_m,
-                    const std::vector<std::shared_ptr<Output>>& outputs_m,
-                    const std::shared_ptr<Payload>& payload_m):Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
+                                         c_array inputs_commitment_m,
+                                         const std::vector<std::shared_ptr<Output>>& outputs_m,
+                                         const std::shared_ptr<Payload>& payload_m):Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
     outputs_(outputs_m),payload_(payload_m)
 {};
 
@@ -71,7 +77,7 @@ Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(Transaction_ty
 };
 void Transaction_Essence::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<network_id_;
     out<<static_cast<quint16>(inputs_.size());
     for(const auto & v: inputs_)v->serialize(out);
@@ -92,7 +98,7 @@ void Transaction_Essence::serialize(QDataStream &out)const
 QJsonObject Transaction_Essence::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("networkId",QString::number(network_id_));  //check this
     var.insert("inputsCommitment",inputs_commitment_.toHexString());
 

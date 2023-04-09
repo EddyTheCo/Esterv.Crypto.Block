@@ -34,14 +34,14 @@ Ed25519_Signature::Ed25519_Signature(QDataStream &in):Signature(Ed25519_typ)
 };
 void Ed25519_Signature::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<public_key_;
     out<<signature_;
 }
 QJsonObject Ed25519_Signature::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("publicKey",public_key_.toHexString());
     var.insert("signature",signature_.toHexString());
     return var;

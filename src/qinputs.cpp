@@ -35,14 +35,14 @@ UTXO_Input::UTXO_Input(QDataStream &in):Input(UTXO_typ)
 };
 void UTXO_Input::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<transaction_id_;
     out<<transaction_output_index_;
 }
 QJsonObject UTXO_Input::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("transactionId",transaction_id_.toHexString());
     var.insert("transactionOutputIndex",(int)transaction_output_index_);
     return var;

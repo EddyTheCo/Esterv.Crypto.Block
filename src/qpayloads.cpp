@@ -37,14 +37,14 @@ Tagged_Data_Payload::Tagged_Data_Payload(QDataStream &in):Payload(Tagged_Data_ty
 }
 void Tagged_Data_Payload::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     out<<tag_;
     out<<data_;
 }
 QJsonObject Tagged_Data_Payload::get_Json(void) const
 {
     QJsonObject var;
-       var.insert("type",(int)type_m);
+       var.insert("type",(int)type());
        var.insert("tag",tag_.toHexString());
        var.insert("data",data_.toHexString());
        return var;
@@ -68,7 +68,7 @@ Transaction_Payload::Transaction_Payload(QDataStream &in):Payload(Transaction_ty
 }
 void Transaction_Payload::serialize(QDataStream &out)const
 {
-    out<<type_m;
+    out<<type();
     essence_->serialize(out);
     out<<static_cast<quint16>(unlocks_.size());
     for(const auto & v: unlocks_)v->serialize(out);
@@ -76,7 +76,7 @@ void Transaction_Payload::serialize(QDataStream &out)const
 QJsonObject Transaction_Payload::get_Json(void) const
 {
     QJsonObject var;
-    var.insert("type",(int)type_m);
+    var.insert("type",(int)type());
     var.insert("essence",essence_->get_Json());
     QJsonArray unloArray;
     for(const auto& v: unlocks_)unloArray.push_back(v->get_Json());

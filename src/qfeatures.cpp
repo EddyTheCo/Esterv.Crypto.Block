@@ -1,6 +1,10 @@
 #include"block/qfeatures.hpp"
 namespace qiota{
 namespace qblocks{
+
+const  QHash<Feature::types,QString > Feature::typesstr=
+{{Sender_typ,"address"},{Issuer_typ,"address"},{Metadata_typ,"data"},{Tag_typ,"tag"}};
+
 void Feature::serialize(QDataStream &out)const{};
 QJsonObject Feature::get_Json(void) const{return QJsonObject();};
 Feature::Feature(types typ ):type_m(typ){};

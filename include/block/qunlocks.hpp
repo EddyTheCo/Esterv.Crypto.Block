@@ -19,6 +19,9 @@ public:
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
+    types type(void)const{return type_m;}
+
+private:
     const types type_m;
 
 };
