@@ -150,7 +150,7 @@ class Alias_Output :public Output
 {
 public:
     Alias_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-                    const quint32& state_index_m, const quint32& foundry_counter_m,
+                    const quint32& state_index_m=0, const quint32& foundry_counter_m=0,
                  fl_array<quint16> state_metadata_m="",
                  const std::vector<std::shared_ptr<Feature>>& features_m={},
                  const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
