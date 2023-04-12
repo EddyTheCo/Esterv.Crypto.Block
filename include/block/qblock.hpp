@@ -36,6 +36,7 @@ public:
     Block(const QJsonValue& val);
 
     friend QDataStream & operator < (QDataStream &out, const Block & obj);
+    static QByteArray get_inputs_Commitment(QByteArray Inputs_hash);
 
     void serialize(QDataStream &out)const;
 
