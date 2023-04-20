@@ -38,7 +38,7 @@ public:
     Transaction_Essence(quint64 network_id_m,const std::vector<std::shared_ptr<Input>>& inputs_m,
                         c_array inputs_commitment_m,
                         const std::vector<std::shared_ptr<Output>> &outputs_m,
-                        const std::shared_ptr<Payload>& payload_m);
+                        const std::shared_ptr<Payload>& payload_m=nullptr);
     Transaction_Essence(const QJsonValue& val);
     Transaction_Essence(QDataStream &in);
     void serialize(QDataStream &out)const;
