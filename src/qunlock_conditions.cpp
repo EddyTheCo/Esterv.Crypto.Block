@@ -14,8 +14,8 @@ QJsonObject Unlock_Condition::get_Json(void) const
     var.insert("address",address_->get_Json());
     return var;
 };
-Unlock_Condition::Unlock_Condition(types typ,std::shared_ptr<Address> address_m ):type_m(typ),address_(address_m){};
-template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::from_(from_type& val){
+Unlock_Condition::Unlock_Condition(types typ, const std::shared_ptr<const Address> &address_m ):type_m(typ),address_(address_m){};
+template<class from_type>  std::shared_ptr<const Unlock_Condition> Unlock_Condition::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
@@ -39,14 +39,14 @@ template<class from_type>  std::shared_ptr<Unlock_Condition> Unlock_Condition::f
     }
 }
 
-template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QDataStream >(QDataStream & val);
-template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<const QJsonValueRef>(const QJsonValueRef& val);
-template std::shared_ptr<Unlock_Condition> Unlock_Condition::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+template std::shared_ptr<const Unlock_Condition> Unlock_Condition::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Unlock_Condition> Unlock_Condition::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Unlock_Condition> Unlock_Condition::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Unlock_Condition> Unlock_Condition::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
 
-Address_Unlock_Condition::Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+Address_Unlock_Condition::Address_Unlock_Condition(const std::shared_ptr<const Address> &address_m):
     Unlock_Condition(Address_typ,address_m){};
 Address_Unlock_Condition::Address_Unlock_Condition(const QJsonValue& val):
     Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
@@ -55,28 +55,28 @@ Address_Unlock_Condition::Address_Unlock_Condition(QDataStream &in):Unlock_Condi
 
 
 
-State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(const std::shared_ptr<const Address> &address_m):
     Unlock_Condition(State_Controller_Address_typ,address_m){};
 State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(const QJsonValue& val):
     State_Controller_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 State_Controller_Address_Unlock_Condition::State_Controller_Address_Unlock_Condition(QDataStream &in):
     Unlock_Condition(State_Controller_Address_typ,Address::from_<QDataStream>(in)){};
 
-Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const std::shared_ptr<const Address> &address_m):
     Unlock_Condition(Governor_Address_typ,address_m){};
 Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(const QJsonValue& val):
     Governor_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Governor_Address_Unlock_Condition::Governor_Address_Unlock_Condition(QDataStream &in):
     Unlock_Condition(Governor_Address_typ,Address::from_<QDataStream>(in)){};
 
-Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<Address> &address_m):
+Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<const Address> &address_m):
     Unlock_Condition(Immutable_Alias_Address_typ,address_m){};
 Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(const QJsonValue& val):
     Immutable_Alias_Address_Unlock_Condition(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Immutable_Alias_Address_Unlock_Condition::Immutable_Alias_Address_Unlock_Condition(QDataStream &in):
     Unlock_Condition(Immutable_Alias_Address_typ,Address::from_<QDataStream>(in)){};
 
-Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<Address> &return_address_m, quint64 return_amount_m)
+Storage_Deposit_Return_Unlock_Condition::Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<const Address> &return_address_m, quint64 return_amount_m)
     :Unlock_Condition(Storage_Deposit_Return_typ,return_address_m),
       return_amount_(return_amount_m)
 {};
@@ -125,7 +125,7 @@ QJsonObject Timelock_Unlock_Condition::get_Json(void) const
 }
 
 
-Expiration_Unlock_Condition::Expiration_Unlock_Condition(quint32 unix_time_m, const std::shared_ptr<Address> &return_address_m):
+Expiration_Unlock_Condition::Expiration_Unlock_Condition(quint32 unix_time_m, const std::shared_ptr<const Address> &return_address_m):
     Unlock_Condition(Expiration_typ,return_address_m),unix_time_(unix_time_m)
 {};
 Expiration_Unlock_Condition::Expiration_Unlock_Condition(const QJsonValue& val):

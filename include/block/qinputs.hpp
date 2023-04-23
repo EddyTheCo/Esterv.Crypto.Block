@@ -12,7 +12,11 @@ class  Input
 public:
     enum types : quint8 { UTXO_typ=0};
     Input(types typ);
-    template<class from_type> static std::shared_ptr<Input> from_(from_type& val);
+    template<class from_type> static std::shared_ptr<const Input> from_(from_type& val);
+    template<class deriv, class... Types> static std::shared_ptr<const Input> get(Types... args)
+    {
+        return std::shared_ptr<Input>(new deriv(args...));
+    }
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -29,7 +33,7 @@ private:
 class UTXO_Input : public Input
 {
 public:
-    UTXO_Input(Transaction_ID  transaction_id_m,quint16 transaction_output_index_m);
+    UTXO_Input(const Transaction_ID&  transaction_id_m,const quint16& transaction_output_index_m);
     UTXO_Input(const QJsonValue& val);
     UTXO_Input(QDataStream &in);
     void serialize(QDataStream &out)const;

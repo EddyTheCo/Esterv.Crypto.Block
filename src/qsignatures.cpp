@@ -5,7 +5,7 @@ namespace qblocks{
 void Signature::serialize(QDataStream &out)const{};
 QJsonObject Signature::get_Json(void) const{return QJsonObject();};
 Signature::Signature(types typ ):type_m(typ){};
-template<class from_type> std::shared_ptr<Signature> Signature::from_(from_type& val){
+template<class from_type> std::shared_ptr<const Signature> Signature::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
     switch(type_) {
       case Ed25519_typ:
@@ -15,9 +15,9 @@ template<class from_type> std::shared_ptr<Signature> Signature::from_(from_type&
 
     }
 }
-template std::shared_ptr<Signature> Signature::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Signature> Signature::from_<QDataStream >(QDataStream & val);
-template std::shared_ptr<Signature> Signature::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Signature> Signature::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Signature> Signature::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Signature> Signature::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
 
 

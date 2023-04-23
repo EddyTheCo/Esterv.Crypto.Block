@@ -12,7 +12,7 @@ QByteArray Essence::get_hash(void)const
     serializedEssence.from_object<Essence>(*this);
     return QCryptographicHash::hash(serializedEssence, QCryptographicHash::Blake2b_256);
 }
-template<class from_type>  std::shared_ptr<Essence> Essence::from_(from_type& val){
+template<class from_type>  std::shared_ptr<const Essence> Essence::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
     switch(type_) {
 
@@ -23,16 +23,16 @@ template<class from_type>  std::shared_ptr<Essence> Essence::from_(from_type& va
 
     }
 }
-template std::shared_ptr<Essence> Essence::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
-template std::shared_ptr<Essence> Essence::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Essence> Essence::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Essence> Essence::from_<QDataStream >(QDataStream & val);
 
 
-
-Transaction_Essence::Transaction_Essence(quint64 network_id_m, const std::vector<std::shared_ptr<Input>>& inputs_m,
-                                         c_array inputs_commitment_m,
-                                         const std::vector<std::shared_ptr<Output>>& outputs_m,
-                                         const std::shared_ptr<Payload>& payload_m):Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
+Transaction_Essence::Transaction_Essence(const quint64& network_id_m, const std::vector<std::shared_ptr<const Input> > &inputs_m,
+                                         const c_array& inputs_commitment_m,
+                                         const std::vector<std::shared_ptr<const Output> > &outputs_m,
+                                         const std::shared_ptr<const Payload> &payload_m):
+    Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
     outputs_(outputs_m),payload_(payload_m)
 {};
 

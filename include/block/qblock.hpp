@@ -46,12 +46,12 @@ public:
 
     void set_nonce(const quint64& nonce_m);
     void set_pv(const quint8& pv);
-
+    std::shared_ptr<const Payload> payload()const{return payload_;}
     private:
 
     quint8 protocol_version;
     quint64 nonce_;
-    std::shared_ptr<Payload> payload_;
+    std::shared_ptr<const Payload> payload_;
     std::vector<Block_ID> parents_;
 
 };

@@ -17,15 +17,20 @@ class Output
 {
 public:
     enum types : quint8 { Basic_typ=3,NFT_typ=6,Foundry_typ=5,Alias_typ=4 };
-    Output(types typ,quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-           const std::vector<std::shared_ptr<Feature>>& features_m={},
-           const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
-           const std::vector<std::shared_ptr<Feature>>& immutable_features_m={});
+    Output(types typ,quint64 amount_m, const std::vector<std::shared_ptr<const Unlock_Condition>> & unlock_conditions_m,
+           const std::vector<std::shared_ptr<const Feature>>& features_m={},
+           const std::vector<std::shared_ptr<const Native_Token>>& native_tokens_m={},
+           const std::vector<std::shared_ptr<const Feature>>& immutable_features_m={});
 
     Output(types typ,const QJsonValue& val);
     Output(types typ):type_m(typ){};
 
     template<class from_type> static std::shared_ptr<Output> from_(from_type& val);
+    template<class deriv, class... Types> static std::shared_ptr<Output> get(Types... args)
+    {
+        return std::shared_ptr<Output>(new deriv(args...));
+    }
+
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
     virtual void set_id(const c_array& id);
@@ -34,37 +39,20 @@ public:
     quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost)const;
 
 
-    void serialize_native_tokens(QDataStream &out)const
-    {
-        serialize_list<quint8>(out,native_tokens_);
-    }
-    void serialize_unlock_conditions(QDataStream &out)const
-    {
-        serialize_list<quint8>(out,unlock_conditions_);
-    }
-    void serialize_features_(QDataStream &out)const
-    {
-        serialize_list<quint8>(out,features_);
-    }
-    void serialize_immutable_features_(QDataStream &out)const
-    {
-        serialize_list<quint8>(out,immutable_features_);
-    }
-
-    std::shared_ptr<Unlock_Condition> get_unlock_(const Unlock_Condition::types& typ)const
+    std::shared_ptr<const Unlock_Condition> get_unlock_(const Unlock_Condition::types& typ)const
     {
         const auto found=std::find_if(unlock_conditions_.begin(),unlock_conditions_.end(),
                                       [typ](const auto& it){return (it->type()==typ);});
         return (found==unlock_conditions_.end())?nullptr:*found;
     }
 
-    std::shared_ptr<Feature> get_feature_(const Feature::types& typ)const
+    std::shared_ptr<const Feature> get_feature_(const Feature::types& typ)const
     {
         const auto found=std::find_if(features_.begin(),features_.end(),
                                       [typ](const auto& it){return (it->type()==typ);});
         return (found==features_.end())?nullptr:*found;
     }
-    std::shared_ptr<Feature> get_immutable_feature_(const Feature::types& typ)const
+    std::shared_ptr<const Feature> get_immutable_feature_(const Feature::types& typ)const
     {
         const auto found=std::find_if(immutable_features_.begin(),immutable_features_.end(),
                                       [typ](const auto& it){return (it->type()==typ);});
@@ -73,10 +61,10 @@ public:
 
 
     quint64 amount_;
-    std::vector<std::shared_ptr<Unlock_Condition>> unlock_conditions_;
-    std::vector<std::shared_ptr<Feature>> features_;
-    std::vector<std::shared_ptr<Feature>> immutable_features_;
-    std::vector<std::shared_ptr<Native_Token>> native_tokens_;
+    std::vector<std::shared_ptr<const Unlock_Condition>> unlock_conditions_;
+    std::vector<std::shared_ptr<const Feature>> features_;
+    std::vector<std::shared_ptr<const Feature>> immutable_features_;
+    std::vector<std::shared_ptr<const Native_Token>> native_tokens_;
     types type(void)const{return type_m;}
     const static QHash<types,QString > typesstr;
 private:
@@ -88,9 +76,9 @@ private:
 class Basic_Output :public Output
 {
 public:
-    Basic_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-                 const std::vector<std::shared_ptr<Feature>>& features_m={},
-                 const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={});
+    Basic_Output(quint64 amount_m, const std::vector<std::shared_ptr<const Unlock_Condition> > &unlock_conditions_m,
+                 const std::vector<std::shared_ptr<const Feature> > &features_m={},
+                 const std::vector<std::shared_ptr<const Native_Token> > &native_tokens_m={});
     Basic_Output(const QJsonValue& val);
     Basic_Output(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -101,10 +89,10 @@ public:
 class NFT_Output :public Output
 {
 public:
-    NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-               const std::vector<std::shared_ptr<Feature>>& features_m={},
-               const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
-               std::vector<std::shared_ptr<Feature>> immutable_features_m={});
+    NFT_Output(quint64 amount_m, const std::vector<std::shared_ptr<const Unlock_Condition> > &unlock_conditions_m,
+               const std::vector<std::shared_ptr<const Feature> > &features_m={},
+               const std::vector<std::shared_ptr<const Native_Token> > &native_tokens_m={},
+               const std::vector<std::shared_ptr<const Feature> > &immutable_features_m={});
     NFT_Output(const QJsonValue& val);
     NFT_Output(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -122,11 +110,11 @@ private:
 class Foundry_Output :public Output
 {
 public:
-    Foundry_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
-                   const std::shared_ptr<Token_Scheme>& token_scheme_m, const quint32& serial_number_m,
-               const std::vector<std::shared_ptr<Feature>>& features_m,
-               const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m,
-               std::vector<std::shared_ptr<Feature>> immutable_features_m=std::vector<std::shared_ptr<Feature>>{});
+    Foundry_Output(const quint64& amount_m, const std::vector<std::shared_ptr<const Unlock_Condition>> & unlock_conditions_m,
+                   std::shared_ptr<Token_Scheme>& token_scheme_m, const quint32& serial_number_m,
+               const std::vector<std::shared_ptr<const Feature>>& features_m,
+               const std::vector<std::shared_ptr<const Native_Token>>& native_tokens_m,
+               std::vector<std::shared_ptr<const Feature>> immutable_features_m={});
     Foundry_Output(const QJsonValue& val);
     Foundry_Output(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -149,12 +137,12 @@ private:
 class Alias_Output :public Output
 {
 public:
-    Alias_Output(quint64 amount_m, const std::vector<std::shared_ptr<Unlock_Condition>> & unlock_conditions_m,
+    Alias_Output(const quint64& amount_m, const std::vector<std::shared_ptr<const Unlock_Condition>> & unlock_conditions_m,
                     const quint32& state_index_m=0, const quint32& foundry_counter_m=0,
-                 fl_array<quint16> state_metadata_m="",
-                 const std::vector<std::shared_ptr<Feature>>& features_m={},
-                 const std::vector<std::shared_ptr<Native_Token>>& native_tokens_m={},
-               std::vector<std::shared_ptr<Feature>> immutable_features_m={});
+                 const fl_array<quint16> &state_metadata_m="",
+                 const std::vector<std::shared_ptr<const Feature>>& features_m={},
+                 const std::vector<std::shared_ptr<const Native_Token>>& native_tokens_m={},
+               const std::vector<std::shared_ptr<const Feature>>& immutable_features_m={});
     Alias_Output(const QJsonValue& val);
     Alias_Output(QDataStream &in);
     void serialize(QDataStream &out)const;

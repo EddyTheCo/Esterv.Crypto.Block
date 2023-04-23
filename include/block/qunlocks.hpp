@@ -14,7 +14,11 @@ public:
 
 
     Unlock(types typ );
-    template<typename from_type> static std::shared_ptr<Unlock> from_(from_type& val);
+    template<typename from_type> static std::shared_ptr<const Unlock> from_(from_type& val);
+    template<class deriv, class... Types> static std::shared_ptr<const Unlock> get(Types... args)
+    {
+        return std::shared_ptr<const Unlock>(new deriv(args...));
+    }
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
@@ -29,14 +33,14 @@ private:
 class Signature_Unlock: public Unlock
 {
 public:
-    Signature_Unlock(const std::shared_ptr<Signature>& signature_m);
+    Signature_Unlock(const std::shared_ptr<const Signature>& signature_m);
     Signature_Unlock(const QJsonValue& val);
     Signature_Unlock(QDataStream &in);
     void serialize(QDataStream &out)const;
     QJsonObject get_Json(void) const;
 
 private:
- std::shared_ptr<Signature> signature_;
+    std::shared_ptr<const Signature> signature_;
 
 };
 
@@ -51,7 +55,7 @@ public:
 
 
 private:
-quint16 reference_;
+    quint16 reference_;
 
 };
 
@@ -66,7 +70,7 @@ public:
 
 
 private:
-quint16 alias_reference_unlock_index_;
+    quint16 alias_reference_unlock_index_;
 
 };
 
@@ -80,7 +84,7 @@ public:
     QJsonObject get_Json(void) const;
 
 private:
-quint16 nft_reference_unlock_index_;
+    quint16 nft_reference_unlock_index_;
 
 };
 };

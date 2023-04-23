@@ -24,7 +24,7 @@ template std::shared_ptr<Token_Scheme> Token_Scheme::from_<const QJsonValueRef>(
 template std::shared_ptr<Token_Scheme> Token_Scheme::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
-Simple_Token_Scheme::Simple_Token_Scheme(quint256  minted_tokens_m,quint256 melted_tokens_m,quint256 maximum_supply_m)
+Simple_Token_Scheme::Simple_Token_Scheme(const quint256 &minted_tokens_m, const quint256 &melted_tokens_m, const quint256 &maximum_supply_m)
     :Token_Scheme(Simple_typ),minted_tokens_(minted_tokens_m),melted_tokens_(melted_tokens_m),maximum_supply_(maximum_supply_m)
 {};
 Simple_Token_Scheme::Simple_Token_Scheme(const QJsonValue& val):

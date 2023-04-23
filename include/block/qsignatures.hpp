@@ -12,7 +12,11 @@ class  Signature
 public:
     enum types : quint8 {Ed25519_typ=0};
     Signature(types typ );
-    template<class from_type> static std::shared_ptr<Signature> from_(from_type& val);
+    template<class from_type> static std::shared_ptr<const Signature> from_(from_type& val);
+    template<class deriv, class... Types> static std::shared_ptr<const Signature> get(Types... args)
+    {
+        return std::shared_ptr<const Signature>(new deriv(args...));
+    }
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 

@@ -5,7 +5,7 @@ void Input::serialize(QDataStream &out)const{};
 QJsonObject Input::get_Json(void) const{return QJsonObject();};
 Input::Input(types typ ):type_m(typ){};
 
-template<class from_type> std::shared_ptr<Input> Input::from_(from_type& val){
+template<class from_type> std::shared_ptr<const Input> Input::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
@@ -17,13 +17,13 @@ template<class from_type> std::shared_ptr<Input> Input::from_(from_type& val){
 
     }
 }
-template std::shared_ptr<Input> Input::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Input> Input::from_<QDataStream >(QDataStream & val);
-template std::shared_ptr<Input> Input::from_<const QJsonValueRef>(const QJsonValueRef& val);
-template std::shared_ptr<Input> Input::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+template std::shared_ptr<const Input> Input::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Input> Input::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Input> Input::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Input> Input::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
-UTXO_Input::UTXO_Input(Transaction_ID transaction_id_m,quint16 transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
+UTXO_Input::UTXO_Input(const Transaction_ID &transaction_id_m, const quint16 &transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
 transaction_output_index_(transaction_output_index_m){};
 UTXO_Input::UTXO_Input(const QJsonValue& val):UTXO_Input(Transaction_ID(val.toObject()["transactionId"]),
     val.toObject()["transactionOutputIndex"].toInt()){};

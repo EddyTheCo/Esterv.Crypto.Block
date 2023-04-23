@@ -13,6 +13,10 @@ public:
     enum types : quint8 { Simple_typ=0};
     Token_Scheme(types typ);
     template<class from_type> static std::shared_ptr<Token_Scheme> from_(from_type& val);
+    template<class deriv, class... Types> static std::shared_ptr<Token_Scheme> get(Types... args)
+    {
+        return std::shared_ptr<Token_Scheme>(new deriv(args...));
+    }
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -27,7 +31,7 @@ private:
 class Simple_Token_Scheme : public Token_Scheme
 {
 public:
-    Simple_Token_Scheme(quint256  minted_tokens_m,quint256 melted_tokens_m,quint256 maximum_supply_m);
+    Simple_Token_Scheme(const quint256&  minted_tokens_m,const quint256& melted_tokens_m,const quint256& maximum_supply_m);
     Simple_Token_Scheme(const QJsonValue& val);
     Simple_Token_Scheme(QDataStream &in);
     void serialize(QDataStream &out)const;

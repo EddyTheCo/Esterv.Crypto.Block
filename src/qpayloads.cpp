@@ -1,11 +1,12 @@
 #include<block/qessences.hpp>
 #include<block/qpayloads.hpp>
+#include<QCryptographicHash>
 namespace qiota{
 namespace qblocks{
 void Payload::serialize(QDataStream &out)const{};
 QJsonObject Payload::get_Json(void) const{return QJsonObject();};
 Payload::Payload(types type_):type_m(type_){};
-template<class from_type> std::shared_ptr<Payload> Payload::from_(from_type& val){
+template<class from_type> std::shared_ptr<const Payload> Payload::from_(from_type& val){
 
     const auto type_=get_type<quint32>(val);
     switch(type_) {
@@ -19,9 +20,9 @@ template<class from_type> std::shared_ptr<Payload> Payload::from_(from_type& val
     }
 }
 
-template std::shared_ptr<Payload> Payload::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Payload> Payload::from_<QDataStream >(QDataStream & val);
-template std::shared_ptr<Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Payload> Payload::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Payload> Payload::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
 
 
@@ -50,7 +51,7 @@ QJsonObject Tagged_Data_Payload::get_Json(void) const
        return var;
 }
 
-Transaction_Payload::Transaction_Payload(const std::shared_ptr<Essence>& essence_m,const std::vector<std::shared_ptr<Unlock>>& unlocks_m):essence_(essence_m),
+Transaction_Payload::Transaction_Payload(std::shared_ptr<const Essence> essence_m, const std::vector<std::shared_ptr<const Unlock> > &unlocks_m):essence_(essence_m),
     unlocks_(unlocks_m),Payload(Transaction_typ){};
 
 Transaction_Payload::Transaction_Payload(const QJsonValue& val):
@@ -85,6 +86,11 @@ QJsonObject Transaction_Payload::get_Json(void) const
    
     return var;
 }
-
+c_array Transaction_Payload::get_id(void)const
+{
+    c_array var;
+    var.from_object(*this);
+    return QCryptographicHash::hash(var, QCryptographicHash::Blake2b_256);
+}
 };
 };

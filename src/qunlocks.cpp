@@ -6,7 +6,7 @@ void Unlock::serialize(QDataStream &out)const{};
 QJsonObject Unlock::get_Json(void) const{return QJsonObject();};
 Unlock::Unlock(types typ ):type_m(typ){};
 
-template<typename from_type> std::shared_ptr<Unlock> Unlock::from_(from_type& val){
+template<typename from_type> std::shared_ptr<const Unlock> Unlock::from_(from_type& val){
     const auto type_=get_type<quint8>(val);
 
     switch(type_) {
@@ -24,13 +24,13 @@ template<typename from_type> std::shared_ptr<Unlock> Unlock::from_(from_type& va
 }
 
 
-template std::shared_ptr<Unlock> Unlock::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Unlock> Unlock::from_<QDataStream>(QDataStream & val);
-template std::shared_ptr<Unlock> Unlock::from_<const QJsonValueRef>(const QJsonValueRef& val);
-template std::shared_ptr<Unlock> Unlock::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+template std::shared_ptr<const Unlock> Unlock::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Unlock> Unlock::from_<QDataStream>(QDataStream & val);
+template std::shared_ptr<const Unlock> Unlock::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Unlock> Unlock::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
-Signature_Unlock::Signature_Unlock(const std::shared_ptr<Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
+Signature_Unlock::Signature_Unlock(const std::shared_ptr<const Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
 Signature_Unlock::Signature_Unlock(const QJsonValue& val):Signature_Unlock(Signature::from_<const QJsonValue>(val.toObject()["signature"])){};
 Signature_Unlock::Signature_Unlock(QDataStream &in):Unlock(types::Signature_typ),signature_(Signature::from_<QDataStream>(in)){};
 void Signature_Unlock::serialize(QDataStream &out)const

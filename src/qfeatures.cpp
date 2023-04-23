@@ -8,7 +8,7 @@ const  QHash<Feature::types,QString > Feature::typesstr=
 void Feature::serialize(QDataStream &out)const{};
 QJsonObject Feature::get_Json(void) const{return QJsonObject();};
 Feature::Feature(types typ ):type_m(typ){};
-template<class from_type> std::shared_ptr<Feature> Feature::from_(from_type& val){
+template<class from_type> std::shared_ptr<const Feature> Feature::from_(from_type& val){
     const auto type_=get_type<types>(val);
 
     switch(type_) {
@@ -25,12 +25,12 @@ template<class from_type> std::shared_ptr<Feature> Feature::from_(from_type& val
 
     }
 }
-template std::shared_ptr<Feature> Feature::from_<const QJsonValue>(const QJsonValue& val);
-template std::shared_ptr<Feature> Feature::from_<QDataStream >(QDataStream & val);
-template std::shared_ptr<Feature> Feature::from_<const QJsonValueRef>(const QJsonValueRef& val);
-template std::shared_ptr<Feature> Feature::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+template std::shared_ptr<const Feature> Feature::from_<const QJsonValue>(const QJsonValue& val);
+template std::shared_ptr<const Feature> Feature::from_<QDataStream >(QDataStream & val);
+template std::shared_ptr<const Feature> Feature::from_<const QJsonValueRef>(const QJsonValueRef& val);
+template std::shared_ptr<const Feature> Feature::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
-Sender_Feature::Sender_Feature(std::shared_ptr<Address> sender_m):Feature(Sender_typ),sender_(sender_m){};
+Sender_Feature::Sender_Feature(std::shared_ptr<const Address> sender_m):Feature(Sender_typ),sender_(sender_m){};
 Sender_Feature::Sender_Feature(const QJsonValue& val):Sender_Feature(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Sender_Feature::Sender_Feature(QDataStream &in):Feature(Sender_typ),sender_(Address::from_<QDataStream>(in)){};
 void Sender_Feature::serialize(QDataStream &out)const
@@ -46,7 +46,7 @@ QJsonObject Sender_Feature::get_Json(void) const
     return var;
 }
 
-Issuer_Feature::Issuer_Feature(std::shared_ptr<Address> issuer_m):Feature(Issuer_typ),issuer_(issuer_m){};
+Issuer_Feature::Issuer_Feature(std::shared_ptr<const Address> issuer_m):Feature(Issuer_typ),issuer_(issuer_m){};
 Issuer_Feature::Issuer_Feature(const QJsonValue& val):Issuer_Feature(Address::from_<const QJsonValue>(val.toObject()["address"])){};
 Issuer_Feature::Issuer_Feature(QDataStream &in):Feature(Issuer_typ),issuer_(Address::from_<QDataStream>(in)){};
 void Issuer_Feature::serialize(QDataStream &out)const
@@ -62,7 +62,7 @@ QJsonObject Issuer_Feature::get_Json(void) const
     return var;
 }
 
-Metadata_Feature::Metadata_Feature(fl_array<quint16> data_m):Feature(Metadata_typ),data_(data_m){};
+Metadata_Feature::Metadata_Feature(const fl_array<quint16> &data_m):Feature(Metadata_typ),data_(data_m){};
 Metadata_Feature::Metadata_Feature(const QJsonValue& val):Metadata_Feature(fl_array<quint16>(val.toObject()["data"])){};
 Metadata_Feature::Metadata_Feature(QDataStream &in):Feature(Metadata_typ){
     in>>data_;
@@ -79,7 +79,7 @@ QJsonObject Metadata_Feature::get_Json(void) const
     var.insert("data",data_.toHexString());
     return var;
 }
-Tag_Feature::Tag_Feature(fl_array<quint8> tag_m):Feature(Tag_typ),tag_(tag_m){};
+Tag_Feature::Tag_Feature(const fl_array<quint8> &tag_m):Feature(Tag_typ),tag_(tag_m){};
 Tag_Feature::Tag_Feature(const QJsonValue& val):Tag_Feature(fl_array<quint8>(val.toObject()["tag"])){};
 Tag_Feature::Tag_Feature(QDataStream &in):Feature(Tag_typ){
     in>>tag_;
