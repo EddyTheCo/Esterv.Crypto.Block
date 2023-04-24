@@ -30,7 +30,12 @@ template std::shared_ptr<const Unlock> Unlock::from_<const QJsonValueRef>(const 
 template std::shared_ptr<const Unlock> Unlock::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
 
-Signature_Unlock::Signature_Unlock(const std::shared_ptr<const Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
+std::shared_ptr<const Unlock> Unlock::Signature(const std::shared_ptr<const class Signature> &signature_m)
+{
+    return std::shared_ptr<Unlock>(new Signature_Unlock(signature_m));
+}
+
+Signature_Unlock::Signature_Unlock(const std::shared_ptr<const class Signature> &signature_m):Unlock(Signature_typ),signature_(signature_m){};
 Signature_Unlock::Signature_Unlock(const QJsonValue& val):Signature_Unlock(Signature::from_<const QJsonValue>(val.toObject()["signature"])){};
 Signature_Unlock::Signature_Unlock(QDataStream &in):Unlock(types::Signature_typ),signature_(Signature::from_<QDataStream>(in)){};
 void Signature_Unlock::serialize(QDataStream &out)const
@@ -46,7 +51,12 @@ QJsonObject Signature_Unlock::get_Json(void) const
     return var;
 }
 
-Reference_Unlock::Reference_Unlock(quint16 reference_m):Unlock(Reference_typ),reference_(reference_m){};
+std::shared_ptr<const Unlock> Unlock::Reference(const quint16 &reference_m)
+{
+    return std::shared_ptr<Unlock>(new Reference_Unlock(reference_m));
+}
+
+Reference_Unlock::Reference_Unlock(const quint16 &reference_m):Unlock(Reference_typ),reference_(reference_m){};
 Reference_Unlock::Reference_Unlock(const QJsonValue& val):Reference_Unlock(val.toObject()["reference"].toInt()){};
 Reference_Unlock::Reference_Unlock(QDataStream &in):Unlock(Reference_typ)
 {
@@ -65,7 +75,12 @@ QJsonObject Reference_Unlock::get_Json(void) const
     return var;
 }
 
-Alias_Unlock::Alias_Unlock(quint16 alias_reference_unlock_index_m):Unlock(Alias_typ),alias_reference_unlock_index_(alias_reference_unlock_index_m){};
+std::shared_ptr<const Unlock> Unlock::Alias(const quint16 &reference_m)
+{
+    return std::shared_ptr<Unlock>(new Alias_Unlock(reference_m));
+}
+
+Alias_Unlock::Alias_Unlock(const quint16 &alias_reference_unlock_index_m):Unlock(Alias_typ),alias_reference_unlock_index_(alias_reference_unlock_index_m){};
 Alias_Unlock::Alias_Unlock(const QJsonValue& val):Alias_Unlock(val.toObject()["reference"].toInt()){};
 Alias_Unlock::Alias_Unlock(QDataStream &in):Unlock(Alias_typ)
 {
@@ -84,8 +99,12 @@ QJsonObject Alias_Unlock::get_Json(void) const
     return var;
 }
 
+std::shared_ptr<const Unlock> Unlock::NFT(const quint16 &reference_m)
+{
+    return std::shared_ptr<Unlock>(new NFT_Unlock(reference_m));
+}
 
-NFT_Unlock::NFT_Unlock(quint16 nft_reference_unlock_index_m):Unlock(NFT_typ),nft_reference_unlock_index_(nft_reference_unlock_index_m){};
+NFT_Unlock::NFT_Unlock(const quint16 &nft_reference_unlock_index_m):Unlock(NFT_typ),nft_reference_unlock_index_(nft_reference_unlock_index_m){};
 NFT_Unlock::NFT_Unlock(const QJsonValue& val):NFT_Unlock(val.toObject()["reference"].toInt()){};
 NFT_Unlock::NFT_Unlock(QDataStream &in):Unlock(NFT_typ)
 {

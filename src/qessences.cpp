@@ -27,10 +27,17 @@ template std::shared_ptr<const Essence> Essence::from_<const QJsonValue>(const Q
 template std::shared_ptr<const Essence> Essence::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<const Essence> Essence::from_<QDataStream >(QDataStream & val);
 
-
-Transaction_Essence::Transaction_Essence(const quint64& network_id_m, const std::vector<std::shared_ptr<const Input> > &inputs_m,
+std::shared_ptr<const Essence> Essence::Transaction(const quint64 &network_id_m,
+                                                    const pvector<const Input> &inputs_m,
+                                                    const c_array &inputs_commitment_m,
+                                                    const pvector<const Output> &outputs_m,
+                                                    const std::shared_ptr<const Payload> &payload_m)
+{
+    return std::shared_ptr<Essence>(new Transaction_Essence(network_id_m,inputs_m,inputs_commitment_m,outputs_m,payload_m));
+}
+Transaction_Essence::Transaction_Essence(const quint64& network_id_m, const pvector<const Input> &inputs_m,
                                          const c_array& inputs_commitment_m,
-                                         const std::vector<std::shared_ptr<const Output> > &outputs_m,
+                                         const pvector<const Output> &outputs_m,
                                          const std::shared_ptr<const Payload> &payload_m):
     Essence(Transaction_typ),network_id_(network_id_m),inputs_(inputs_m),inputs_commitment_(inputs_commitment_m),
     outputs_(outputs_m),payload_(payload_m)

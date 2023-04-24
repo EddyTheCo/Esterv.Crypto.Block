@@ -126,10 +126,13 @@ using dataF = fl_array<quint32>;
  **/
 using tagF = fl_array<quint8>;
 
+
+template<class T> using pvector=std::vector<std::shared_ptr<T>> ;
+
 template<class T>
-std::vector<std::shared_ptr<const T>> get_T(const QJsonArray& val)
+pvector<const T> get_T(const QJsonArray& val)
 {
-    std::vector<std::shared_ptr<const T>> var;
+    pvector<const T> var;
     for(const auto& v:val)var.push_back(T::from_(v));
     return var;
 }
@@ -145,20 +148,15 @@ template<class type_type> type_type get_type(QDataStream & val)
 }
 
 template<class size_type,class obj_type> void serialize_list(QDataStream &out,
-                                                             const std::vector<std::shared_ptr<const obj_type>> & ptr_vector)
+                                                             const pvector<const obj_type> & ptr_vector)
 {
-    auto var=ptr_vector;
-    std::sort(var.begin(), var.end(), [](auto a, auto b)
-    {
-        return *a < *b;
-    });
-    out<<static_cast<size_type>(var.size());
-    for(const auto& v: var)v->serialize(out);
+    out<<static_cast<size_type>(ptr_vector.size());
+    for(const auto& v: ptr_vector)v->serialize(out);
 }
 
-template<class size_type,class obj_type> std::vector<std::shared_ptr<const obj_type>> deserialize_list(QDataStream &in)
+template<class size_type,class obj_type> pvector<const obj_type> deserialize_list(QDataStream &in)
 {
-    std::vector<std::shared_ptr<const obj_type>>  ptr_vector;
+    pvector<const obj_type>  ptr_vector;
     size_type  length_;
     in>>length_;
     for(auto i=0;i<length_;i++)
@@ -167,7 +165,13 @@ template<class size_type,class obj_type> std::vector<std::shared_ptr<const obj_t
     }
     return ptr_vector;
 }
-
+template<class obj_type> void order_list(pvector<obj_type> &ptr_vector)
+{
+    std::sort(ptr_vector.begin(), ptr_vector.end(), [](auto a, auto b)
+    {
+        return *a < *b;
+    });
+}
 
 };
 

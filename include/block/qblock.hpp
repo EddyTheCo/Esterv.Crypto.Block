@@ -32,7 +32,7 @@ class Block
 public: 
 	Block(){};
     Block(QDataStream &serialized_block);
-    Block(const std::shared_ptr<Payload>& pyl);
+    Block(const std::shared_ptr<const Payload>& pyl);
     Block(const QJsonValue& val);
 
     friend QDataStream & operator < (QDataStream &out, const Block & obj);

@@ -13,10 +13,12 @@ public:
     enum types : quint8 { Sender_typ=0, Issuer_typ=1 , Metadata_typ=2 , Tag_typ=3};
     Feature(types typ);
     template<class from_type>static std::shared_ptr<const Feature> from_(from_type& val);
-    template<class deriv, class... Types> static std::shared_ptr<const Feature> get(Types... args)
-    {
-        return std::shared_ptr<Feature>(new deriv(args...));
-    }
+
+    static std::shared_ptr<const Feature> Sender(const std::shared_ptr<const Address> &sender_m);
+    static std::shared_ptr<const Feature> Issuer(const std::shared_ptr<const Address>& issuer_m);
+    static std::shared_ptr<const Feature> Metadata(const fl_array<quint16>& data_m);
+    static std::shared_ptr<const Feature> Tag(const fl_array<quint8>& tag_m);
+
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
 
@@ -35,7 +37,7 @@ private:
 class Sender_Feature : public Feature
 {
 public:
-    Sender_Feature(std::shared_ptr<const Address> sender_m);
+    Sender_Feature(const std::shared_ptr<const Address> &sender_m);
     Sender_Feature(const QJsonValue& val);
     Sender_Feature(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -48,7 +50,7 @@ private:
 class Issuer_Feature : public Feature
 {
 public:
-    Issuer_Feature(std::shared_ptr<const Address> issuer_m);
+    Issuer_Feature(const std::shared_ptr<const Address>& issuer_m);
     Issuer_Feature(const QJsonValue& val);
     Issuer_Feature(QDataStream &in);
     void serialize(QDataStream &out)const;

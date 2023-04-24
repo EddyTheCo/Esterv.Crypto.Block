@@ -24,17 +24,18 @@ template std::shared_ptr<const Payload> Payload::from_<const QJsonValue>(const Q
 template std::shared_ptr<const Payload> Payload::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<const Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef& val);
 
+std::shared_ptr<const Payload> Payload::Tagged_Data(const tagF &tag_m, const dataF &data_m)
+{
+    return std::shared_ptr<Payload>(new Tagged_Data_Payload(tag_m,data_m));
+}
 
-
-Tagged_Data_Payload::Tagged_Data_Payload(const tagF tag_m, const dataF data_m):Payload(Tagged_Data_typ),tag_(tag_m),data_(data_m){};
+Tagged_Data_Payload::Tagged_Data_Payload(const tagF &tag_m, const dataF &data_m):Payload(Tagged_Data_typ),tag_(tag_m),data_(data_m){};
 Tagged_Data_Payload::Tagged_Data_Payload(const QJsonValue& val):
     Tagged_Data_Payload(tagF(val.toObject()["tag"]),dataF(val.toObject()["data"])){};
 Tagged_Data_Payload::Tagged_Data_Payload(QDataStream &in):Payload(Tagged_Data_typ)
 {
-    qDebug()<<"inside Tagged_Data_Payload";
     in>>tag_;
     in>>data_;
-
 }
 void Tagged_Data_Payload::serialize(QDataStream &out)const
 {
@@ -51,7 +52,13 @@ QJsonObject Tagged_Data_Payload::get_Json(void) const
        return var;
 }
 
-Transaction_Payload::Transaction_Payload(std::shared_ptr<const Essence> essence_m, const std::vector<std::shared_ptr<const Unlock> > &unlocks_m):essence_(essence_m),
+
+std::shared_ptr<const Payload> Payload::Transaction(const std::shared_ptr<const Essence>& essence_m,const pvector<const Unlock>& unlocks_m)
+{
+    return std::shared_ptr<Payload>(new Transaction_Payload(essence_m,unlocks_m));
+}
+
+Transaction_Payload::Transaction_Payload(const std::shared_ptr<const Essence> &essence_m, const pvector<const Unlock>  &unlocks_m):essence_(essence_m),
     unlocks_(unlocks_m),Payload(Transaction_typ){};
 
 Transaction_Payload::Transaction_Payload(const QJsonValue& val):

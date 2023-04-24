@@ -8,7 +8,7 @@ QByteArray Block::get_inputs_Commitment(QByteArray Inputs_hash)
 {
     return QCryptographicHash::hash(Inputs_hash, QCryptographicHash::Blake2b_256);
 }
-Block::Block(const std::shared_ptr<Payload> &pyl):
+Block::Block(const std::shared_ptr<const Payload> &pyl):
     payload_(pyl){};
 
 Block::Block(QDataStream &in)

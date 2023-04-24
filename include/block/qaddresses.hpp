@@ -20,10 +20,11 @@ public:
         auto var=QByteArray(val.constData(),val.size());
         return from_(var);
     };
-    template<class deriv, class... Types> static std::shared_ptr<const Address> get(Types... args)
-    {
-        return std::shared_ptr<Address>(new deriv(args...));
-    }
+
+    static std::shared_ptr<const Address> NFT(const c_array& nft_id_m);
+    static std::shared_ptr<const Address> Alias(const c_array& alias_id_m);
+    static std::shared_ptr<const Address> Ed25519(const c_array& pubkeyhash_m);
+
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;

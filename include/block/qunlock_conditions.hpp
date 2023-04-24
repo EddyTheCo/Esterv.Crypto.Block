@@ -14,10 +14,14 @@ public:
                           Governor_Address_typ=5, Immutable_Alias_Address_typ=6};
     Unlock_Condition(types typ, const std::shared_ptr<const Address> &address_m=nullptr );
     template<class from_type>static std::shared_ptr<const Unlock_Condition> from_(from_type& val);
-    template<class deriv, class... Types> static std::shared_ptr<const Unlock_Condition> get(Types... args)
-    {
-        return std::shared_ptr<const Unlock_Condition>(new deriv(args...));
-    }
+
+    static std::shared_ptr<const Unlock_Condition> Address(const std::shared_ptr<const class Address>& address_m);
+    static std::shared_ptr<const Unlock_Condition> Storage_Deposit_Return(const std::shared_ptr<const class Address>& return_address_m,const quint64& return_amount_m);
+    static std::shared_ptr<const Unlock_Condition> Timelock(const quint32 &unix_time_m);
+    static std::shared_ptr<const Unlock_Condition> Expiration(const quint32& unix_time_m,const std::shared_ptr<const class Address> &return_address_m);
+    static std::shared_ptr<const Unlock_Condition> State_Controller_Address(const std::shared_ptr<const class Address>& address_m);
+    static std::shared_ptr<const Unlock_Condition> Governor_Address(const std::shared_ptr<const class Address>& address_m);
+    static std::shared_ptr<const Unlock_Condition> Immutable_Alias_Address(const std::shared_ptr<const class Address>& address_m);
 
     virtual void serialize(QDataStream &out)const;
     virtual QJsonObject get_Json(void) const;
@@ -26,19 +30,19 @@ public:
     {
         return a.type_m<b.type_m;
     }
-    std::shared_ptr<const Address>  address(void)const{return address_;}
+    std::shared_ptr<const class Address>  address(void)const{return address_;}
     types type(void)const{return type_m;}
 
 private:
     const types type_m;
-    std::shared_ptr<const Address> address_;
+    std::shared_ptr<const class Address> address_;
 
 };
 
 class Address_Unlock_Condition : public Unlock_Condition
 {
 public:
-    Address_Unlock_Condition(const std::shared_ptr<const Address>& address_m);
+    Address_Unlock_Condition(const std::shared_ptr<const class Address>& address_m);
     Address_Unlock_Condition(const QJsonValue& val);
     Address_Unlock_Condition(QDataStream &in);
 
@@ -48,7 +52,7 @@ public:
 class Storage_Deposit_Return_Unlock_Condition : public Unlock_Condition
 {
 public:
-    Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<const Address>& return_address_m, quint64 return_amount_m);
+    Storage_Deposit_Return_Unlock_Condition(const std::shared_ptr<const class Address>& return_address_m,const quint64& return_amount_m);
     Storage_Deposit_Return_Unlock_Condition(const QJsonValue& val);
     Storage_Deposit_Return_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -64,7 +68,7 @@ private:
 class Timelock_Unlock_Condition: public Unlock_Condition
 {
 public:
-    Timelock_Unlock_Condition(quint32 unix_time_m);
+    Timelock_Unlock_Condition(const quint32 &unix_time_m);
     Timelock_Unlock_Condition(const QJsonValue& val);
     Timelock_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -80,7 +84,7 @@ private:
 class Expiration_Unlock_Condition:public Unlock_Condition
 {
 public:
-    Expiration_Unlock_Condition(quint32 unix_time_m,const std::shared_ptr<const Address> &return_address_m);
+    Expiration_Unlock_Condition(const quint32& unix_time_m,const std::shared_ptr<const class Address> &return_address_m);
     Expiration_Unlock_Condition(const QJsonValue& val);
     Expiration_Unlock_Condition(QDataStream &in);
     void serialize(QDataStream &out)const;
@@ -95,7 +99,7 @@ private:
 class State_Controller_Address_Unlock_Condition:public Unlock_Condition
 {
 public:
-    State_Controller_Address_Unlock_Condition(const std::shared_ptr<const Address>& address_m);
+    State_Controller_Address_Unlock_Condition(const std::shared_ptr<const class Address>& address_m);
     State_Controller_Address_Unlock_Condition(const QJsonValue& val);
     State_Controller_Address_Unlock_Condition(QDataStream &in);
 
@@ -104,14 +108,14 @@ public:
 class Governor_Address_Unlock_Condition:public Unlock_Condition
 {
 public:
-    Governor_Address_Unlock_Condition(const std::shared_ptr<const Address>& address_m);
+    Governor_Address_Unlock_Condition(const std::shared_ptr<const class Address>& address_m);
     Governor_Address_Unlock_Condition(const QJsonValue& val);
     Governor_Address_Unlock_Condition(QDataStream &in);
 };
 class Immutable_Alias_Address_Unlock_Condition:public Unlock_Condition
 {
 public:
-    Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<const Address>& address_m);
+    Immutable_Alias_Address_Unlock_Condition(const std::shared_ptr<const class Address>& address_m);
     Immutable_Alias_Address_Unlock_Condition(const QJsonValue& val);
     Immutable_Alias_Address_Unlock_Condition(QDataStream &in);
 

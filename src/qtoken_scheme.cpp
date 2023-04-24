@@ -11,10 +11,10 @@ template<class from_type> std::shared_ptr<Token_Scheme> Token_Scheme::from_(from
 
     switch(type_) {
 
-      case Simple_typ:
+    case Simple_typ:
         return std::shared_ptr<Token_Scheme>(new Simple_Token_Scheme(val));
     default:
-    return nullptr;
+        return nullptr;
 
     }
 }
@@ -22,6 +22,13 @@ template std::shared_ptr<Token_Scheme> Token_Scheme::from_<const QJsonValue>(con
 template std::shared_ptr<Token_Scheme> Token_Scheme::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<Token_Scheme> Token_Scheme::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<Token_Scheme> Token_Scheme::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+
+std::shared_ptr<Token_Scheme> Token_Scheme::Simple(const quint256 &minted_tokens_m,
+                                                   const quint256 &melted_tokens_m,
+                                                   const quint256 &maximum_supply_m)
+{
+    return std::shared_ptr<Token_Scheme>(new Simple_Token_Scheme(minted_tokens_m,melted_tokens_m,maximum_supply_m));
+}
 
 
 Simple_Token_Scheme::Simple_Token_Scheme(const quint256 &minted_tokens_m, const quint256 &melted_tokens_m, const quint256 &maximum_supply_m)

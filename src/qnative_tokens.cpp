@@ -1,6 +1,12 @@
 #include"block/qnative_tokens.hpp"
 namespace qiota{
 namespace qblocks{
+std::shared_ptr<const Native_Token> Native_Token::Native(const Token_ID &token_id_m, const quint256 &amount_m)
+{
+    return std::shared_ptr<Native_Token>(new Native_Token(token_id_m,amount_m));
+}
+
+
 Native_Token::Native_Token(const Token_ID &token_id_m, const quint256 &amount_m):token_id_(token_id_m),
 amount_(amount_m){};
 Native_Token::Native_Token(const QJsonValue& val):token_id_(Token_ID(val.toObject()["id"])),
@@ -14,6 +20,7 @@ template std::shared_ptr<const Native_Token> Native_Token::from_<const QJsonValu
 template std::shared_ptr<const Native_Token> Native_Token::from_<QDataStream >(QDataStream & val);
 template std::shared_ptr<const Native_Token> Native_Token::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<const Native_Token> Native_Token::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
+
 
 Native_Token::Native_Token(QDataStream &in)
 {

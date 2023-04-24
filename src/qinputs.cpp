@@ -22,6 +22,11 @@ template std::shared_ptr<const Input> Input::from_<QDataStream >(QDataStream & v
 template std::shared_ptr<const Input> Input::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<const Input> Input::from_<QJsonValueConstRef const>(QJsonValueConstRef const&);
 
+std::shared_ptr<const Input> Input::UTXO(const Transaction_ID &transaction_id_m, const quint16 &transaction_output_index_m)
+{
+    return std::shared_ptr<Input>(new UTXO_Input(transaction_id_m,transaction_output_index_m));
+}
+
 
 UTXO_Input::UTXO_Input(const Transaction_ID &transaction_id_m, const quint16 &transaction_output_index_m):Input(UTXO_typ),transaction_id_(transaction_id_m),
 transaction_output_index_(transaction_output_index_m){};

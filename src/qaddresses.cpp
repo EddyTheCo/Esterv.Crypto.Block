@@ -41,6 +41,11 @@ std::shared_ptr<const Address> Address::from_(QByteArray& val)
     return qblocks::Address::from_<QDataStream>(buffer);
 }
 
+std::shared_ptr<const Address> Address::NFT(const c_array& nft_id_m)
+{
+    return std::shared_ptr<Address>(new NFT_Address(nft_id_m));
+};
+
 NFT_Address::NFT_Address(const c_array &nft_id_m):Address(NFT_typ,nft_id_m){};
 NFT_Address::NFT_Address(const QJsonValue& val):NFT_Address(NFT_ID(val.toObject()["nftId"])){};
 NFT_Address::NFT_Address(QDataStream &in):Address(NFT_typ,in){};
@@ -52,6 +57,10 @@ QJsonObject NFT_Address::get_Json(void) const
     var.insert("nftId",addrhash().toHexString());
     return var;
 }
+std::shared_ptr<const Address> Address::Alias(const c_array &alias_id_m)
+{
+    return std::shared_ptr<Address>(new Alias_Address(alias_id_m));
+};
 
 Alias_Address::Alias_Address(const c_array &alias_id_m):Address(Alias_typ,alias_id_m){};
 Alias_Address::Alias_Address(const QJsonValue& val):Alias_Address(c_array(val.toObject()["aliasId"])){};
@@ -65,6 +74,11 @@ QJsonObject Alias_Address::get_Json(void) const
     var.insert("aliasId",addrhash().toHexString());
     return var;
 }
+
+std::shared_ptr<const Address> Address::Ed25519(const c_array& pubkeyhash_m)
+{
+    return std::shared_ptr<Address>(new Ed25519_Address(pubkeyhash_m));
+};
 
 Ed25519_Address::Ed25519_Address(const c_array& pubkeyhash_m):Address(Ed25519_typ,pubkeyhash_m){};
 Ed25519_Address::Ed25519_Address(const QJsonValue& val):Ed25519_Address(c_array(val.toObject()["pubKeyHash"])){};

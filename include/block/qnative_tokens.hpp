@@ -18,10 +18,8 @@ public:
     Native_Token(const QJsonValue& val);
     Native_Token(QDataStream &in);
     template<class from_type> static std::shared_ptr<const Native_Token> from_(from_type& val);
-    template<class deriv, class... Types> static std::shared_ptr<const Native_Token> get(Types... args)
-    {
-        return std::shared_ptr<Native_Token>(new deriv(args...));
-    }
+
+    static std::shared_ptr<const Native_Token> Native(const Token_ID& token_id_m, const quint256& amount_m);
     void serialize(QDataStream &out)const;
 
     friend inline bool operator<(const Native_Token& a, const Native_Token& b)
