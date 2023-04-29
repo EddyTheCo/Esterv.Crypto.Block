@@ -14,12 +14,8 @@ public:
     Address(types typ, c_array addrhash_m );
     Address(types typ,QDataStream &in);
     template<class from_type> static  std::shared_ptr<const Address> from_(from_type& val);
-    static std::shared_ptr<const Address> from_(QByteArray& val);
-    static std::shared_ptr<const Address> from_(c_array& val)
-    {
-        auto var=QByteArray(val.constData(),val.size());
-        return from_(var);
-    };
+    static std::shared_ptr<const Address> from_array(QByteArray& val);
+
 
     static std::shared_ptr<const Address> NFT(const c_array& nft_id_m);
     static std::shared_ptr<const Address> Alias(const c_array& alias_id_m);

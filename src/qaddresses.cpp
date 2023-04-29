@@ -34,7 +34,7 @@ template std::shared_ptr<const Address> Address::from_<const QJsonValue>(const Q
 template std::shared_ptr<const Address> Address::from_<const QJsonValueRef>(const QJsonValueRef& val);
 template std::shared_ptr<const Address> Address::from_<QDataStream>(QDataStream & val);
 
-std::shared_ptr<const Address> Address::from_(QByteArray& val)
+std::shared_ptr<const Address> Address::from_array(QByteArray& val)
 {
     auto buffer=QDataStream(&val,QIODevice::ReadOnly);
     buffer.setByteOrder(QDataStream::LittleEndian);
