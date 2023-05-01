@@ -118,7 +118,7 @@ public:
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
-    void set_id(const c_array& id){nft_id_=id;};
+    void set_id(const c_array& outputid){nft_id_=outputid.hash<QCryptographicHash::Blake2b_256>();};
     c_array get_id(void)const{return nft_id_;}
 
 private:
@@ -169,7 +169,7 @@ public:
     void serialize(QDataStream &out)const;
 
     QJsonObject get_Json(void) const;
-    void set_id(const c_array& id){alias_id_=id;};
+    void set_id(const c_array& outputid){alias_id_=outputid.hash<QCryptographicHash::Blake2b_256>();};
     c_array get_id(void)const{return alias_id_;}
     quint32 state_index_,foundry_counter_;
     fl_array<quint16> state_metadata_;
