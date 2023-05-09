@@ -1,7 +1,15 @@
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 include(local_conf.cmake OPTIONAL)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+include(cmake/VersionFromGit.cmake)
 
-project(QtIotaBlock VERSION 0.2 DESCRIPTION "QT   library  with block types on IOTA network " LANGUAGES CXX)
+version_from_git(
+	LOG       OFF
+  TIMESTAMP "%Y%m%d%H%M%S"
+)
+
+
+project(QtIotaBlock VERSION ${VERSION} DESCRIPTION "QT library  with block types on IOTA" LANGUAGES CXX)
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -20,18 +28,23 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
     src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
 
-find_package(Qt6 REQUIRED COMPONENTS Core)
+include(cmake/FindQt.cmake)
 target_link_libraries(qblock PUBLIC  Qt6::Core )
 
 target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     "$<INSTALL_INTERFACE:include>")
+
+
+find_package(qbigint 0 QUIET )
+if(NOT qbigint_FOUND AND NOT TARGET qbigint)
 include(FetchContent)
 FetchContent_Declare(
-    qbigint
-    GIT_REPOSITORY git@github.com:EddyTheCo/QbigInt.git
-    GIT_TAG main
-)
+        qbigint
+        GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
+        GIT_TAG v0.0.1
+        )
 FetchContent_MakeAvailable(qbigint)
+endif(NOT qbigint_FOUND AND NOT TARGET qbigint)
 
 target_link_libraries(qblock PUBLIC qbigint)
 install(TARGETS qblock EXPORT qblockTargets DESTINATION lib)
@@ -51,8 +64,8 @@ configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
 )
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/qblockConfigVersion.cmake"
-    VERSION "0.1.1.0"
-    COMPATIBILITY AnyNewerVersion
+	VERSION ${VERSION}
+	COMPATIBILITY SameMajorVersion
 )
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/qblockConfig.cmake
@@ -65,6 +78,11 @@ export(EXPORT qblockTargets
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     include(CTest)
+    set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-v${SEMVER}-${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_VERSION}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_CXX_COMPILER_ID}")
+    if(NOT BUILD_SHARED_LIBS)	    
+    set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-static")
+    endif(NOT BUILD_SHARED_LIBS)		    
+    include(CPack)
 endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(tests)
