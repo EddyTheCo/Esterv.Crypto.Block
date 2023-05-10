@@ -16,8 +16,8 @@ int main(int argc, char** argv)
     qDebug()<<"payload:"<<serialized_pay.toHex();
     auto block_=Block(payload_);
 
-    block_.set_parents({block_id(QByteArray::fromHex("210fc7bb818639ac48a4c6afa2f1581a8b9525e20fda68927f2b2ff836f73578")),
-                        block_id(QByteArray::fromHex("db0fa54c29f7fd928d92ca43f193dee47f591549f597a811c8fa67ab031ebd9c"))});
+    block_.set_parents({QByteArray::fromHex("210fc7bb818639ac48a4c6afa2f1581a8b9525e20fda68927f2b2ff836f73578"),
+                        QByteArray::fromHex("db0fa54c29f7fd928d92ca43f193dee47f591549f597a811c8fa67ab031ebd9c")});
     block_.set_nonce(28110);
     qDebug()<<block_.get_Json();
     c_array serialized_block;
