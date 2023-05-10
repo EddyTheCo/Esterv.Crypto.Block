@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} pushed
 on: 
   push:
     branches: [develop]
+    tags:
+      - 'v*'
   pull_request:
     branches: [main]
 
