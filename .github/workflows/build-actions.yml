@@ -5,6 +5,8 @@ on:
     branches: [develop]
     tags:
       - 'v*'
+    if: startsWith(github.ref, 'refs/tags/')
+
   pull_request:
     branches: [main]
 
