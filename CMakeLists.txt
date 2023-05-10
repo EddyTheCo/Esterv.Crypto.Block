@@ -25,16 +25,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 
-add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
-    src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
-
-include(cmake/FindQt.cmake)
-target_link_libraries(qblock PUBLIC  Qt6::Core )
-
-target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    "$<INSTALL_INTERFACE:include>")
-
-
 find_package(qbigint 0 QUIET )
 if(NOT qbigint_FOUND AND NOT TARGET qbigint)
 include(FetchContent)
@@ -45,6 +35,17 @@ FetchContent_Declare(
         )
 FetchContent_MakeAvailable(qbigint)
 endif(NOT qbigint_FOUND AND NOT TARGET qbigint)
+
+add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
+    src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
+
+include(cmake/FindQt.cmake)
+target_link_libraries(qblock PUBLIC  Qt6::Core )
+
+target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    "$<INSTALL_INTERFACE:include>")
+
+
 
 target_link_libraries(qblock PUBLIC qbigint)
 install(TARGETS qblock EXPORT qblockTargets DESTINATION lib)
