@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
 include(local_conf.cmake OPTIONAL)
-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-include(cmake/VersionFromGit.cmake)
 
+include(FetchContent)
+FetchContent_Declare(
+	ccommon
+	GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
+	GIT_TAG main
+	)
+FetchContent_MakeAvailable(ccommon)
 version_from_git(
 	LOG       OFF
   TIMESTAMP "%Y%m%d%H%M%S"
@@ -22,12 +27,24 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+if (Qt6_FOUND)
+qt_standard_project_setup()
+endif(Qt6_FOUND)
+
+add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
+    src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
+
+if (Qt6_FOUND)
+target_link_libraries(qblock PUBLIC  Qt6::Core )
+endif(Qt6_FOUND)
 
 find_package(qbigint 0 QUIET )
 if(NOT qbigint_FOUND AND NOT TARGET qbigint)
-include(FetchContent)
 FetchContent_Declare(
         qbigint
         GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
@@ -36,16 +53,10 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(qbigint)
 endif(NOT qbigint_FOUND AND NOT TARGET qbigint)
 
-add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
-    src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
 
-include(cmake/FindQt.cmake)
-target_link_libraries(qblock PUBLIC  Qt6::Core )
 
 target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     "$<INSTALL_INTERFACE:include>")
-
-
 
 target_link_libraries(qblock PUBLIC qbigint)
 install(TARGETS qblock EXPORT qblockTargets DESTINATION lib)
@@ -87,4 +98,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     add_subdirectory(tests)
+endif()
+if(BUILD_DOCS)
+	get_target_property(build_docs cmake_build_docs SOURCES)
+	include(${build_docs})
 endif()
