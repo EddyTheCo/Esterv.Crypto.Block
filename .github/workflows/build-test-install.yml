@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest,macos-latest,windows-latest]
         sharedLib: [true,false]
 
-    uses: EddyTheCo/Common/.github/workflows/build-test-install.yml@main
+    uses: EddyTheCo/Common/.github/workflows/build-test-install.yml@develop
     permissions:
       contents: write
     with:
