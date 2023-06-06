@@ -39,7 +39,7 @@ endif(Qt6_FOUND)
 
 add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
 	src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
-
+target_compile_definitions(qblock PRIVATE WINDOWS_SHAREDLIB)
 if (Qt6_FOUND)
 	target_link_libraries(qblock PUBLIC  Qt6::Core )
 endif(Qt6_FOUND)
