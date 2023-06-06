@@ -85,7 +85,7 @@ public:
     pvector<const Feature> immutable_features_;
     pvector<const Native_Token> native_tokens_;
     types type(void)const{return type_m;}
-    const static QHash<types,QString > typesstr;
+    SHAREDLIB_EXPORT const static QHash<types,QString > typesstr;
 private:
     const types type_m;
 
