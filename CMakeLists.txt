@@ -33,6 +33,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
 
+find_package(Qt6 COMPONENTS Core)
 if (Qt6_FOUND)
 	qt_standard_project_setup()
 endif(Qt6_FOUND)
