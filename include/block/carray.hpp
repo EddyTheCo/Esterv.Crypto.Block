@@ -120,6 +120,7 @@ using NFT_ID =c_array;
 using Alias_ID =c_array;
 using Output_ID =c_array;
 using Token_ID = c_array;
+using dataf = fl_array <quint16>;
 /*
  *
  *
