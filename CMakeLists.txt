@@ -48,7 +48,7 @@ endif(Qt6_FOUND)
 FetchContent_Declare(
 	qbigint
 	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-	GIT_TAG v0.0.1
+	GIT_TAG v0.0.2
 	FIND_PACKAGE_ARGS 0 CONFIG
 	)
 FetchContent_MakeAvailable(qbigint)
