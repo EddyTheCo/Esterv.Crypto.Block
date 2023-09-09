@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.11 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 include(local_conf.cmake OPTIONAL)
 
 include(FetchContent)
@@ -49,7 +49,7 @@ FetchContent_Declare(
 	qbigint
 	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
 	GIT_TAG v0.0.2
-	FIND_PACKAGE_ARGS 0 CONFIG
+	FIND_PACKAGE_ARGS 0.0 CONFIG
 	)
 FetchContent_MakeAvailable(qbigint)
 
@@ -62,7 +62,7 @@ target_link_libraries(qblock PUBLIC qbigint)
 install(TARGETS qblock EXPORT qblockTargets
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	)
-install(DIRECTORY include/
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 	)
 
@@ -75,8 +75,6 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
 	"${CMAKE_CURRENT_BINARY_DIR}/qblockConfig.cmake"
 	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qblock
-	NO_SET_AND_CHECK_MACRO
-	NO_CHECK_REQUIRED_COMPONENTS_MACRO
 	)
 write_basic_package_version_file(
 	"${CMAKE_CURRENT_BINARY_DIR}/qblockConfigVersion.cmake"
@@ -93,6 +91,7 @@ export(EXPORT qblockTargets
 	)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+	set(CPACK_PACKAGE_CONTACT "estervtech")
 	include(CTest)
 	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-v${SEMVER}-${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_VERSION}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_CXX_COMPILER_ID}")
 	if(NOT BUILD_SHARED_LIBS)
