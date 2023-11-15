@@ -16,7 +16,7 @@ namespace qblocks{
 class Output
 {
 public:
-    enum types : quint8 { Basic_typ=3,NFT_typ=6,Foundry_typ=5,Alias_typ=4 };
+    enum types : quint8 { All_typ=0, Basic_typ=3,NFT_typ=6,Foundry_typ=5,Alias_typ=4 };
     Output(types typ,const quint64& amount_m, const pvector<const Unlock_Condition> & unlock_conditions_m,
            const pvector<const Feature>& features_m={},
            const pvector<const Native_Token>& native_tokens_m={},
