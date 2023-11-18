@@ -27,7 +27,14 @@ public:
 
     template<class from_type> static std::shared_ptr<Output> from_(from_type& val);
 
-
+    std::shared_ptr<Output> clone(void)const
+    {
+        QByteArray var;
+        auto buffer=QDataStream(&var,QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        serialize(buffer);
+        return from_<QDataStream>(buffer);
+    }
     static std::shared_ptr<Output> Basic(const quint64& amount_m, const pvector<const Unlock_Condition> & unlock_conditions_m,
                                          const pvector<const Native_Token> & native_tokens_m={},
                                          const pvector<const Feature> & features_m={});
