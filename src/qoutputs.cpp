@@ -3,7 +3,7 @@ namespace qiota{
 namespace qblocks{
 
 const  QHash<Output::types,QString > Output::typesstr=
-{{All_typ,""},{Basic_typ,"basic"},{NFT_typ,"nft"},{Foundry_typ,"foundry"},{Alias_typ,"alias"}};
+{{All_typ,""},{Basic_typ,"/basic"},{NFT_typ,"/nft"},{Foundry_typ,"/foundry"},{Alias_typ,"/alias"}};
 
 
 void Output::serialize(QDataStream &out)const{};
