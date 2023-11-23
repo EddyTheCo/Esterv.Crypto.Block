@@ -10,7 +10,7 @@ namespace qblocks{
 class  Unlock
 {
 public:
-    enum types : quint8 { Signature_typ, Reference_typ, Alias_typ, NFT_typ };
+    enum types : quint8 { Signature_typ=0, Reference_typ=1, Alias_typ=2, NFT_typ=3 };
 
 
     Unlock(types typ );

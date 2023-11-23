@@ -8,7 +8,7 @@
 #include<QIODevice>
 #include <QCryptographicHash>
 #include "qbigint.hpp"
-
+#include<set>
 
 #include <QtCore/QtGlobal>
 
@@ -184,11 +184,35 @@ using tagF = fl_array<quint8>;
 template<class T> using pvector=std::vector<std::shared_ptr<T>> ;
 
 /*!
+ * \brief Container of ordered shared pointers.
+*/
+template <class T>
+struct ptrLess {
+    bool operator()(const std::shared_ptr<T>& a, const
+                    std::shared_ptr<T>& b)const {
+        return *a < *b;
+    }
+};
+
+template<class T> using pset=std::set<std::shared_ptr<T>,ptrLess<T>>;
+
+/*!
+ *  \return Container of ordered shared pointers from JSON-objects in an Array.
+ *  The object has the from_(const QJsonValue& val) function.
+*/
+template<class T>
+pset<const T> get_T(const QJsonArray& val)
+{
+    pset<const T> var;
+    for(const auto& v:val)var.insert(T::from_(v));
+    return var;
+}
+/*!
  *  \return Container of shared pointers from JSON-objects in an Array.
  *  The object has the from_(const QJsonValue& val) function.
 */
 template<class T>
-pvector<const T> get_T(const QJsonArray& val)
+pvector<const T> get_Tvec(const QJsonArray& val)
 {
     pvector<const T> var;
     for(const auto& v:val)var.push_back(T::from_(v));
@@ -214,33 +238,33 @@ template<class type_type> type_type get_type(QDataStream & val)
 /*!
  *  \brief append to the datastream the serialized form of objects in a container
 */
-template<class size_type,class obj_type> void serialize_list(QDataStream &out,
-                                                             const pvector<const obj_type> & ptr_vector)
+template<class size_type,class obj_type> void serializeList(QDataStream &out,
+                                                             const pset<const obj_type> & ptrSet)
 {
-    out<<static_cast<size_type>(ptr_vector.size());
-    for(const auto& v: ptr_vector)v->serialize(out);
+    out<<static_cast<size_type>(ptrSet.size());
+    for(const auto& v: ptrSet)v->serialize(out);
 }
 /*!
  *  \return A container of objects from datastream. The lenght of the container is read from the datastream.
 */
-template<class size_type,class obj_type> pvector<const obj_type> deserialize_list(QDataStream &in)
+template<class size_type,class obj_type> pset<const obj_type> deserializeList(QDataStream &in)
 {
-    pvector<const obj_type>  ptr_vector;
+    pset<const obj_type>  ptrSet;
     size_type  length_;
     in>>length_;
     for(auto i=0;i<length_;i++)
     {
-        ptr_vector.push_back(obj_type::template from_<QDataStream>(in));
+        ptrSet.insert(obj_type::template from_<QDataStream>(in));
     }
-    return ptr_vector;
+    return ptrSet;
 }
 /*!
  *  \brief Order a Container of shared pointer to objects
  *  Normally ordered by type.
 */
-template<class obj_type> void order_list(pvector<obj_type> &ptr_vector)
+template<class obj_type> void orderList(pvector<obj_type> &ptrVector)
 {
-    std::sort(ptr_vector.begin(), ptr_vector.end(), [](auto a, auto b)
+    std::sort(ptrVector.begin(), ptrVector.end(), [](auto a, auto b)
     {
         return *a < *b;
     });

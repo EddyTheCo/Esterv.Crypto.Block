@@ -46,9 +46,9 @@ Transaction_Essence::Transaction_Essence(const quint64& network_id_m, const pvec
 
 Transaction_Essence::Transaction_Essence(const QJsonValue& val):
     Transaction_Essence(val.toObject()["networkId"].toInt(),
-    get_T<Input>(val.toObject()["inputs"].toArray()),
+    get_Tvec<Input>(val.toObject()["inputs"].toArray()),
     c_array(val.toObject()["inputsCommitment"]),
-    get_T<Output>(val.toObject()["outputs"].toArray()),
+    get_Tvec<Output>(val.toObject()["outputs"].toArray()),
     Payload::from_<const QJsonValue>(val.toObject()["payload"])
   ){};
 Transaction_Essence::Transaction_Essence(QDataStream &in):Essence(Transaction_typ)
