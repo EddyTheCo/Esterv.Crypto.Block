@@ -30,10 +30,12 @@ public:
     std::shared_ptr<Output> clone(void)const
     {
         QByteArray var;
-        auto buffer=QDataStream(&var,QIODevice::WriteOnly | QIODevice::Append);
-        buffer.setByteOrder(QDataStream::LittleEndian);
-        serialize(buffer);
-        return from_<QDataStream>(buffer);
+        auto wBuffer=QDataStream(&var,QIODevice::WriteOnly | QIODevice::Append);
+        wBuffer.setByteOrder(QDataStream::LittleEndian);
+        serialize(wBuffer);
+        auto rBuffer=QDataStream(&var,QIODevice::ReadOnly);
+        rBuffer.setByteOrder(QDataStream::LittleEndian);
+        return from_<QDataStream>(rBuffer);
     }
     static std::shared_ptr<Output> Basic(const quint64& amount_m, const pset<const Unlock_Condition> & unlock_conditions_m,
                                          const pset<const Native_Token> & native_tokens_m={},
