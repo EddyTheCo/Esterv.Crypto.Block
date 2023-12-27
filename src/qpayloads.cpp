@@ -63,7 +63,7 @@ Transaction_Payload::Transaction_Payload(const std::shared_ptr<const Essence> &e
 
 Transaction_Payload::Transaction_Payload(const QJsonValue& val):
     Transaction_Payload(Essence::from_<const QJsonValue>(val.toObject()["essence"]),
-    get_T<Unlock>(val.toObject()["unlocks"].toArray())
+    get_Tvec<Unlock>(val.toObject()["unlocks"].toArray())
     ){};
 Transaction_Payload::Transaction_Payload(QDataStream &in):Payload(Transaction_typ),essence_(Essence::from_<QDataStream>(in))
 {
