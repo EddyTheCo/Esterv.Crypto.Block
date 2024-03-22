@@ -42,6 +42,7 @@ if (Qt6_FOUND)
 	add_library(${PROJECT_NAME}::qblock ALIAS qblock)
 	set_target_properties(qblock PROPERTIES VERSION ${VERSION} SOVERSION ${VERSION_MAJOR})
 	target_link_libraries(qblock PUBLIC  Qt6::Core )
+	target_compile_definitions(qblock PRIVATE WINDOWS_QBLOCK)
 
 
 
