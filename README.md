@@ -38,7 +38,7 @@ FetchContent_Declare(
 	FIND_PACKAGE_ARGS MAJOR.MINOR CONFIG  
 	)
 FetchContent_MakeAvailable(QtIotaBlock)
-target_link_libraries(<target> <PRIVATE|PUBLIC|INTERFACE> QtIotaPow::qblock)
+target_link_libraries(<target> <PRIVATE|PUBLIC|INTERFACE> QtIotaBlock::qblock)
 ```
 
 
