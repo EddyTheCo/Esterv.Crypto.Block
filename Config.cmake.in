@@ -1,5 +1,5 @@
 @PACKAGE_INIT@
 include(CMakeFindDependencyMacro)
 find_dependency(Qt6 REQUIRED COMPONENTS Core)
-find_dependency(qbigint 0.1 REQUIRED  CONFIG)
+find_dependency(QtbigInt 0.1 REQUIRED  CONFIG)
 include ( "${CMAKE_CURRENT_LIST_DIR}/QtIotaBlock-config.cmake" )
