@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
 	ccommon
 	GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-	GIT_TAG use_IFW
+	GIT_TAG v0.3.0
 	)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(
@@ -27,8 +27,8 @@ include(GNUInstallDirs)
 FetchContent_Declare(
 	QtbigInt
 	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-	GIT_TAG use_IFW
-	FIND_PACKAGE_ARGS 0.0 CONFIG
+	GIT_TAG v0.1.0
+	FIND_PACKAGE_ARGS 0.1 CONFIG
 	)
 FetchContent_MakeAvailable(QtbigInt)
 
