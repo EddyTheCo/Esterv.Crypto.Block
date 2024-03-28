@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
-include(local_conf.cmake OPTIONAL)
+cmake_minimum_required(VERSION 3.24 )
+include(${CMAKE_CURRENT_BINARY_DIR}/local_conf.cmake OPTIONAL)
 
 include(FetchContent)
 FetchContent_Declare(
 	ccommon
 	GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-	GIT_TAG main
+	GIT_TAG v0.3.0
 	)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(
@@ -14,17 +14,8 @@ version_from_git(
 	)
 
 
-project(QtIotaBlock VERSION ${VERSION} DESCRIPTION "QT library  with block types on IOTA" LANGUAGES CXX)
+project(QtIotaBlock VERSION ${VERSION} DESCRIPTION "Library  with block types on IOTA" LANGUAGES CXX)
 
-set(default_build_type "Release")
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-	message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
-	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
-		STRING "Choose the type of build." FORCE)
-	# Set the possible values of build type for cmake-gui
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-		"Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 17)
@@ -33,76 +24,53 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
 
+FetchContent_Declare(
+	QtbigInt
+	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
+	GIT_TAG v0.1.0
+	FIND_PACKAGE_ARGS 0.1 CONFIG
+	)
+FetchContent_MakeAvailable(QtbigInt)
+
 find_package(Qt6 COMPONENTS Core)
 if (Qt6_FOUND)
 	qt_standard_project_setup()
-endif(Qt6_FOUND)
 
-add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
-	src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
-target_compile_definitions(qblock PRIVATE WINDOWS_QBLOCK)
-if (Qt6_FOUND)
+	add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
+		src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
+
+	add_library(${PROJECT_NAME}::qblock ALIAS qblock)
+	set_target_properties(qblock PROPERTIES VERSION ${VERSION} SOVERSION ${VERSION_MAJOR})
 	target_link_libraries(qblock PUBLIC  Qt6::Core )
+	target_compile_definitions(qblock PRIVATE WINDOWS_QBLOCK)
+
+
+
+	target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/Esterv/>")
+
+	target_link_libraries(qblock PUBLIC qbigint)
+
+	install(TARGETS qblock
+		EXPORT ${PROJECT_NAME}-config
+		DESTINATION ${CMAKE_INSTALL_LIBDIR}
+		COMPONENT block
+		)
+
+	install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
+		DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Esterv
+		COMPONENT ${PROJECT_NAME}
+		)
+
+	build_exports()
+	if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+		build_cpack()
+		if(BUILD_TESTING)
+			include(CTest)
+			add_subdirectory(tests)
+		endif(BUILD_TESTING)
+	endif(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif(Qt6_FOUND)
-
-FetchContent_Declare(
-	qbigint
-	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-	GIT_TAG v0.0.2
-	FIND_PACKAGE_ARGS 0.0 CONFIG
-	)
-FetchContent_MakeAvailable(qbigint)
-
-
-target_include_directories(qblock PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-	"$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-
-target_link_libraries(qblock PUBLIC qbigint)
-
-install(TARGETS qblock EXPORT qblockTargets
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	)
-install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
-	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-	)
-
-install(EXPORT qblockTargets
-	FILE qblockTargets.cmake
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qblock
-	)
-
-include(CMakePackageConfigHelpers)
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-	"${CMAKE_CURRENT_BINARY_DIR}/qblockConfig.cmake"
-	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qblock
-	)
-write_basic_package_version_file(
-	"${CMAKE_CURRENT_BINARY_DIR}/qblockConfigVersion.cmake"
-	VERSION ${VERSION}
-	COMPATIBILITY SameMajorVersion
-	)
-install(FILES
-	${CMAKE_CURRENT_BINARY_DIR}/qblockConfig.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/qblockConfigVersion.cmake
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/qblock
-	)
-export(EXPORT qblockTargets
-	FILE "${CMAKE_CURRENT_BINARY_DIR}/qblockTargets.cmake"
-	)
-
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-	set(CPACK_PACKAGE_CONTACT "estervtech")
-	include(CTest)
-	set(CPACK_PACKAGE_FILE_NAME "${PROJECT_NAME}-v${SEMVER}-${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_VERSION}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_CXX_COMPILER_ID}")
-	if(NOT BUILD_SHARED_LIBS)
-		set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}-static")
-	endif(NOT BUILD_SHARED_LIBS)
-	include(CPack)
-endif()
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
-	add_subdirectory(tests)
-endif()
 if(BUILD_DOCS)
-	get_target_property(build_docs cmake_build_docs SOURCES)
-	include(${build_docs})
+	build_docs()
 endif()
