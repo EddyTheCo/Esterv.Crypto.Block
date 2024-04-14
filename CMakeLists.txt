@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
 	ccommon
 	GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-	GIT_TAG v0.3.0
+	GIT_TAG v0.3.1
 	)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(
@@ -27,7 +27,7 @@ include(GNUInstallDirs)
 FetchContent_Declare(
 	QtbigInt
 	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-	GIT_TAG v0.1.0
+	GIT_TAG develop
 	FIND_PACKAGE_ARGS 0.1 CONFIG
 	)
 FetchContent_MakeAvailable(QtbigInt)
@@ -55,6 +55,7 @@ if (Qt6_FOUND)
 		EXPORT ${PROJECT_NAME}-config
 		DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		COMPONENT block
+		RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT block
 		)
 
 	install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
@@ -73,4 +74,4 @@ if (Qt6_FOUND)
 endif(Qt6_FOUND)
 if(BUILD_DOCS)
 	build_docs()
-endif()
+endif(BUILD_DOCS)
