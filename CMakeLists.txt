@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
 	ccommon
 	GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-	GIT_TAG v0.3.0
+	GIT_TAG v0.4.0
 	)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(
@@ -27,7 +27,7 @@ include(GNUInstallDirs)
 FetchContent_Declare(
 	QtbigInt
 	GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-	GIT_TAG v0.1.0
+	GIT_TAG v0.1.1
 	FIND_PACKAGE_ARGS 0.1 CONFIG
 	)
 FetchContent_MakeAvailable(QtbigInt)
@@ -36,7 +36,7 @@ find_package(Qt6 COMPONENTS Core)
 if (Qt6_FOUND)
 	qt_standard_project_setup()
 
-	add_library(qblock qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
+	add_library(qblock src/qblock.cpp src/carray.cpp  src/qsignatures.cpp src/qpayloads.cpp src/qunlocks.cpp src/qessences.cpp src/qinputs.cpp src/qoutputs.cpp
 		src/qnative_tokens.cpp src/qunlock_conditions.cpp src/qfeatures.cpp src/qaddresses.cpp src/qoutput_metadata_response.cpp src/qtoken_scheme.cpp)
 
 	add_library(${PROJECT_NAME}::qblock ALIAS qblock)
@@ -55,6 +55,7 @@ if (Qt6_FOUND)
 		EXPORT ${PROJECT_NAME}-config
 		DESTINATION ${CMAKE_INSTALL_LIBDIR}
 		COMPONENT block
+		RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT block
 		)
 
 	install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
@@ -73,4 +74,4 @@ if (Qt6_FOUND)
 endif(Qt6_FOUND)
 if(BUILD_DOCS)
 	build_docs()
-endif()
+endif(BUILD_DOCS)

@@ -10,6 +10,6 @@ if (WIN32 AND BUILD_SHARED_LIBS)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${app}> $<TARGET_FILE_DIR:${app}>
         COMMAND_EXPAND_LISTS
     )
-endif ()
+endif (WIN32 AND BUILD_SHARED_LIBS)
 endforeach()
 
