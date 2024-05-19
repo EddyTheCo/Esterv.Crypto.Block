@@ -10,25 +10,27 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
-namespace qiota
-{
-namespace qblocks
+
+namespace qiota::qblocks
 {
 
+enum ByteSizes {hash=32};
 class Output
 {
   public:
     enum types : quint8
     {
-        All_typ = 0,
-        Basic_typ = 3,
-        NFT_typ = 6,
-        Foundry_typ = 5,
-        Alias_typ = 4
+        Basic_typ = 0,
+        Account_typ = 1,
+        Anchor_typ = 2,
+        Foundry_typ = 3,
+        NFT_typ = 4,
+        All_type=100
+
     };
-    Output(types typ, const quint64 &amount_m, const pset<const Unlock_Condition> &unlock_conditions_m,
-           const pset<const Feature> &features_m = {}, const pset<const Native_Token> &native_tokens_m = {},
-           const pset<const Feature> &immutable_features_m = {});
+    Output(types typ, const quint64 &amount, const pset<const Unlock_Condition> &unlock_conditions,
+           const pset<const Feature> &features = {}, const pset<const Native_Token> &native_tokens = {},
+           const pset<const Feature> &immutable_features = {});
 
     Output(types typ, const QJsonValue &val);
     Output(types typ) : type_m(typ){};
@@ -45,44 +47,46 @@ class Output
         rBuffer.setByteOrder(QDataStream::LittleEndian);
         return from_<QDataStream>(rBuffer);
     }
-    static std::shared_ptr<Output> Basic(const quint64 &amount_m,
-                                         const pset<const Unlock_Condition> &unlock_conditions_m,
-                                         const pset<const Native_Token> &native_tokens_m = {},
-                                         const pset<const Feature> &features_m = {});
-    static std::shared_ptr<Output> NFT(const quint64 &amount_m, const pset<const Unlock_Condition> &unlock_conditions_m,
-                                       const pset<const Native_Token> &native_tokens_m = {},
-                                       const pset<const Feature> &immutable_features_m = {},
-                                       const pset<const Feature> &features_m = {});
-    static std::shared_ptr<Output> Foundry(const quint64 &amount_m,
-                                           const pset<const Unlock_Condition> &unlock_conditions_m,
-                                           const std::shared_ptr<Token_Scheme> &token_scheme_m,
-                                           const quint32 &serial_number_m,
-                                           const pset<const Native_Token> &native_tokens_m = {},
-                                           const pset<const Feature> &immutable_features_m = {},
-                                           const pset<const Feature> &features_m = {});
-    static std::shared_ptr<Output> Alias(const quint64 &amount_m,
-                                         const pset<const Unlock_Condition> &unlock_conditions_m,
-                                         const fl_array<quint16> &state_metadata_m = "",
-                                         const quint32 &foundry_counter_m = 0, const quint32 &state_index_m = 0,
-                                         const pset<const Native_Token> &native_tokens_m = {},
-                                         const pset<const Feature> &immutable_features_m = {},
-                                         const pset<const Feature> &features_m = {});
+    static std::shared_ptr<Output> Basic(const quint64 &amount,const quint64 &mana,
+                                         const pset<const Unlock_Condition> &unlockConditions,
+                                         const pset<const Feature> &features = {});
+    static std::shared_ptr<Output> NFT(const quint64 &amount, const quint64 &mana,
+                                       const pset<const Unlock_Condition> &unlockConditions,
+                                       const pset<const Feature> &immutableFeatures = {},
+                                       const pset<const Feature> &features = {});
+    static std::shared_ptr<Output> Foundry(const quint64 &amount,
+                                           const pset<const Unlock_Condition> &unlockConditions,
+                                           const std::shared_ptr<Token_Scheme> &tokenScheme,
+                                           const quint32 &serialNumber,
+                                           const pset<const Feature> &immutableFeatures= {},
+                                           const pset<const Feature> &features = {});
+    static std::shared_ptr<Output> Anchor(const quint64 &amount,const quint64 &mana,
+                                         const pset<const Unlock_Condition> &unlockConditions,
+                                         const quint32 &stateIndex = 0,
+                                         const pset<const Feature> &immutableFeatures = {},
+                                         const pset<const Feature> &features = {});
+    static std::shared_ptr<Output> Account(const quint64 &amount, const quint64 &mana,
+                                         const pset<const Unlock_Condition> &unlockConditions,
+                                         const quint32 &foundryCounter = 0,
+                                         const pset<const Feature> &immutableFeatures = {},
+                                         const pset<const Feature> &features = {});
+
 
     virtual void serialize(QDataStream &out) const;
-    virtual QJsonObject get_Json(void) const;
-    virtual void set_id(const c_array &id);
-    virtual c_array get_id(void) const
+    virtual QJsonObject getJson(void) const;
+    virtual void setId(const c_array &id);
+    virtual c_array getId(void) const
     {
-        return c_array(32, 0);
+        return c_array(ByteSizes::hash, 0);
     };
     virtual void consume(void);
-    quint64 min_deposit_of_output(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const;
+    quint64 minDepositOfOutput(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const;
 
     std::shared_ptr<const Unlock_Condition> get_unlock_(const Unlock_Condition::types &typ) const
     {
-        const auto found = std::find_if(unlock_conditions_.begin(), unlock_conditions_.end(),
+        const auto found = std::find_if(m_unlockConditions.begin(), m_unlockConditions.end(),
                                         [typ](const auto &it) { return (it->type() == typ); });
-        return (found == unlock_conditions_.end()) ? nullptr : *found;
+        return (found == m_unlockConditions.end()) ? nullptr : *found;
     }
 
     std::shared_ptr<const Feature> get_feature_(const Feature::types &typ) const
@@ -99,18 +103,17 @@ class Output
     }
 
     quint64 amount_;
-    pset<const Unlock_Condition> unlock_conditions_;
-    pset<const Feature> features_;
-    pset<const Feature> immutable_features_;
-    pset<const Native_Token> native_tokens_;
+    pset<const Unlock_Condition> m_unlockConditions;
+    pset<const Feature> m_features;
+    pset<const Feature> m_immutable_features;
     types type(void) const
     {
-        return type_m;
+        return m_type;
     }
     QBLOCK_EXPORT const static QHash<types, QString> typesstr;
 
   private:
-    const types type_m;
+    const types m_type;
 };
 
 class Basic_Output : public Output
@@ -202,6 +205,5 @@ class Alias_Output : public Output
     Alias_ID alias_id_;
 };
 
-}; // namespace qblocks
 
 }; // namespace qiota

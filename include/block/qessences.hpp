@@ -9,9 +9,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
-namespace qiota
-{
-namespace qblocks
+namespace qiota::qblocks
 {
 
 class Payload;
@@ -66,5 +64,4 @@ class Transaction_Essence : public Essence
     std::shared_ptr<const Payload> payload_;
 };
 
-}; // namespace qblocks
 }; // namespace qiota

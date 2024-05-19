@@ -48,7 +48,22 @@ if(Qt6_FOUND)
     src/qfeatures.cpp
     src/qaddresses.cpp
     src/qoutput_metadata_response.cpp
-    src/qtoken_scheme.cpp)
+    src/qtoken_scheme.cpp
+    include/block/carray.hpp
+    include/block/qaddresses.hpp
+    include/block/qblock.hpp
+    include/block/qessences.hpp
+    include/block/qfeatures.hpp
+    include/block/qinputs.hpp
+    include/block/qnative_tokens.hpp
+    include/block/qoutputs.hpp
+    include/block/qoutput_metadata_response.hpp
+    include/block/qpayloads.hpp
+    include/block/qsignatures.hpp
+    include/block/qtoken_scheme.hpp
+    include/block/qunlock_conditions.hpp
+    include/block/qunlocks.hpp
+)
 
   add_library(${PROJECT_NAME}::qblock ALIAS qblock)
   set_target_properties(qblock PROPERTIES VERSION ${VERSION} SOVERSION
