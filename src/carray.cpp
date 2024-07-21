@@ -1,10 +1,9 @@
 #include <QIODevice>
-#include <block/carray.hpp>
+#include <esterv/crypto/block/carray.hpp>
 
-namespace qiota
+namespace esterv::crypto::block
 {
-namespace qblocks
-{
+
 c_array c_array::fromHexString(QString hash)
 {
     return QByteArray::fromHex(hash.toLatin1().remove(0, 2));
@@ -13,7 +12,9 @@ QString c_array::toHexString(void) const
 {
     return QString("0x") + QString(toHex());
 }
-c_array::c_array(const QJsonValue &val) : QByteArray(QByteArray::fromHex(val.toString().toLatin1().remove(0, 2))){};
+c_array::c_array(const QJsonValue &val) : QByteArray(QByteArray::fromHex(val.toString().toLatin1().remove(0, 2)))
+{
+}
 
 QDataStream &operator<<(QDataStream &out, const c_array &obj)
 {
@@ -26,5 +27,4 @@ QDataStream &operator>>(QDataStream &in, c_array &obj)
     return in;
 }
 
-} // namespace qblocks
-} // namespace qiota
+} // namespace esterv::crypto::block

@@ -10,9 +10,9 @@ FetchContent_MakeAvailable(ccommon)
 version_from_git(LOG OFF TIMESTAMP "%Y%m%d%H%M%S")
 
 project(
-  QtIotaBlock
+  EstervBlock
   VERSION ${VERSION}
-  DESCRIPTION "Library  with block types on IOTA"
+  DESCRIPTION "Library with block types"
   LANGUAGES CXX)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -23,71 +23,69 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
 
 FetchContent_Declare(
-  QtbigInt
-  GIT_REPOSITORY https://github.com/EddyTheCo/QbigInt.git
-  GIT_TAG v0.1.1
+  EstervBigInt 
+  GIT_REPOSITORY https://github.com/EddyTheCo/BigInt.git
+  GIT_TAG fixes
   FIND_PACKAGE_ARGS 0.1 CONFIG)
-FetchContent_MakeAvailable(QtbigInt)
+FetchContent_MakeAvailable(EstervBigInt)
 
 find_package(Qt6 COMPONENTS Core)
 if(Qt6_FOUND)
   qt_standard_project_setup()
 
   add_library(
-    qblock
-    src/qblock.cpp
+    block
+#    src/block.cpp
     src/carray.cpp
-    src/qsignatures.cpp
-    src/qpayloads.cpp
-    src/qunlocks.cpp
-    src/qessences.cpp
-    src/qinputs.cpp
-    src/qoutputs.cpp
-    src/qnative_tokens.cpp
-    src/qunlock_conditions.cpp
-    src/qfeatures.cpp
-    src/qaddresses.cpp
-    src/qoutput_metadata_response.cpp
-    src/qtoken_scheme.cpp
-    include/block/carray.hpp
-    include/block/qaddresses.hpp
-    include/block/qblock.hpp
-    include/block/qessences.hpp
-    include/block/qfeatures.hpp
-    include/block/qinputs.hpp
-    include/block/qnative_tokens.hpp
-    include/block/qoutputs.hpp
-    include/block/qoutput_metadata_response.hpp
-    include/block/qpayloads.hpp
-    include/block/qsignatures.hpp
-    include/block/qtoken_scheme.hpp
-    include/block/qunlock_conditions.hpp
-    include/block/qunlocks.hpp
+#    src/signatures.cpp
+#    src/payloads.cpp
+#    src/unlocks.cpp
+#    src/essences.cpp
+#    src/inputs.cpp
+#    src/outputs.cpp
+    src/unlock_conditions.cpp
+    src/features.cpp
+    src/addresses.cpp
+#    src/output_metadata_response.cpp
+#    src/token_scheme.cpp
+    include/esterv/crypto/block/carray.hpp
+    include/esterv/crypto/block/addresses.hpp
+#    include/block/block.hpp
+#    include/block/essences.hpp
+    include/esterv/crypto/block/features.hpp
+#    include/block/inputs.hpp
+#    include/block/outputs.hpp
+#    include/block/output_metadata_response.hpp
+#    include/block/payloads.hpp
+#    include/block/signatures.hpp
+#    include/block/token_scheme.hpp
+    include/esterv/crypto/block/unlock_conditions.hpp
+#    include/block/unlocks.hpp
 )
 
-  add_library(${PROJECT_NAME}::qblock ALIAS qblock)
-  set_target_properties(qblock PROPERTIES VERSION ${VERSION} SOVERSION
+  add_library(${PROJECT_NAME}::block ALIAS block)
+  set_target_properties(block PROPERTIES VERSION ${VERSION} SOVERSION
                                                              ${VERSION_MAJOR})
-  target_link_libraries(qblock PUBLIC Qt6::Core)
-  target_compile_definitions(qblock PRIVATE WINDOWS_QBLOCK)
+  target_link_libraries(block PUBLIC Qt6::Core)
+  target_compile_definitions(block PRIVATE WINDOWS_QBLOCK)
 
   target_include_directories(
-    qblock PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    block PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/Esterv/>")
 
-  target_link_libraries(qblock PUBLIC qbigint)
+  target_link_libraries(block PUBLIC bigint)
 
   install(
-    TARGETS qblock
+    TARGETS block
     EXPORT ${PROJECT_NAME}-config
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT block
-    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT block)
+    COMPONENT ${PROJECT_NAME}
+    RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT ${PROJECT_NAME})
 
   install(
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/Esterv
-    COMPONENT ${PROJECT_NAME})
+    COMPONENT ${PROJECT_NAME}-dev)
 
   build_exports()
   if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

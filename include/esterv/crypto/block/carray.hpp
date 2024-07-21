@@ -1,6 +1,6 @@
 #pragma once
 
-#include "qbigint.hpp"
+#include "esterv/crypto/bigint.hpp"
 #include <QByteArray>
 #include <QCryptographicHash>
 #include <QDataStream>
@@ -18,10 +18,73 @@
 #define QBLOCK_EXPORT Q_DECL_IMPORT
 #endif
 
-namespace qiota
+namespace esterv::crypto::block
 {
-namespace qblocks
+enum ByteSizes
 {
+    hash = 32,
+    token = 38
+};
+enum class UnlockConditionType : quint8
+{
+    Address = 0,
+    StorageDepositReturn = 1,
+    Timelock = 2,
+    Expiration = 3,
+    StateControllerAddress = 4,
+    GovernorAddress = 5,
+    ImmutableAccountAddress = 6
+};
+enum class OutputType : quint8
+{
+    Basic = 0,
+    Account = 1,
+    Anchor = 2,
+    Foundry = 3,
+    NFT = 4,
+};
+enum class FeatureType : quint8
+{
+    Sender = 0,
+    Issuer = 1,
+    Metadata = 2,
+    Tag = 4,
+    NativeToken = 5
+};
+enum class AddressType : quint8
+{
+    Anchor = 24,
+    NFT = 16,
+    Account = 8,
+    Ed25519 = 0
+};
+template <class T> class C_Base
+{
+  protected:
+    const T m_type;
+
+    C_Base(T typ) : m_type(typ)
+    {
+    }
+  public:
+    virtual void serialize(QDataStream &out) const
+    {
+        out << m_type;
+    }
+    virtual void addJson(QJsonObject &var) const
+    {
+        var.insert("type", (int)m_type);
+    }
+    auto type(void) const
+    {
+        return m_type;
+    }
+
+    friend inline bool operator<(const C_Base &a, const C_Base &b)
+    {
+        return a.m_type < b.m_type;
+    }
+};
 /*!
  * \brief Byte Array that takes care of storing the objects in serialized form
  *
@@ -33,7 +96,9 @@ class c_array : public QByteArray
     /*!
      * \brief Copy constructor from ByteArray
      */
-    c_array(const QByteArray &var) : QByteArray(var.constData(), var.size()){};
+    c_array(const QByteArray &var) : QByteArray(var.constData(), var.size())
+    {
+    }
     /*!
      * \brief Constructor from a json value hex string
      */
@@ -78,22 +143,23 @@ class c_array : public QByteArray
      * \brief Append obj data. Objects that have the serialize(QDataStream) function
      * \sa to_object()
      */
-    template <class obj_type> void from_object(const obj_type &obj)
+    template <class obj_type> void fromObject(const obj_type &obj)
     {
         auto buffer = QDataStream(this, QIODevice::WriteOnly | QIODevice::Append);
         buffer.setByteOrder(QDataStream::LittleEndian);
-        obj.serialize(buffer);
+        obj->serialize(buffer);
     }
     /*!
      * \brief Return Object from serialized data.
-     * Objects that implement the constructor(QDataStream &in)
+     * Objects that have the from(QDataStream) method.
      * \sa from_object()
      */
-    template <class obj_type> obj_type to_object(void)
+    template <class obj_type, std::shared_ptr<const obj_type> (*from)(QDataStream &)>
+    std::shared_ptr<const obj_type> toObject(void)
     {
         auto buffer = QDataStream(this, QIODevice::ReadOnly);
         buffer.setByteOrder(QDataStream::LittleEndian);
-        return obj_type(buffer);
+        return from(buffer);
     }
 };
 
@@ -109,7 +175,6 @@ template <typename max_lenght> class fl_array : public c_array
      */
     friend QDataStream &operator<<(QDataStream &out, const fl_array &obj)
     {
-
         out << static_cast<max_lenght>(obj.size());
         out << static_cast<c_array>(obj);
         return out;
@@ -136,7 +201,7 @@ using Block_ID = c_array;
 /*!
  * \brief Is the BLAKE2b-256 hash of the transaction payload.
  */
-using Transaction_ID = c_array;
+using TransactionID = c_array;
 
 using public_key = c_array;
 using signature = c_array;
@@ -144,19 +209,20 @@ using signature = c_array;
 /*!
  * \brief BLAKE2b-256 hash of the Output ID that created the NFT chain of outputs
  */
-using NFT_ID = c_array;
+using NFTID = c_array;
 /*!
  * \brief BLAKE2b-256 hash of the Output ID that created the Alias chain of outputs
  */
-using Alias_ID = c_array;
+using AnchorID = c_array;
+using AccountID = c_array;
 /*!
  * \brief Concatenation of Transaction_ID || outputIndex
  */
-using Output_ID = c_array;
+using OutputID = c_array;
 /*!
  * \brief The concatenation of Address || Serial Number || Token Scheme Type = Foundry ID
  */
-using Token_ID = c_array;
+using TokenID = c_array;
 
 /*!
  * \brief Binary data. A leading uint16 denotes its length. Used in
@@ -198,7 +264,7 @@ template <class T> using pset = std::set<std::shared_ptr<T>, ptrLess<T>>;
  *  \return Container of ordered shared pointers from JSON-objects in an Array.
  *  The object has the from_(const QJsonValue& val) function.
  */
-template <class T> pset<const T> get_T(const QJsonArray &val)
+template <class T> pset<const T> getT(const QJsonArray &val)
 {
     pset<const T> var;
     for (const auto &v : val)
@@ -209,7 +275,7 @@ template <class T> pset<const T> get_T(const QJsonArray &val)
  *  \return Container of shared pointers from JSON-objects in an Array.
  *  The object has the from_(const QJsonValue& val) function.
  */
-template <class T> pvector<const T> get_Tvec(const QJsonArray &val)
+template <class T> pvector<const T> getTvec(const QJsonArray &val)
 {
     pvector<const T> var;
     for (const auto &v : val)
@@ -219,14 +285,14 @@ template <class T> pvector<const T> get_Tvec(const QJsonArray &val)
 /*!
  *  \return The type of the object from its JSON form
  */
-template <class type_type> type_type get_type(const QJsonValue &val)
+template <class type_type> type_type getType(const QJsonValue &val)
 {
     return ((type_type)val.toObject()["type"].toInt());
 }
 /*!
  *  \return The type of the object from its serialized form
  */
-template <class type_type> type_type get_type(QDataStream &val)
+template <class type_type> type_type getType(QDataStream &val)
 {
     type_type type_;
     val >> type_;
@@ -236,11 +302,13 @@ template <class type_type> type_type get_type(QDataStream &val)
 /*!
  *  \brief append to the datastream the serialized form of objects in a container
  */
-template <class size_type, class obj_type> void serializeList(QDataStream &out, const pset<const obj_type> &ptrSet)
+template <class size_type, class T> void serializeList(QDataStream &out, const T &container)
 {
-    out << static_cast<size_type>(ptrSet.size());
-    for (const auto &v : ptrSet)
-        v->serialize(out);
+    out << static_cast<size_type>(container.size());
+    for (const auto &v : container)
+    {
+        out << v;
+    }
 }
 /*!
  *  \return A container of objects from datastream. The lenght of the container is read from the datastream.
@@ -248,23 +316,13 @@ template <class size_type, class obj_type> void serializeList(QDataStream &out, 
 template <class size_type, class obj_type> pset<const obj_type> deserializeList(QDataStream &in)
 {
     pset<const obj_type> ptrSet;
-    size_type length_;
-    in >> length_;
-    for (auto i = 0; i < length_; i++)
+    size_type length;
+    in >> length;
+    for (auto i = 0; i < length; i++)
     {
-        ptrSet.insert(obj_type::template from_<QDataStream>(in));
+        ptrSet.insert(obj_type::template from<QDataStream>(in));
     }
     return ptrSet;
 }
-/*!
- *  \brief Order a Container of shared pointer to objects
- *  Normally ordered by type.
- */
-template <class obj_type> void orderList(pvector<obj_type> &ptrVector)
-{
-    std::sort(ptrVector.begin(), ptrVector.end(), [](auto a, auto b) { return *a < *b; });
-}
 
 }; // namespace qblocks
-
-}; // namespace qiota

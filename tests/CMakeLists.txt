@@ -1,6 +1,6 @@
-foreach(app serialization)
+foreach(app addresses)
   add_executable(${app} ${app}.cpp)
-  target_link_libraries(${app} PRIVATE qblock)
+  target_link_libraries(${app} PRIVATE block)
   add_test(NAME ${app} COMMAND ${app})
 
   if(WIN32 AND BUILD_SHARED_LIBS)
