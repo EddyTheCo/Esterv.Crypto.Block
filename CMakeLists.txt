@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
   ccommon
   GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-  GIT_TAG v0.4.0)
+  GIT_TAG v0.4.1)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(LOG OFF TIMESTAMP "%Y%m%d%H%M%S")
 
@@ -23,8 +23,8 @@ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 include(GNUInstallDirs)
 
 FetchContent_Declare(
-  EstervBigInt 
-  GIT_REPOSITORY https://github.com/EddyTheCo/BigInt.git
+  EstervBigInt
+  GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Crypto.BigInt.git
   GIT_TAG fixes
   FIND_PACKAGE_ARGS 0.1 CONFIG)
 FetchContent_MakeAvailable(EstervBigInt)
@@ -41,8 +41,8 @@ if(Qt6_FOUND)
 #    src/payloads.cpp
 #    src/unlocks.cpp
 #    src/essences.cpp
-#    src/inputs.cpp
-#    src/outputs.cpp
+    src/inputs.cpp
+    #    src/outputs.cpp
     src/unlock_conditions.cpp
     src/features.cpp
     src/addresses.cpp
@@ -53,8 +53,8 @@ if(Qt6_FOUND)
 #    include/block/block.hpp
 #    include/block/essences.hpp
     include/esterv/crypto/block/features.hpp
-#    include/block/inputs.hpp
-#    include/block/outputs.hpp
+    include/esterv/crypto/block/inputs.hpp
+    #   include/esterv/crypto/block/outputs.hpp
 #    include/block/output_metadata_response.hpp
 #    include/block/payloads.hpp
 #    include/block/signatures.hpp
@@ -63,7 +63,7 @@ if(Qt6_FOUND)
 #    include/block/unlocks.hpp
 )
 
-  add_library(${PROJECT_NAME}::block ALIAS block)
+add_library(Esterv::block ALIAS block)
   set_target_properties(block PROPERTIES VERSION ${VERSION} SOVERSION
                                                              ${VERSION_MAJOR})
   target_link_libraries(block PUBLIC Qt6::Core)
@@ -73,7 +73,7 @@ if(Qt6_FOUND)
     block PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/Esterv/>")
 
-  target_link_libraries(block PUBLIC bigint)
+	  target_link_libraries(block PUBLIC Esterv::bigint)
 
   install(
     TARGETS block

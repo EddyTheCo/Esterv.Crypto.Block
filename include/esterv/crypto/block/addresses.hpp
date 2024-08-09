@@ -7,7 +7,7 @@ namespace esterv::crypto::block
 class Address : public C_Base<AddressType>
 {
     c_array m_addrHash;
-    static const QHash<AddressType, QString> JsonStr;
+    QBLOCK_EXPORT static const QHash<AddressType, QString> JsonStr;
 
   protected:
     Address(const AddressType typ, const c_array addrHash);

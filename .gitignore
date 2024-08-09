@@ -3,5 +3,6 @@ doc/html/
 doc/*.tag
 *.swp
 CMakeLists.txt.user
+CMakeUserPresets.json
 build
 tags

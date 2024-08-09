@@ -1,101 +1,160 @@
 #pragma once
 
-#include "block/carray.hpp"
-#include "block/qfeatures.hpp"
-#include "block/qnative_tokens.hpp"
-#include "block/qtoken_scheme.hpp"
-#include "block/qunlock_conditions.hpp"
-#include <QByteArray>
-#include <QDataStream>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
+#include "esterv/crypto/block/features.hpp"
+#include "esterv/crypto/block/unlock_conditions.hpp"
 
-namespace qiota::qblocks
+namespace esterv::crypto::block
 {
+
 
 class Output : public C_Base<OutputType>
 {
+
+    quint64 m_amount;
+
+    QBLOCK_EXPORT static const QHash<OutputType, QString> typesstr;
+
+protected:
+    pset<const UnlockCondition> m_unlockConditions;
+
+    Output(OutputType typ, const quint64 &amount, const pset<const UnlockCondition> &unlockConditions):
+      C_Base<OutputType>{typ}, m_amount{amount}, m_unlockConditions{unlockConditions} {
+    }
+    Output(OutputType typ,const QJsonValue &val):C_Base<OutputType>(typ),
+        m_amount{val.toObject()["amount"].toString().toULongLong()},
+        m_unlockConditions{getT<UnlockCondition>(val.toObject()["unlockConditions"].toArray())}
+    {
+
+    }
+    Output(OutputType typ,QDataStream &in):C_Base<OutputType>(typ)
+    {
+        in>>m_amount;
+    }
+
+    void addJson(QJsonObject &var) const override
+    {
+        C_Base::addJson(var);
+        var.insert("amount", QString::number(m_amount));
+        QJsonArray unlockConditions;
+        for (const auto &v : m_unlockConditions)
+        {
+            QJsonObject unlockCondition;
+            v->addJson(unlockCondition);
+            unlockConditions.push_back(unlockCondition);
+        }
+        var.insert("unlockConditions", unlockConditions);
+
+    }
+    void serialize(QDataStream &out) const override
+    {
+        C_Base::serialize(out);
+        out<<m_amount;
+    }
+
   public:
-    Output(OutputType typ, const quint64 &amount, const pset<const Unlock_Condition> &unlockConditions,
-           const pset<const Feature> &features = {});
-
-    Output(OutputType typ, const QJsonValue &val);
-    Output(OutputType typ, QDataStream &in);
-
     template <class from_type> static std::shared_ptr<Output> from(from_type &val);
 
-    std::shared_ptr<Output> clone(void) const
-    {
-        QByteArray var;
-        auto wBuffer = QDataStream(&var, QIODevice::WriteOnly | QIODevice::Append);
-        wBuffer.setByteOrder(QDataStream::LittleEndian);
-        serialize(wBuffer);
-        auto rBuffer = QDataStream(&var, QIODevice::ReadOnly);
-        rBuffer.setByteOrder(QDataStream::LittleEndian);
-        return from<QDataStream>(rBuffer);
-    }
-    template <class... Args> static auto Basic(Args &&...args);
-    template <class... Args> static auto Account(Args &&...args);
-    template <class... Args> static auto Anchor(Args &&...args);
-    template <class... Args> static auto Foundry(Args &&...args);
-    template <class... Args> static auto NFT(Args &&...args);
+    [[nodiscard]] std::shared_ptr<Output> clone(void) const;
 
-    void serialize(QDataStream &out) const;
-    QJsonObject getJson(void) const;
-    virtual void setId(const c_array &id);
-    virtual c_array getId(void) const;
+    template <class... Args> [[nodiscard]] static auto Basic(Args &&...args);
+    template <class... Args> [[nodiscard]] static auto Account(Args &&...args);
+    template <class... Args> [[nodiscard]] static auto Anchor(Args &&...args);
+    template <class... Args> [[nodiscard]] static auto Foundry(Args &&...args);
+    template <class... Args> [[nodiscard]] static auto NFT(Args &&...args);
+    template <class... Args> [[nodiscard]] static auto Delegation(Args &&...args);
+
+    virtual void setId(const OutputID &id);
+    [[nodiscard]] virtual OutputID getId(void) const;
     virtual void consume(void);
-    quint64 minDepositOfOutput(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const;
+    [[nodiscard]] quint64 minDepositOfOutput(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const;
 
-    std::shared_ptr<const Unlock_Condition> getUnlock(const Unlock_Condition::types &typ) const
+    [[nodiscard]] std::shared_ptr<const UnlockCondition> getUnlock(const UnlockConditionType &typ) const
     {
         const auto found = std::find_if(m_unlockConditions.begin(), m_unlockConditions.end(),
                                         [typ](const auto &it) { return (it->type() == typ); });
         return (found == m_unlockConditions.end()) ? nullptr : *found;
     }
-
-    std::shared_ptr<const Feature> getFeature(const FeatureType &typ) const
+    void setUnlock(std::shared_ptr<const UnlockCondition>& unlockCondition)
     {
-        const auto found =
-            std::find_if(m_features.begin(), m_features.end(), [typ](const auto &it) { return (it->type() == typ); });
+        m_unlockConditions.insert(unlockCondition);
+    }
+    [[nodiscard]] auto amount()const{return m_amount;}
+    void setAmount(const quint64 amount){m_amount=amount;}
+
+};
+
+class BasicOutput : virtual public Output
+{
+    quint64 m_mana;
+    pset<const Feature> m_features;
+    template <class... Args>
+    BasicOutput(const quint64 &mana, const pset<const Feature> &features = {}, Args &&...args)
+        : m_mana{mana},m_features{features}, Output(OutputType::Basic, std::forward<Args>(args)...) //Check This
+    {
+    }
+    BasicOutput(const QJsonValue &val)
+        : Output(OutputType::Basic,val),m_mana{val.toObject()["mana"].toString().toULongLong()},
+        m_features{getT<Feature>(val.toObject()["features"].toArray())}
+    {
+    }
+    BasicOutput(QDataStream &in) : Output(OutputType::Basic,in)
+    {
+        in>>m_mana;
+        m_unlockConditions = deserializeList<quint8, UnlockCondition>(in);
+        m_features = deserializeList<quint8, Feature>(in);
+    }
+public:
+    void addJson(QJsonObject &var) const override
+    {
+        Output::addJson(var);
+        var.insert("mana", QString::number(m_mana));
+        if(m_features.size())
+        {
+            QJsonArray features;
+            for (const auto &v : m_features)
+            {
+                QJsonObject feature;
+                v->addJson(feature);
+                features.push_back(feature);
+            }
+            var.insert("features", features);
+        }
+    }
+    void serialize(QDataStream &out) const override
+    {
+        Output::serialize(out);
+        out<<m_mana;
+        serializeList<quint8>(out, m_unlockConditions);
+        serializeList<quint8>(out, m_features);
+    }
+
+    [[nodiscard]] auto mana()const{return m_mana;}
+    void setMana(const quint64 mana){m_mana=mana;}
+
+    [[nodiscard]] std::shared_ptr<const Feature> getFeature(const FeatureType &typ) const
+    {
+        const auto found = std::find_if(m_features.begin(), m_features.end(),
+                                        [typ](const auto &it) { return (it->type() == typ); });
         return (found == m_features.end()) ? nullptr : *found;
     }
-    std::shared_ptr<const Feature> getImmutableFeature(const FeatureType &typ) const
+    void setFeature(std::shared_ptr<const Feature>& feature)
     {
-        const auto found = std::find_if(m_immutableFeatures.begin(), m_immutableFeatures.end(),
-                                        [typ](const auto &it) { return (it->type() == typ); });
-        return (found == m_immutableFeatures.end()) ? nullptr : *found;
+        m_features.insert(feature);
     }
 
-    QBLOCK_EXPORT const static QHash<OutputType, QString> typesstr;
 
-  private:
-    quint64 m_amount;
-    pset<const Unlock_Condition> m_unlockConditions;
-    pset<const Feature> m_features;
+    friend class Output;
 };
-
-// move to source files
-class BasicOutput : public Output
+class NFTOutput : public BasicOutput
 {
+    NFTID m_nftId;
+    pset<const Feature> m_immutableFeatures;
+
   public:
     template <class... Args>
-    BasicOutput(const quint64 &mana, Args &&...args)
-        : m_mana{mana}, Output(OutputType::Basic, std::forward<Args>(args)...)
-    {
-    }
-
-  private:
-    quint64 m_mana;
-};
-class NFTOutput : public Output
-{
-  public:
-    template <class... Args>
-    NFTOutput(const quint64 &mana, const pset<const Feature> &immutablefeatures = {}, Args &&...args)
-        : Output(OutputType::NFT, std::forward<Args>(args)...), m_nftId{NFTID(ByteSizes::hash, 0)}, m_mana{mana},
-          m_immutablefeatures{immutablefeatures}
+    NFTOutput(const pset<const Feature> &immutablefeatures = {}, Args &&...args)
+        : BasicOutput(std::forward<Args>(args)...),m_nftId{NFTID(ByteSizes::hash, 0)},
+          m_immutableFeatures{immutablefeatures},Output(OutputType::NFT, std::forward<Args>(args)...)
     {
     }
     NFTOutput(const QJsonValue &val);
@@ -103,20 +162,16 @@ class NFTOutput : public Output
     void serialize(QDataStream &out) const;
 
     QJsonObject getJson(void) const;
-    void setId(const OutputID &outputid)
+    void setId(const OutputID &outputid) override
     {
         if (m_nftId == OutputID(ByteSizes::hash, 0))
             m_nftId = outputid.hash<QCryptographicHash::Blake2b_256>();
     }
-    c_array getId(void) const
+    c_array getId(void) const override
     {
         return m_nftId;
     }
 
-  private:
-    NFTID m_nftId;
-    pset<const Feature> m_immutableFeatures;
-    quint64 m_mana;
 };
 
 class FoundryOutput : public Output

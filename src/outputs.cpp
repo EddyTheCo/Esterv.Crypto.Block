@@ -1,15 +1,24 @@
-#include "block/qoutputs.hpp"
-namespace qiota
-{
-namespace qblocks
+#include "esterv/crypto/block/outputs.hpp"
+
+namespace esterv::crypto::block
 {
 
+std::shared_ptr<Output> Output::clone(void) const
+{
+    QByteArray var;
+    auto wBuffer = QDataStream(&var, QIODevice::WriteOnly | QIODevice::Append);
+    wBuffer.setByteOrder(QDataStream::LittleEndian);
+    serialize(wBuffer);
+    auto rBuffer = QDataStream(&var, QIODevice::ReadOnly);
+    rBuffer.setByteOrder(QDataStream::LittleEndian);
+    return from<QDataStream>(rBuffer);
+}
 c_array Output::getId(void) const
 {
     return c_array(ByteSizes::hash, 0);
 }
 const QHash<OutputType, QString> Output::typesstr = {
-    {Basic, "/basic"}, {NFT, "/nft"}, {Foundry, "/foundry"}, {Anchor, "/Anchor"}, {Account, "/Account"}};
+    {OutputType::Basic, "/basic"}, {OutputType::NFT, "/nft"}, {OutputType::Foundry, "/foundry"}, {OutputType::Anchor, "/Anchor"}, {OutputType::Account, "/Account"}};
 
 void Output::serialize(QDataStream &out) const
 {
@@ -29,51 +38,29 @@ void FoundryOutput::consume(void)
 {
     m_features.clear();
 }
-QJsonObject Output::getJson(void) const
-{
-    QJsonObject var;
-    var.insert("amount", QString::number(m_amount));
-
-    QJsonArray unarr;
-    for (const auto &v : m_unlockConditions)
-        unarr.push_back(v->get_Json());
-    var.insert("unlockConditions", unarr);
-    if (m_features.size())
-    {
-        QJsonArray fearr;
-        for (const auto &v : m_features)
-            fearr.push_back(v->get_Json());
-        var.insert("features", fearr);
-    }
-    return var;
-}
-Output::Output(OutputType typ, const quint64 &amount, const pset<const Unlock_Condition> &unlockConditions,
-               const pset<const Feature> &features)
-    : C_Base<OutputType>{typ}, m_amount{amount}, m_unlockConditions{unlockConditions}, m_features{features} {
-}
 template <class from_type> std::shared_ptr<Output> Output::from(from_type &val)
 {
-    const auto type_ = get_type<types>(val);
-    switch (type_)
+    const auto type = getType<OutputType>(val);
+    switch (type)
     {
-    case Basic_typ:
+    case OutputType::Basic:
         return std::shared_ptr<Output>(new BasicOutput(val));
-    case NFT_typ:
+    case OutputType::NFT:
         return std::shared_ptr<Output>(new NFTOutput(val));
-    case Foundry_typ:
+    case OutputType::Foundry:
         return std::shared_ptr<Output>(new FoundryOutput(val));
-    case Anchor_typ:
+    case OutputType::Anchor:
         return std::shared_ptr<Output>(new AnchorOutput(val));
-    case Account_typ:
+    case OutputType::Account:
         return std::shared_ptr<Output>(new AccountOutput(val));
+    case OutputType::Delegation:
+        return std::shared_ptr<Output>(new DelegationOutput(val));
     default:
         return nullptr;
     }
 }
 template std::shared_ptr<Output> Output::from<const QJsonValue>(const QJsonValue &val);
 template std::shared_ptr<Output> Output::from<QDataStream>(QDataStream &val);
-template std::shared_ptr<Output> Output::from<const QJsonValueRef>(const QJsonValueRef &val);
-template std::shared_ptr<Output> Output::from<QJsonValueConstRef const>(QJsonValueConstRef const &);
 
 quint64 Output::minDepositOfOutput(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const
 {
@@ -246,4 +233,3 @@ void Alias_Output::serialize(QDataStream &out) const
 
 }; // namespace qblocks
 
-}; // namespace qiota

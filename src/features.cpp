@@ -74,4 +74,8 @@ std::shared_ptr<const Feature> Feature::Tag(const tagF &tag)
     return std::shared_ptr<const Feature>(new TagFeature(tag));
 }
 
+std::shared_ptr<const Feature> Feature::NativeToken(const TokenID &tokenId, const uint256 &amount)
+{
+    return std::shared_ptr<const Feature>(new NativeTokenFeature(tokenId,amount));
+}
 } // namespace qiota::qblocks

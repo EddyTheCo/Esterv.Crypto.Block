@@ -1,51 +1,34 @@
-#  Generalization of the Tangle transaction concept
-
+# Esterv.Crypto.Block 
 
 [TOC]
 
-This repo implements a library for working with IOTA blocks according to this [TIP](https://github.com/iotaledger/tips/blob/main/tips/TIP-0024/tip-0024.md).
+This repo implements a library for working blocks.
 
-## Installing the library 
-
-### From source code
-```
-git clone https://github.com/EddyTheCo/Qblock-IOTA.git 
-
-mkdir build
-cd build
-qt-cmake -G Ninja -DCMAKE_INSTALL_PREFIX=installDir -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_DOCS=OFF ../Qblock-IOTA
-
-cmake --build . 
-
-cmake --install . 
-```
-where `installDir` is the installation path.
-One can choose to build or not the tests and the documentation with the `BUILD_TESTING` and `BUILD_DOCS` variables.
-
-### From GitHub releases
-Download the releases from this repo. 
+## Configure, build, test, package ...
+ 
+The project uses [CMake presets](https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html) as a way to share CMake configurations.
+Refer to [cmake](https://cmake.org/cmake/help/latest/manual/cmake.1.html), [ctest](https://cmake.org/cmake/help/latest/manual/ctest.1.html) and [cpack](https://cmake.org/cmake/help/latest/manual/cpack.1.html) documentation for more information on the use of presets.
 
 ## Adding the libraries to your CMake project 
 
 ```CMake
 include(FetchContent)
 FetchContent_Declare(
-	QtIotaBlock	
-	GIT_REPOSITORY https://github.com/EddyTheCo/Qblock-IOTA.git
+	EstervBlock	
+	GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Crypto.Block.git
 	GIT_TAG vMAJOR.MINOR.PATCH 
 	FIND_PACKAGE_ARGS MAJOR.MINOR CONFIG  
 	)
-FetchContent_MakeAvailable(QtIotaBlock)
-target_link_libraries(<target> <PRIVATE|PUBLIC|INTERFACE> QtIotaBlock::qblock)
+FetchContent_MakeAvailable(EstervBlock)
+target_link_libraries(<target> <PRIVATE|PUBLIC|INTERFACE> Esterv::block)
 ```
 
 
 ## API reference
 
-You can read the [API reference](https://eddytheco.github.io/Qblock-IOTA/), or generate it yourself like
+You can read the [API reference](https://eddytheco.github.io/Esterv.Crypto.Block/), or generate it yourself like
 ```
-cmake -DBUILD_DOCS=ON ../
-cmake --build . --target doxygen_docs
+cmake --workflow --preset default-documentation
 ```
 
 ## Contributing

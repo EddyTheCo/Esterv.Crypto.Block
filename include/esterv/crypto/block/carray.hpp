@@ -23,7 +23,8 @@ namespace esterv::crypto::block
 enum ByteSizes
 {
     hash = 32,
-    token = 38
+    token = 38,
+    transactionId = 36
 };
 enum class UnlockConditionType : quint8
 {
@@ -42,6 +43,7 @@ enum class OutputType : quint8
     Anchor = 2,
     Foundry = 3,
     NFT = 4,
+    Delegation = 5,
 };
 enum class FeatureType : quint8
 {
@@ -50,6 +52,10 @@ enum class FeatureType : quint8
     Metadata = 2,
     Tag = 4,
     NativeToken = 5
+};
+enum class InputType : quint8
+{
+    UTXO = 0
 };
 enum class AddressType : quint8
 {

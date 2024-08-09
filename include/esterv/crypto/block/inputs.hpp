@@ -1,56 +1,73 @@
 #pragma once
 
-#include "block/carray.hpp"
-#include <QByteArray>
-#include <QDataStream>
-#include <QJsonObject>
-#include <QJsonValue>
-namespace qiota
-{
-namespace qblocks
-{
-class Input
-{
-  public:
-    enum types : quint8
-    {
-        UTXO_typ = 0
-    };
-    Input(types typ);
-    template <class from_type> static std::shared_ptr<const Input> from_(from_type &val);
+#include "esterv/crypto/block/carray.hpp"
 
-    static std::shared_ptr<const Input> UTXO(const Transaction_ID &transaction_id_m,
-                                             const quint16 &transaction_output_index_m);
-    virtual void serialize(QDataStream &out) const;
-    virtual QJsonObject get_Json(void) const;
+namespace esterv::crypto::block
+{
 
-    types type(void) const
+class Input: public C_Base<InputType>
+{
+protected:
+    Input(InputType typ): C_Base<InputType>(typ)
     {
-        return type_m;
     }
+  public:
+    template <class from_type> static std::shared_ptr<const Input> from(from_type &val);
 
-  private:
-    const types type_m;
+    [[nodiscard]] static std::shared_ptr<const Input> UTXO(const TransactionID &transactionId,
+                                             const quint16 &transactionOutputIndex);
+
 };
 
 /*
  * @brief Describes an input which references an unspent transaction output to consume.
  *
  */
-class UTXO_Input : public Input
+class UTXOInput : public Input
 {
-  public:
-    UTXO_Input(const Transaction_ID &transaction_id_m, const quint16 &transaction_output_index_m);
-    UTXO_Input(const QJsonValue &val);
-    UTXO_Input(QDataStream &in);
-    void serialize(QDataStream &out) const;
-    QJsonObject get_Json(void) const;
+    TransactionID m_transactionId;
+    quint16 m_transactionOutputIndex;
 
-  private:
-    quint16 transaction_output_index_;
-    Transaction_ID transaction_id_;
+    UTXOInput(const TransactionID &transactionId,
+               const quint16 &transactionOutputIndex) : Input(InputType::UTXO),
+        m_transactionId{transactionId},
+        m_transactionOutputIndex{transactionOutputIndex}
+    {
+    }
+    UTXOInput(const QJsonValue &val)
+        : Input{InputType::UTXO}, m_transactionId{TransactionID(val.toObject()["transactionId"])},
+        m_transactionOutputIndex(val.toObject()["transactionOutputIndex"].toInt())
+    {
+    }
+    UTXOInput(QDataStream &in) : Input{InputType::UTXO}
+    {
+        m_transactionId = TransactionID(ByteSizes::transactionId, 0);
+        in >> m_transactionId;
+        in >> m_transactionOutputIndex;
+    }
+
+public:
+    void serialize(QDataStream &out) const override
+    {
+        C_Base::serialize(out);
+        out<< m_transactionId;
+        out << m_transactionOutputIndex;
+    }
+    void addJson(QJsonObject &var) const override
+    {
+        Input::addJson(var);
+        var.insert("transactionId", m_transactionId.toHexString());
+        var.insert("transactionOutputIndex", (int)m_transactionOutputIndex);
+    }
+    [[nodiscard]] auto transactionOutputIndex(void) const
+    {
+        return m_transactionOutputIndex;
+    }
+    [[nodiscard]] auto transactionId(void) const
+    {
+        return m_transactionId;
+    }
+    friend class Input;
 };
 
 }; // namespace qblocks
-
-}; // namespace qiota
