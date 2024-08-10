@@ -3,6 +3,10 @@
 namespace esterv::crypto::block
 {
 
+const QHash<OutputType, QString> NFTOutput::jsonStr{{OutputType::NFT, "nftId"},
+                                                    {OutputType::Account, "accountId"},
+                                                    {OutputType::Anchor, "anchorId"},
+                                                    {OutputType::Delegation, "delegationId"}};
 std::shared_ptr<Output> Output::clone(void) const
 {
     QByteArray var;
@@ -93,13 +97,6 @@ template <class... Args> auto Output::Basic(Args &&...args)
 template <class... Args> auto Output::NFT(Args &&...args)
 {
     return std::shared_ptr<Output>(new NFTOutput(std::forward<Args>(args)...));
-}
-
-NFTOutput::NFTOutput(const QJsonValue &val)
-    : NFTOutput(val.toObject()["mana"].toString().toULongLong(),
-                get_T<Feature>(val.toObject()["immutableFeatures"].toArray()), val),
-      m_nftId(NFTID(val.toObject()["nftId"]))
-{
 }
 
 NFTOutput::NFTOutput(QDataStream &in) : Output(types::NFT_typ)

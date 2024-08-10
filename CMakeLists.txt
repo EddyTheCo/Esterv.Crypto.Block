@@ -5,7 +5,7 @@ include(FetchContent)
 FetchContent_Declare(
   ccommon
   GIT_REPOSITORY https://github.com/EddyTheCo/Common.git
-  GIT_TAG v0.4.1)
+  GIT_TAG main)
 FetchContent_MakeAvailable(ccommon)
 version_from_git(LOG OFF TIMESTAMP "%Y%m%d%H%M%S")
 
@@ -25,7 +25,7 @@ include(GNUInstallDirs)
 FetchContent_Declare(
   EstervBigInt
   GIT_REPOSITORY https://github.com/EddyTheCo/Esterv.Crypto.BigInt.git
-  GIT_TAG fixes
+  GIT_TAG develop 
   FIND_PACKAGE_ARGS 0.1 CONFIG)
 FetchContent_MakeAvailable(EstervBigInt)
 
@@ -42,7 +42,7 @@ if(Qt6_FOUND)
 #    src/unlocks.cpp
 #    src/essences.cpp
     src/inputs.cpp
-    #    src/outputs.cpp
+    src/outputs.cpp
     src/unlock_conditions.cpp
     src/features.cpp
     src/addresses.cpp
@@ -54,7 +54,7 @@ if(Qt6_FOUND)
 #    include/block/essences.hpp
     include/esterv/crypto/block/features.hpp
     include/esterv/crypto/block/inputs.hpp
-    #   include/esterv/crypto/block/outputs.hpp
+   include/esterv/crypto/block/outputs.hpp
 #    include/block/output_metadata_response.hpp
 #    include/block/payloads.hpp
 #    include/block/signatures.hpp

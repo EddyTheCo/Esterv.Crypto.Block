@@ -213,14 +213,9 @@ using public_key = c_array;
 using signature = c_array;
 
 /*!
- * \brief BLAKE2b-256 hash of the Output ID that created the NFT chain of outputs
+ * \brief BLAKE2b-256 hash of the Output ID that created the chain of outputs
  */
-using NFTID = c_array;
-/*!
- * \brief BLAKE2b-256 hash of the Output ID that created the Alias chain of outputs
- */
-using AnchorID = c_array;
-using AccountID = c_array;
+using ID = c_array;
 /*!
  * \brief Concatenation of Transaction_ID || outputIndex
  */

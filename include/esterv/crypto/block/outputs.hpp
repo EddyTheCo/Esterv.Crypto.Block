@@ -6,8 +6,7 @@
 namespace esterv::crypto::block
 {
 
-
-class Output : public C_Base<OutputType>
+class Output : virtual public C_Base<OutputType>
 {
 
     quint64 m_amount;
@@ -17,16 +16,17 @@ class Output : public C_Base<OutputType>
 protected:
     pset<const UnlockCondition> m_unlockConditions;
 
-    Output(OutputType typ, const quint64 &amount, const pset<const UnlockCondition> &unlockConditions):
-      C_Base<OutputType>{typ}, m_amount{amount}, m_unlockConditions{unlockConditions} {
+    Output(const quint64 &amount, const pset<const UnlockCondition> &unlockConditions)
+        : C_Base<OutputType>{OutputType::Basic}, m_amount{amount}, m_unlockConditions{unlockConditions}
+    {
     }
-    Output(OutputType typ,const QJsonValue &val):C_Base<OutputType>(typ),
-        m_amount{val.toObject()["amount"].toString().toULongLong()},
-        m_unlockConditions{getT<UnlockCondition>(val.toObject()["unlockConditions"].toArray())}
+    Output(const QJsonValue &val)
+        : C_Base<OutputType>{OutputType::Basic}, m_amount{val.toObject()["amount"].toString().toULongLong()},
+          m_unlockConditions{getT<UnlockCondition>(val.toObject()["unlockConditions"].toArray())}
     {
 
     }
-    Output(OutputType typ,QDataStream &in):C_Base<OutputType>(typ)
+    Output(QDataStream &in) : C_Base<OutputType>(OutputType::Basic)
     {
         in>>m_amount;
     }
@@ -83,25 +83,30 @@ protected:
 
 };
 
-class BasicOutput : virtual public Output
+class BasicOutput : public Output
 {
     quint64 m_mana;
     pset<const Feature> m_features;
+
+  protected:
     template <class... Args>
     BasicOutput(const quint64 &mana, const pset<const Feature> &features = {}, Args &&...args)
-        : m_mana{mana},m_features{features}, Output(OutputType::Basic, std::forward<Args>(args)...) //Check This
+        : m_mana{mana}, m_features{features}, Output(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::Basic}
     {
     }
     BasicOutput(const QJsonValue &val)
-        : Output(OutputType::Basic,val),m_mana{val.toObject()["mana"].toString().toULongLong()},
-        m_features{getT<Feature>(val.toObject()["features"].toArray())}
+        : Output(val), C_Base<OutputType>{OutputType::Basic}, m_mana{val.toObject()["mana"].toString().toULongLong()},
+          m_features{getT<Feature>(val.toObject()["features"].toArray())}
     {
     }
-    BasicOutput(QDataStream &in) : Output(OutputType::Basic,in)
+    BasicOutput(QDataStream &in) : Output(in), C_Base<OutputType>{OutputType::Basic}
     {
         in>>m_mana;
-        m_unlockConditions = deserializeList<quint8, UnlockCondition>(in);
-        m_features = deserializeList<quint8, Feature>(in);
+        if (type() == OutputType::Basic)
+        {
+            m_unlockConditions = deserializeList<quint8, UnlockCondition>(in);
+            m_features = deserializeList<quint8, Feature>(in);
+        }
     }
 public:
     void addJson(QJsonObject &var) const override
@@ -142,26 +147,40 @@ public:
         m_features.insert(feature);
     }
 
-
     friend class Output;
 };
 class NFTOutput : public BasicOutput
 {
-    NFTID m_nftId;
+    ID m_id;
     pset<const Feature> m_immutableFeatures;
 
-  public:
+  protected:
+    static const QHash<OutputType, QString> jsonStr;
     template <class... Args>
     NFTOutput(const pset<const Feature> &immutablefeatures = {}, Args &&...args)
-        : BasicOutput(std::forward<Args>(args)...),m_nftId{NFTID(ByteSizes::hash, 0)},
-          m_immutableFeatures{immutablefeatures},Output(OutputType::NFT, std::forward<Args>(args)...)
+        : BasicOutput(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::NFT}, m_id{ID(ByteSizes::hash, 0)},
+          m_immutableFeatures{immutablefeatures}
     {
     }
-    NFTOutput(const QJsonValue &val);
-    NFTOutput(QDataStream &in);
-    void serialize(QDataStream &out) const;
+    NFTOutput(const QJsonValue &val)
+        : C_Base<OutputType>{OutputType::NFT}, BasicOutput(val),
+          m_immutableFeatures{getT<Feature>(val.toObject()["immutableFeatures"].toArray())},
+          m_id{ID(val.toObject()["nftId"])}
+    {
+    }
+    NFTOutput(QDataStream &in) : C_Base<OutputType>{OutputType::NFT}, BasicOutput(in)
+    {
+        m_nftId = NFTID(ByteSizes::hash, 0); // Check why initialize to zeroes here
+        in >> m_nftId;
+        m_unlockConditions = deserializeList<quint8, Unlock_Condition>(in);
+        m_features = deserializeList<quint8, Feature>(in);
+        m_immutableFeatures = deserializeList<quint8, Feature>(in);
+    }
 
+  public:
+    void serialize(QDataStream &out) const override;
     QJsonObject getJson(void) const;
+
     void setId(const OutputID &outputid) override
     {
         if (m_nftId == OutputID(ByteSizes::hash, 0))
