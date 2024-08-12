@@ -38,6 +38,8 @@ class UnlockCondition : public C_Base<UnlockConditionType>
 
 class AddressUnlockCondition : virtual public UnlockCondition
 {
+    std::shared_ptr<const class Address> m_address;
+
   protected:
     AddressUnlockCondition(const std::shared_ptr<const class Address> &address)
         : UnlockCondition(UnlockConditionType::Address), m_address{address}
@@ -50,8 +52,6 @@ class AddressUnlockCondition : virtual public UnlockCondition
     AddressUnlockCondition(QDataStream &in) : AddressUnlockCondition(Address::from<QDataStream>(in))
     {
     }
-
-    std::shared_ptr<const class Address> m_address;
     static const QHash<UnlockConditionType, QString> jsonStr;
 
   public:
@@ -74,7 +74,7 @@ class AddressUnlockCondition : virtual public UnlockCondition
     {
         return m_address;
     }
-    void setAddress(std::shared_ptr<const class Address> address)
+    void setAddress(const std::shared_ptr<const class Address> &address)
     {
         m_address = address;
     }
@@ -118,7 +118,7 @@ class StorageDepositReturnUnlockCondition : public AddressUnlockCondition
     {
         return m_returnAmount;
     }
-    void setReturnAmount(quint64 returnAmount)
+    void setReturnAmount(const quint64 &returnAmount)
     {
         m_returnAmount = returnAmount;
     }
@@ -159,7 +159,7 @@ class TimelockUnlockCondition : virtual public UnlockCondition
     {
         return m_slotIndex;
     }
-    void setSlotIndex(quint32 slotIndex)
+    void setSlotIndex(const quint32 &slotIndex)
     {
         m_slotIndex = slotIndex;
     }

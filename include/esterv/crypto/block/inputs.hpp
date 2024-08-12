@@ -67,6 +67,14 @@ public:
     {
         return m_transactionId;
     }
+    void setTransactionId(const TransactionID &transactionId)
+    {
+        m_transactionId = transactionId;
+    }
+    void setTransactionOutputIndex(const quint16 &transactionOutputIndex)
+    {
+        m_transactionOutputIndex = transactionOutputIndex;
+    }
     friend class Input;
 };
 

@@ -65,6 +65,10 @@ class SenderFeature : public Feature
     {
         return m_sender;
     }
+    void setSender(const std::shared_ptr<const Address> &sender)
+    {
+        m_sender = sender;
+    }
     friend class Feature;
 };
 class IssuerFeature : public Feature
@@ -98,6 +102,10 @@ class IssuerFeature : public Feature
     [[nodiscard]] auto issuer(void) const
     {
         return m_issuer;
+    }
+    void setIssuer(const std::shared_ptr<const Address> &issuer)
+    {
+        m_issuer = issuer;
     }
     friend class Feature;
 };
@@ -133,6 +141,10 @@ class MetadataFeature : public Feature
     {
         return m_entries;
     }
+    void setEntries(const MetadataEntries &entries)
+    {
+        m_entries = entries;
+    }
     friend class Feature;
 };
 
@@ -165,6 +177,10 @@ class TagFeature : public Feature
     [[nodiscard]] auto tag(void) const
     {
         return m_tag;
+    }
+    void setTag(const fl_array<quint8> &tag)
+    {
+        m_tag = tag;
     }
     friend class Feature;
 };
@@ -210,6 +226,14 @@ class NativeTokenFeature : public Feature
     [[nodiscard]] auto amount(void) const
     {
         return m_amount;
+    }
+    void setTokenId(const TokenID &tokenId)
+    {
+        m_tokenId = tokenId;
+    }
+    void setAmount(const uint256 &amount)
+    {
+        m_amount = amount;
     }
     friend class Feature;
 };

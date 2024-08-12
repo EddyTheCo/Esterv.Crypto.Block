@@ -3,10 +3,10 @@
 namespace esterv::crypto::block
 {
 
-const QHash<OutputType, QString> NFTOutput::jsonStr{{OutputType::NFT, "nftId"},
-                                                    {OutputType::Account, "accountId"},
-                                                    {OutputType::Anchor, "anchorId"},
-                                                    {OutputType::Delegation, "delegationId"}};
+const QHash<OutputType, QString> ChainOutput::jsonStr{{OutputType::NFT, "nftId"},
+                                                      {OutputType::Account, "accountId"},
+                                                      {OutputType::Anchor, "anchorId"},
+                                                      {OutputType::Delegation, "delegationId"}};
 std::shared_ptr<Output> Output::clone(void) const
 {
     QByteArray var;
