@@ -1,5 +1,6 @@
 #include "esterv/crypto/block/addresses.hpp"
 #include "esterv/crypto/block/features.hpp"
+#include "esterv/crypto/block/outputs.hpp"
 #undef NDEBUG
 #include <assert.h>
 
@@ -25,5 +26,36 @@ int main(int argc, char **argv)
     QJsonObject sendFeaJson;
     sendFea->addJson(sendFeaJson);
     qDebug() << sendFeaJson;
+
+    auto basicOutput = Output::Basic();
+    QJsonObject basicOutputJson;
+    basicOutput->addJson(basicOutputJson);
+    qDebug() << "Basic output:" << basicOutputJson;
+
+    auto nftOutput = Output::NFT(10, 10, {}, {sendFea});
+    QJsonObject nftOutputJson;
+    nftOutput->addJson(nftOutputJson);
+    qDebug() << "NFT output:" << nftOutputJson;
+
+    auto accountOutput = Output::Account();
+    QJsonObject accountOutputJson;
+    accountOutput->addJson(accountOutputJson);
+    qDebug() << "Account output:" << accountOutputJson;
+
+    auto anchorOutput = Output::Anchor();
+    QJsonObject anchorOutputJson;
+    anchorOutput->addJson(anchorOutputJson);
+    qDebug() << "anchor output:" << anchorOutputJson;
+
+    auto foundryOutput = Output::Foundry();
+    QJsonObject foundryOutputJson;
+    foundryOutput->addJson(foundryOutputJson);
+    qDebug() << "Foundry output:" << foundryOutputJson;
+
+    auto delegationOutput = Output::Delegation();
+    QJsonObject delegationOutputJson;
+    delegationOutput->addJson(delegationOutputJson);
+    qDebug() << "Delegation output:" << delegationOutputJson;
+
     return 0;
 }

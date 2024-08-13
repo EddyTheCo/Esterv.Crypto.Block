@@ -3,9 +3,6 @@
 namespace esterv::crypto::block
 {
 
-Feature::Feature(FeatureType typ) : C_Base<FeatureType>(typ)
-{
-}
 template <class from_type> std::shared_ptr<const Feature> Feature::from(from_type &val)
 {
     const auto type = getType<FeatureType>(val);
@@ -28,6 +25,7 @@ template <class from_type> std::shared_ptr<const Feature> Feature::from(from_typ
 }
 template std::shared_ptr<const Feature> Feature::from<const QJsonValue>(const QJsonValue &val);
 template std::shared_ptr<const Feature> Feature::from<QDataStream>(QDataStream &val);
+template std::shared_ptr<const Feature> Feature::from<QJsonValueConstRef const>(QJsonValueConstRef const &);
 
 std::shared_ptr<const Feature> Feature::Sender(const std::shared_ptr<const Address> &sender)
 {

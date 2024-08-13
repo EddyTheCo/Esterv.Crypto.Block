@@ -45,6 +45,10 @@ enum class OutputType : quint8
     NFT = 4,
     Delegation = 5,
 };
+enum class TokenSchemeType : quint8
+{
+    Simple = 0
+};
 enum class FeatureType : quint8
 {
     Sender = 0,
@@ -269,7 +273,7 @@ template <class T> pset<const T> getT(const QJsonArray &val)
 {
     pset<const T> var;
     for (const auto &v : val)
-        var.insert(T::from_(v));
+        var.insert(T::from(v));
     return var;
 }
 /*!
@@ -308,7 +312,7 @@ template <class size_type, class T> void serializeList(QDataStream &out, const T
     out << static_cast<size_type>(container.size());
     for (const auto &v : container)
     {
-        out << v;
+        v->serialize(out);
     }
 }
 /*!

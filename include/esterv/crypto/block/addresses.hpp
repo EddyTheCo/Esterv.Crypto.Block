@@ -17,10 +17,10 @@ class Address : public C_Base<AddressType>
   public:
     template <class from_type> static std::shared_ptr<const Address> from(from_type &val);
 
-    static std::shared_ptr<const Address> NFT(const c_array addrhash);
-    static std::shared_ptr<const Address> Account(const c_array addrhash);
-    static std::shared_ptr<const Address> Ed25519(const c_array addrhash);
-    static std::shared_ptr<const Address> Anchor(const c_array addrhash);
+    [[nodiscard]] static std::shared_ptr<const Address> NFT(const c_array addrhash);
+    [[nodiscard]] static std::shared_ptr<const Address> Account(const c_array addrhash);
+    [[nodiscard]] static std::shared_ptr<const Address> Ed25519(const c_array addrhash);
+    [[nodiscard]] static std::shared_ptr<const Address> Anchor(const c_array addrhash);
 
     [[nodiscard]] auto addrHash(void) const
     {

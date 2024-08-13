@@ -12,7 +12,11 @@ class MetadataEntries : public std::map<fl_array<quint8>, fl_array<quint16>>
     MetadataEntries(QDataStream &in);
     friend QDataStream &operator<<(QDataStream &out, const MetadataEntries &obj)
     {
-        serializeList<quint8>(out, obj);
+        out << static_cast<quint8>(obj.size());
+        for (const auto &v : obj)
+        {
+            out << v.first << v.second;
+        }
         return out;
     }
     [[nodiscard]] QJsonArray getJson() const;
@@ -21,7 +25,9 @@ class MetadataEntries : public std::map<fl_array<quint8>, fl_array<quint16>>
 class Feature : public C_Base<FeatureType>
 {
   protected:
-    Feature(FeatureType typ);
+    Feature(FeatureType typ) : C_Base<FeatureType>(typ)
+    {
+    }
 
   public:
     template <class from_type> static std::shared_ptr<const Feature> from(from_type &val);

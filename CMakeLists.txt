@@ -47,7 +47,7 @@ if(Qt6_FOUND)
     src/features.cpp
     src/addresses.cpp
 #    src/output_metadata_response.cpp
-#    src/token_scheme.cpp
+    src/token_scheme.cpp
     include/esterv/crypto/block/carray.hpp
     include/esterv/crypto/block/addresses.hpp
 #    include/block/block.hpp
@@ -58,7 +58,7 @@ if(Qt6_FOUND)
 #    include/block/output_metadata_response.hpp
 #    include/block/payloads.hpp
 #    include/block/signatures.hpp
-#    include/block/token_scheme.hpp
+   include/esterv/crypto/block/token_scheme.hpp
     include/esterv/crypto/block/unlock_conditions.hpp
 #    include/block/unlocks.hpp
 )
