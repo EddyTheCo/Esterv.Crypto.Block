@@ -25,7 +25,7 @@ class MetadataEntries : public std::map<fl_array<quint8>, fl_array<quint16>>
 class Feature : public C_Base<FeatureType>
 {
   protected:
-    Feature(FeatureType typ) : C_Base<FeatureType>(typ)
+    Feature(FeatureType typ) : C_Base{typ}
     {
     }
 
@@ -58,14 +58,20 @@ class SenderFeature : public Feature
     void serialize(QDataStream &out) const override
     {
         C_Base::serialize(out);
-        m_sender->serialize(out);
+        if (m_sender)
+        {
+            m_sender->serialize(out);
+        }
     }
     void addJson(QJsonObject &var) const override
     {
         Feature::addJson(var);
-        QJsonObject address;
-        m_sender->addJson(address);
-        var.insert("address", address);
+        if (m_sender)
+        {
+            QJsonObject address;
+            m_sender->addJson(address);
+            var.insert("address", address);
+        }
     }
     auto sender(void) const
     {
@@ -73,7 +79,10 @@ class SenderFeature : public Feature
     }
     void setSender(const std::shared_ptr<const Address> &sender)
     {
-        m_sender = sender;
+        if (sender)
+        {
+            m_sender = sender;
+        }
     }
     friend class Feature;
 };
@@ -96,14 +105,20 @@ class IssuerFeature : public Feature
     void serialize(QDataStream &out) const override
     {
         C_Base::serialize(out);
-        m_issuer->serialize(out);
+        if (m_issuer)
+        {
+            m_issuer->serialize(out);
+        }
     }
     void addJson(QJsonObject &var) const override
     {
         Feature::addJson(var);
-        QJsonObject address;
-        m_issuer->addJson(address);
-        var.insert("address", address);
+        if (m_issuer)
+        {
+            QJsonObject address;
+            m_issuer->addJson(address);
+            var.insert("address", address);
+        }
     }
     [[nodiscard]] auto issuer(void) const
     {
@@ -111,7 +126,10 @@ class IssuerFeature : public Feature
     }
     void setIssuer(const std::shared_ptr<const Address> &issuer)
     {
-        m_issuer = issuer;
+        if (issuer)
+        {
+            m_issuer = issuer;
+        }
     }
     friend class Feature;
 };

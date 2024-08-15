@@ -96,7 +96,7 @@ std::shared_ptr<Output> Output::Anchor(const quint64 &amount, const quint64 &man
         new AnchorOutput(stateIndex, immutableFeatures, mana, features, amount, unlockConditions));
 }
 std::shared_ptr<Output> Output::Delegation(const quint64 &amount, const quint64 &delegatedAmount,
-                                           const std::shared_ptr<const Address> validatorAddress,
+                                           const std::shared_ptr<const Address> &validatorAddress,
                                            const quint64 &startEpoch, const quint64 &endEpoch,
                                            const pset<const UnlockCondition> &unlockConditions)
 {

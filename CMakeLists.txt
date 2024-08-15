@@ -57,10 +57,10 @@ if(Qt6_FOUND)
    include/esterv/crypto/block/outputs.hpp
 #    include/block/output_metadata_response.hpp
 #    include/block/payloads.hpp
-#    include/block/signatures.hpp
+#    include/esterv/crypto/block/signatures.hpp
    include/esterv/crypto/block/token_scheme.hpp
     include/esterv/crypto/block/unlock_conditions.hpp
-#    include/block/unlocks.hpp
+#    include/esterv/crypto/block/unlocks.hpp
 )
 
 add_library(Esterv::block ALIAS block)

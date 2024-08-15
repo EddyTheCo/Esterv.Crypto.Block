@@ -1,22 +1,17 @@
 #pragma once
 
-#include "block/carray.hpp"
-#include "block/qaddresses.hpp"
-#include <QByteArray>
-#include <QDataStream>
-#include <QJsonValue>
-namespace qiota
+#include "esterv/crypto/block/carray.hpp"
+
+namespace esterv::crypto::block
 {
-namespace qblocks
+class Signature : public C_Base<SignatureType>
 {
-class Signature
-{
-  public:
-    enum types : quint8
+  protected:
+    Signature(SignatureType typ) : C_Base{typ}
     {
-        Ed25519_typ = 0
-    };
-    Signature(types typ);
+    }
+
+  public:
     template <class from_type> static std::shared_ptr<const Signature> from_(from_type &val);
 
     static std::shared_ptr<const Signature> Ed25519(const public_key &public_key_m, const signature &signature_m);
@@ -46,6 +41,4 @@ class Ed25519_Signature : public Signature
     signature signature_;
 };
 
-}; // namespace qblocks
-
-}; // namespace qiota
+}; // namespace esterv::crypto::block

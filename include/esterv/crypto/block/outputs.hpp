@@ -18,11 +18,11 @@ class Output : virtual public C_Base<OutputType>
     pset<const UnlockCondition> m_unlockConditions;
 
     Output(const quint64 &amount = 0, const pset<const UnlockCondition> &unlockConditions = {})
-        : C_Base<OutputType>{OutputType::Basic}, m_amount{amount}, m_unlockConditions{unlockConditions}
+        : C_Base{OutputType::Basic}, m_amount{amount}, m_unlockConditions{unlockConditions}
     {
     }
     Output(const QJsonValue &val)
-        : C_Base<OutputType>{OutputType::Basic}, m_amount{val.toObject()["amount"].toString().toULongLong()},
+        : C_Base{OutputType::Basic}, m_amount{val.toObject()["amount"].toString().toULongLong()},
           m_unlockConditions{getT<UnlockCondition>(val.toObject()["unlockConditions"].toArray())}
     {
 
@@ -37,32 +37,32 @@ class Output : virtual public C_Base<OutputType>
 
     [[nodiscard]] std::shared_ptr<Output> clone(void) const;
 
-    [[nodiscard]] static std::shared_ptr<Output> Basic(const quint64 &amount = 0, const quint64 &mana = 0,
-                                                       const pset<const UnlockCondition> &unlockConditions = {},
+    [[nodiscard]] static std::shared_ptr<Output> Basic(const quint64 &amount, const quint64 &mana,
+                                                       const pset<const UnlockCondition> &unlockConditions,
                                                        const pset<const Feature> &features = {});
-    [[nodiscard]] static std::shared_ptr<Output> Account(const quint64 &amount = 0, const quint64 &mana = 0,
-                                                         const quint32 &foundryCounter = 0,
-                                                         const pset<const UnlockCondition> &unlockConditions = {},
+    [[nodiscard]] static std::shared_ptr<Output> Account(const quint64 &amount, const quint64 &mana,
+                                                         const quint32 &foundryCounter,
+                                                         const pset<const UnlockCondition> &unlockConditions,
                                                          const pset<const Feature> &features = {},
                                                          const pset<const Feature> &immutableFeatures = {});
-    [[nodiscard]] static std::shared_ptr<Output> Anchor(const quint64 &amount = 0, const quint64 &mana = 0,
-                                                        const quint32 &stateIndex = 0,
-                                                        const pset<const UnlockCondition> &unlockConditions = {},
+    [[nodiscard]] static std::shared_ptr<Output> Anchor(const quint64 &amount, const quint64 &mana,
+                                                        const quint32 &stateIndex,
+                                                        const pset<const UnlockCondition> &unlockConditions,
                                                         const pset<const Feature> &features = {},
                                                         const pset<const Feature> &immutableFeatures = {});
-    [[nodiscard]] static std::shared_ptr<Output> Foundry(
-        const quint64 &amount = 0, const quint32 &serialNumber = 0,
-        const std::shared_ptr<const TokenScheme> &tokenScheme = nullptr,
-        const pset<const UnlockCondition> &unlockConditions = {}, const pset<const Feature> &features = {},
-        const pset<const Feature> &immutableFeatures = {});
-    [[nodiscard]] static std::shared_ptr<Output> NFT(const quint64 &amount = 0, const quint64 &mana = 0,
-                                                     const pset<const UnlockCondition> &unlockConditions = {},
+    [[nodiscard]] static std::shared_ptr<Output> Foundry(const quint64 &amount, const quint32 &serialNumber,
+                                                         const std::shared_ptr<const TokenScheme> &tokenScheme,
+                                                         const pset<const UnlockCondition> &unlockConditions,
+                                                         const pset<const Feature> &features = {},
+                                                         const pset<const Feature> &immutableFeatures = {});
+    [[nodiscard]] static std::shared_ptr<Output> NFT(const quint64 &amount, const quint64 &mana,
+                                                     const pset<const UnlockCondition> &unlockConditions,
                                                      const pset<const Feature> &features = {},
                                                      const pset<const Feature> &immutableFeatures = {});
-    [[nodiscard]] static std::shared_ptr<Output> Delegation(
-        const quint64 &amount = 0, const quint64 &delegatedAmount = 0,
-        const std::shared_ptr<const Address> validatorAddress = nullptr, const quint64 &startEpoch = 0,
-        const quint64 &endEpoch = 0, const pset<const UnlockCondition> &unlockConditions = {});
+    [[nodiscard]] static std::shared_ptr<Output> Delegation(const quint64 &amount, const quint64 &delegatedAmount,
+                                                            const std::shared_ptr<const Address> &validatorAddress,
+                                                            const quint64 &startEpoch, const quint64 &endEpoch,
+                                                            const pset<const UnlockCondition> &unlockConditions);
 
     [[nodiscard]] quint64 minDepositOfOutput(const quint64 &wkey, const quint64 &wdata, const quint64 &v_byte_cost) const;
 
@@ -73,9 +73,12 @@ class Output : virtual public C_Base<OutputType>
         QJsonArray unlockConditions;
         for (const auto &v : m_unlockConditions)
         {
-            QJsonObject unlockCondition;
-            v->addJson(unlockCondition);
-            unlockConditions.push_back(unlockCondition);
+            if (v)
+            {
+                QJsonObject unlockCondition;
+                v->addJson(unlockCondition);
+                unlockConditions.push_back(unlockCondition);
+            }
         }
         var.insert("unlockConditions", unlockConditions);
     }
@@ -93,7 +96,10 @@ class Output : virtual public C_Base<OutputType>
     }
     void setUnlock(std::shared_ptr<const UnlockCondition>& unlockCondition)
     {
-        m_unlockConditions.insert(unlockCondition);
+        if (unlockCondition)
+        {
+            m_unlockConditions.insert(unlockCondition);
+        }
     }
     [[nodiscard]] auto amount()const{return m_amount;}
     void setAmount(const quint64 amount){m_amount=amount;}
@@ -107,12 +113,12 @@ class BasicOutput : public Output
   protected:
     pset<const Feature> m_features;
     template <class... Args>
-    BasicOutput(const quint64 &mana = 0, const pset<const Feature> &features = {}, Args &&...args)
-        : m_mana{mana}, m_features{features}, Output(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::Basic}
+    BasicOutput(const quint64 &mana, const pset<const Feature> &features, Args &&...args)
+        : m_mana{mana}, m_features{features}, Output(std::forward<Args>(args)...), C_Base{OutputType::Basic}
     {
     }
     BasicOutput(const QJsonValue &val)
-        : Output(val), C_Base<OutputType>{OutputType::Basic},
+        : Output(val), C_Base{OutputType::Basic},
           m_mana{(m_type != OutputType::Foundry)
                      ? val.toObject()[(m_type != OutputType::Delegation) ? "mana" : "delegatedAmount"]
                            .toString()
@@ -121,7 +127,7 @@ class BasicOutput : public Output
           m_features{getT<Feature>(val.toObject()["features"].toArray())}
     {
     }
-    BasicOutput(QDataStream &in) : Output(in), C_Base<OutputType>{OutputType::Basic}
+    BasicOutput(QDataStream &in) : Output(in), C_Base{OutputType::Basic}
     {
         if (m_type != OutputType::Foundry)
         {
@@ -146,9 +152,12 @@ public:
             QJsonArray features;
             for (const auto &v : m_features)
             {
-                QJsonObject feature;
-                v->addJson(feature);
-                features.push_back(feature);
+                if (v)
+                {
+                    QJsonObject feature;
+                    v->addJson(feature);
+                    features.push_back(feature);
+                }
             }
             var.insert("features", features);
         }
@@ -178,7 +187,10 @@ public:
     }
     void setFeature(std::shared_ptr<const Feature>& feature)
     {
-        m_features.insert(feature);
+        if (feature)
+        {
+            m_features.insert(feature);
+        }
     }
 
     friend class Output;
@@ -194,18 +206,18 @@ class ChainOutput : public BasicOutput
   protected:
     pset<const Feature> m_immutableFeatures;
     template <class... Args>
-    ChainOutput(const pset<const Feature> &immutablefeatures = {}, Args &&...args)
-        : BasicOutput{std::forward<Args>(args)...}, C_Base<OutputType>{OutputType::NFT}, m_id{ByteSizes::hash, 0},
+    ChainOutput(const pset<const Feature> &immutablefeatures, Args &&...args)
+        : BasicOutput{std::forward<Args>(args)...}, C_Base{OutputType::NFT}, m_id{ByteSizes::hash, 0},
           m_immutableFeatures{immutablefeatures}
 
     {
     }
     ChainOutput(const QJsonValue &val)
-        : BasicOutput(val), C_Base<OutputType>{OutputType::NFT}, m_id{val.toObject()[jsonStr[m_type]]},
+        : BasicOutput(val), C_Base{OutputType::NFT}, m_id{val.toObject()[jsonStr[m_type]]},
           m_immutableFeatures{getT<Feature>(val.toObject()["immutableFeatures"].toArray())}
     {
     }
-    ChainOutput(QDataStream &in) : BasicOutput(in), C_Base<OutputType>(OutputType::NFT)
+    ChainOutput(QDataStream &in) : BasicOutput(in), C_Base{OutputType::NFT}
     {
         if (m_type != OutputType::Foundry)
         {
@@ -245,9 +257,12 @@ class ChainOutput : public BasicOutput
             QJsonArray features;
             for (const auto &v : m_immutableFeatures)
             {
-                QJsonObject feature;
-                v->addJson(feature);
-                features.push_back(feature);
+                if (v)
+                {
+                    QJsonObject feature;
+                    v->addJson(feature);
+                    features.push_back(feature);
+                }
             }
             var.insert("immutableFeatures", features);
         }
@@ -277,14 +292,14 @@ class ChainOutput : public BasicOutput
 class NFTOutput : public ChainOutput
 {
     template <class... Args>
-    NFTOutput(Args &&...args) : ChainOutput(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::NFT}
+    NFTOutput(Args &&...args) : ChainOutput(std::forward<Args>(args)...), C_Base{OutputType::NFT}
     {
     }
-    NFTOutput(const QJsonValue &val) : C_Base<OutputType>{OutputType::NFT}, ChainOutput(val)
+    NFTOutput(const QJsonValue &val) : C_Base{OutputType::NFT}, ChainOutput(val)
 
     {
     }
-    NFTOutput(QDataStream &in) : C_Base<OutputType>{OutputType::NFT}, ChainOutput(in)
+    NFTOutput(QDataStream &in) : C_Base{OutputType::NFT}, ChainOutput(in)
     {
         ChainOutput::finishDeserialize(in);
     }
@@ -303,15 +318,14 @@ class AnchorOutput : public ChainOutput
     quint32 m_stateIndex;
     template <class... Args>
     AnchorOutput(const quint32 &stateIndex = 0, Args &&...args)
-        : ChainOutput(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::Anchor}, m_stateIndex{stateIndex}
+        : ChainOutput(std::forward<Args>(args)...), C_Base{OutputType::Anchor}, m_stateIndex{stateIndex}
     {
     }
     AnchorOutput(const QJsonValue &val)
-        : C_Base<OutputType>{OutputType::Anchor}, ChainOutput(val),
-          m_stateIndex(val.toObject()["stateIndex"].toInteger())
+        : C_Base{OutputType::Anchor}, ChainOutput(val), m_stateIndex(val.toObject()["stateIndex"].toInteger())
     {
     }
-    AnchorOutput(QDataStream &in) : C_Base<OutputType>{OutputType::Anchor}, ChainOutput(in)
+    AnchorOutput(QDataStream &in) : C_Base{OutputType::Anchor}, ChainOutput(in)
     {
         in >> m_stateIndex;
         ChainOutput::finishDeserialize(in);
@@ -346,15 +360,14 @@ class AccountOutput : public ChainOutput
     quint32 m_foundryCounter;
     template <class... Args>
     AccountOutput(const quint32 &foundryCounter = 0, Args &&...args)
-        : ChainOutput(std::forward<Args>(args)...), C_Base<OutputType>{OutputType::Account}
+        : ChainOutput(std::forward<Args>(args)...), C_Base{OutputType::Account}
     {
     }
     AccountOutput(const QJsonValue &val)
-        : C_Base<OutputType>{OutputType::Account}, ChainOutput(val),
-          m_foundryCounter(val.toObject()["foundryCounter"].toInteger())
+        : C_Base{OutputType::Account}, ChainOutput(val), m_foundryCounter(val.toObject()["foundryCounter"].toInteger())
     {
     }
-    AccountOutput(QDataStream &in) : C_Base<OutputType>{OutputType::Account}, ChainOutput(in)
+    AccountOutput(QDataStream &in) : C_Base{OutputType::Account}, ChainOutput(in)
     {
         in >> m_foundryCounter;
         ChainOutput::finishDeserialize(in);
@@ -390,19 +403,18 @@ class FoundryOutput : public ChainOutput
     quint32 m_serialNumber;
 
     template <class... Args>
-    FoundryOutput(const std::shared_ptr<const TokenScheme> &tokenScheme, const quint32 &serialNumber = 0,
-                  Args &&...args)
-        : ChainOutput{std::forward<Args>(args)...}, C_Base<OutputType>{OutputType::Foundry}, m_tokenScheme{tokenScheme},
+    FoundryOutput(const std::shared_ptr<const TokenScheme> &tokenScheme, const quint32 &serialNumber, Args &&...args)
+        : ChainOutput{std::forward<Args>(args)...}, C_Base{OutputType::Foundry}, m_tokenScheme{tokenScheme},
           m_serialNumber{serialNumber}
     {
     }
     FoundryOutput(const QJsonValue &val)
-        : ChainOutput{val}, C_Base<OutputType>{OutputType::Foundry},
+        : ChainOutput{val}, C_Base{OutputType::Foundry},
           m_tokenScheme(TokenScheme::from<const QJsonValue>(val.toObject()["tokenScheme"])),
           m_serialNumber(val.toObject()["serialNumber"].toInteger())
     {
     }
-    FoundryOutput(QDataStream &in) : ChainOutput{in}, C_Base<OutputType>{OutputType::Foundry}
+    FoundryOutput(QDataStream &in) : ChainOutput{in}, C_Base{OutputType::Foundry}
     {
         in >> m_serialNumber;
         m_tokenScheme = TokenScheme::from<QDataStream>(in);
@@ -418,7 +430,10 @@ class FoundryOutput : public ChainOutput
     {
         ChainOutput::serialize(out);
         out << m_serialNumber;
-        m_tokenScheme->serialize(out);
+        if (m_tokenScheme)
+        {
+            m_tokenScheme->serialize(out);
+        }
         ChainOutput::finishSerialize(out);
     }
 
@@ -426,9 +441,12 @@ class FoundryOutput : public ChainOutput
     {
         ChainOutput::addJson(var);
         var.insert("serialNumber", (int)m_serialNumber);
-        QJsonObject tokenScheme;
-        m_tokenScheme->addJson(tokenScheme);
-        var.insert("tokenScheme", tokenScheme);
+        if (m_tokenScheme)
+        {
+            QJsonObject tokenScheme;
+            m_tokenScheme->addJson(tokenScheme);
+            var.insert("tokenScheme", tokenScheme);
+        }
     }
     [[nodiscard]] auto tokenScheme(void) const
     {
@@ -444,7 +462,10 @@ class FoundryOutput : public ChainOutput
     }
     void setTokenScheme(const std::shared_ptr<const TokenScheme> &tokenScheme)
     {
-        m_tokenScheme = tokenScheme;
+        if (tokenScheme)
+        {
+            m_tokenScheme = tokenScheme;
+        }
     }
     friend class Output;
 };
@@ -462,10 +483,10 @@ class DelegationOutput : public ChainOutput
     using ChainOutput::setImmutableFeature;
 
     template <class... Args>
-    DelegationOutput(const std::shared_ptr<const Address> validatorAddress = nullptr, const quint64 &startEpoch = 0,
-                     const quint64 &endEpoch = 0, Args &&...args)
+    DelegationOutput(const std::shared_ptr<const Address> &validatorAddress, const quint64 &startEpoch,
+                     const quint64 &endEpoch, Args &&...args)
         : ChainOutput{std::forward<Args>(args)...}, C_Base{OutputType::Delegation}, m_startEpoch{startEpoch},
-          m_endEpoch{endEpoch}
+          m_endEpoch{endEpoch}, m_validatorAddress{validatorAddress}
     {
     }
     DelegationOutput(const QJsonValue &val)
@@ -487,7 +508,10 @@ class DelegationOutput : public ChainOutput
     void serialize(QDataStream &out) const override
     {
         ChainOutput::serialize(out);
-        m_validatorAddress->serialize(out);
+        if (m_validatorAddress)
+        {
+            m_validatorAddress->serialize(out);
+        }
         out << m_startEpoch;
         out << m_endEpoch;
         serializeList<quint8>(out, m_unlockConditions);
@@ -496,9 +520,12 @@ class DelegationOutput : public ChainOutput
     void addJson(QJsonObject &var) const override
     {
         ChainOutput::addJson(var);
-        QJsonObject validatorAddress;
-        m_validatorAddress->addJson(validatorAddress);
-        var.insert("validatorAddress", validatorAddress);
+        if (m_validatorAddress)
+        {
+            QJsonObject validatorAddress;
+            m_validatorAddress->addJson(validatorAddress);
+            var.insert("validatorAddress", validatorAddress);
+        }
         var.insert("startEpoch", QString::number(m_startEpoch));
         var.insert("endEpoch", QString::number(m_endEpoch));
     }
@@ -532,7 +559,10 @@ class DelegationOutput : public ChainOutput
     }
     void setValidatorAddress(const std::shared_ptr<const Address> &validatorAddress)
     {
-        m_validatorAddress = validatorAddress;
+        if (validatorAddress)
+        {
+            m_validatorAddress = validatorAddress;
+        }
     }
     friend class Output;
 };

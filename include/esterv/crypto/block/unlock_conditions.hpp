@@ -8,7 +8,7 @@ namespace esterv::crypto::block
 class UnlockCondition : public C_Base<UnlockConditionType>
 {
   protected:
-    UnlockCondition(UnlockConditionType typ) : C_Base<UnlockConditionType>(typ)
+    UnlockCondition(UnlockConditionType typ) : C_Base{typ}
     {
     }
 
@@ -16,18 +16,18 @@ class UnlockCondition : public C_Base<UnlockConditionType>
     template <class from_type> static std::shared_ptr<const UnlockCondition> from(from_type &val);
 
     [[nodiscard]] static std::shared_ptr<const UnlockCondition> Address(
-        const std::shared_ptr<const class Address> &address = nullptr);
+        const std::shared_ptr<const class Address> &address);
 
     [[nodiscard]] static std::shared_ptr<const UnlockCondition> StorageDepositReturn(
-        const std::shared_ptr<const class Address> &returnAddress = nullptr, const quint64 &returnAmount = 0);
+        const std::shared_ptr<const class Address> &returnAddress, const quint64 &returnAmount);
 
-    [[nodiscard]] static std::shared_ptr<const UnlockCondition> Timelock(const quint32 &slotIndex = 0);
+    [[nodiscard]] static std::shared_ptr<const UnlockCondition> Timelock(const quint32 &slotIndex);
 
     [[nodiscard]] static std::shared_ptr<const UnlockCondition> Expiration(
-        const std::shared_ptr<const class Address> &returnAddress = nullptr, const quint32 &slotIndex = 0);
+        const std::shared_ptr<const class Address> &returnAddress, const quint32 &slotIndex);
 
     [[nodiscard]] static std::shared_ptr<const UnlockCondition> StateControllerAddress(
-        const std::shared_ptr<const class Address> &address = nullptr);
+        const std::shared_ptr<const class Address> &address);
 
     [[nodiscard]] static std::shared_ptr<const UnlockCondition> GovernorAddress(
         const std::shared_ptr<const class Address> &address);
@@ -42,7 +42,7 @@ class AddressUnlockCondition : virtual public UnlockCondition
 
   protected:
     AddressUnlockCondition(const std::shared_ptr<const class Address> &address)
-        : UnlockCondition(UnlockConditionType::Address), m_address{address}
+        : UnlockCondition{UnlockConditionType::Address}, m_address{address}
     {
     }
     AddressUnlockCondition(const QJsonValue &val)
@@ -59,16 +59,21 @@ class AddressUnlockCondition : virtual public UnlockCondition
     {
         if (m_type == UnlockConditionType::Address)
             UnlockCondition::serialize(out);
-        m_address->serialize(out);
+        if (m_address)
+        {
+            m_address->serialize(out);
+        }
     }
     void addJson(QJsonObject &var) const override
     {
         if (m_type == UnlockConditionType::Address)
             UnlockCondition::addJson(var);
-
-        QJsonObject address;
-        m_address->addJson(address);
-        var.insert(jsonStr[m_type], address);
+        if (m_address)
+        {
+            QJsonObject address;
+            m_address->addJson(address);
+            var.insert(jsonStr[m_type], address);
+        }
     }
     [[nodiscard]] auto address(void) const
     {
@@ -76,7 +81,10 @@ class AddressUnlockCondition : virtual public UnlockCondition
     }
     void setAddress(const std::shared_ptr<const class Address> &address)
     {
-        m_address = address;
+        if (address)
+        {
+            m_address = address;
+        }
     }
     friend class UnlockCondition;
 };
@@ -86,17 +94,17 @@ class StorageDepositReturnUnlockCondition : public AddressUnlockCondition
     quint64 m_returnAmount;
     StorageDepositReturnUnlockCondition(const std::shared_ptr<const class Address> &returnAddress,
                                         const quint64 &returnAmount)
-        : AddressUnlockCondition(returnAddress), UnlockCondition(UnlockConditionType::StorageDepositReturn),
-          m_returnAmount(returnAmount)
+        : AddressUnlockCondition{returnAddress}, UnlockCondition{UnlockConditionType::StorageDepositReturn},
+          m_returnAmount{returnAmount}
     {
     }
     StorageDepositReturnUnlockCondition(const QJsonValue &val)
-        : AddressUnlockCondition(val), UnlockCondition(UnlockConditionType::StorageDepositReturn),
+        : AddressUnlockCondition{val}, UnlockCondition{UnlockConditionType::StorageDepositReturn},
           m_returnAmount{val.toObject()["amount"].toString().toULongLong()}
     {
     }
     StorageDepositReturnUnlockCondition(QDataStream &in)
-        : AddressUnlockCondition(in), UnlockCondition(UnlockConditionType::StorageDepositReturn)
+        : AddressUnlockCondition{in}, UnlockCondition{UnlockConditionType::StorageDepositReturn}
     {
         in >> m_returnAmount;
     }
@@ -131,13 +139,14 @@ class TimelockUnlockCondition : virtual public UnlockCondition
   protected:
     quint32 m_slotIndex;
     TimelockUnlockCondition(const quint32 &slotIndex)
-        : UnlockCondition(UnlockConditionType ::Timelock), m_slotIndex(slotIndex)
+        : UnlockCondition{UnlockConditionType ::Timelock}, m_slotIndex{slotIndex}
     {
     }
-    TimelockUnlockCondition(const QJsonValue &val) : TimelockUnlockCondition(val.toObject()["slot"].toInteger())
+    TimelockUnlockCondition(const QJsonValue &val)
+        : TimelockUnlockCondition{static_cast<quint32>(val.toObject()["slot"].toInteger())}
     {
     }
-    TimelockUnlockCondition(QDataStream &in) : UnlockCondition(UnlockConditionType::Timelock)
+    TimelockUnlockCondition(QDataStream &in) : UnlockCondition{UnlockConditionType::Timelock}
     {
         in >> m_slotIndex;
     }
@@ -170,16 +179,16 @@ class TimelockUnlockCondition : virtual public UnlockCondition
 class ExpirationUnlockCondition : public AddressUnlockCondition, public TimelockUnlockCondition
 {
     ExpirationUnlockCondition(const std::shared_ptr<const class Address> &returnAddress, const quint32 &slotIndex)
-        : AddressUnlockCondition(returnAddress), TimelockUnlockCondition(slotIndex),
-          UnlockCondition(UnlockConditionType::Expiration)
+        : AddressUnlockCondition{returnAddress}, TimelockUnlockCondition{slotIndex},
+          UnlockCondition{UnlockConditionType::Expiration}
     {
     }
     ExpirationUnlockCondition(const QJsonValue &val)
-        : AddressUnlockCondition(val), TimelockUnlockCondition(val), UnlockCondition(UnlockConditionType::Expiration)
+        : AddressUnlockCondition{val}, TimelockUnlockCondition{val}, UnlockCondition{UnlockConditionType::Expiration}
     {
     }
     ExpirationUnlockCondition(QDataStream &in)
-        : AddressUnlockCondition(in), TimelockUnlockCondition(in), UnlockCondition(UnlockConditionType::Expiration)
+        : AddressUnlockCondition{in}, TimelockUnlockCondition{in}, UnlockCondition{UnlockConditionType::Expiration}
     {
     }
 
@@ -201,15 +210,15 @@ class ExpirationUnlockCondition : public AddressUnlockCondition, public Timelock
 class StateControllerAddressUnlockCondition : public AddressUnlockCondition
 {
     StateControllerAddressUnlockCondition(const std::shared_ptr<const class Address> &address)
-        : AddressUnlockCondition(address), UnlockCondition(UnlockConditionType::StateControllerAddress)
+        : AddressUnlockCondition{address}, UnlockCondition{UnlockConditionType::StateControllerAddress}
     {
     }
     StateControllerAddressUnlockCondition(const QJsonValue &val)
-        : AddressUnlockCondition(val), UnlockCondition(UnlockConditionType::StateControllerAddress)
+        : AddressUnlockCondition{val}, UnlockCondition{UnlockConditionType::StateControllerAddress}
     {
     }
     StateControllerAddressUnlockCondition(QDataStream &in)
-        : AddressUnlockCondition(in), UnlockCondition(UnlockConditionType::StateControllerAddress)
+        : AddressUnlockCondition{in}, UnlockCondition{UnlockConditionType::StateControllerAddress}
     {
     }
 
@@ -219,15 +228,15 @@ class StateControllerAddressUnlockCondition : public AddressUnlockCondition
 class GovernorAddressUnlockCondition : public AddressUnlockCondition
 {
     GovernorAddressUnlockCondition(const std::shared_ptr<const class Address> &address)
-        : AddressUnlockCondition(address), UnlockCondition(UnlockConditionType::GovernorAddress)
+        : AddressUnlockCondition{address}, UnlockCondition{UnlockConditionType::GovernorAddress}
     {
     }
     GovernorAddressUnlockCondition(const QJsonValue &val)
-        : AddressUnlockCondition(val), UnlockCondition(UnlockConditionType::GovernorAddress)
+        : AddressUnlockCondition{val}, UnlockCondition{UnlockConditionType::GovernorAddress}
     {
     }
     GovernorAddressUnlockCondition(QDataStream &in)
-        : AddressUnlockCondition(in), UnlockCondition(UnlockConditionType::GovernorAddress)
+        : AddressUnlockCondition{in}, UnlockCondition{UnlockConditionType::GovernorAddress}
     {
     }
 
@@ -236,15 +245,15 @@ class GovernorAddressUnlockCondition : public AddressUnlockCondition
 class ImmutableAccountAddressUnlockCondition : public AddressUnlockCondition
 {
     ImmutableAccountAddressUnlockCondition(const std::shared_ptr<const class Address> &address)
-        : AddressUnlockCondition(address), UnlockCondition(UnlockConditionType::ImmutableAccountAddress)
+        : AddressUnlockCondition{address}, UnlockCondition{UnlockConditionType::ImmutableAccountAddress}
     {
     }
     ImmutableAccountAddressUnlockCondition(const QJsonValue &val)
-        : AddressUnlockCondition(val), UnlockCondition(UnlockConditionType::ImmutableAccountAddress)
+        : AddressUnlockCondition{val}, UnlockCondition{UnlockConditionType::ImmutableAccountAddress}
     {
     }
     ImmutableAccountAddressUnlockCondition(QDataStream &in)
-        : AddressUnlockCondition(in), UnlockCondition(UnlockConditionType::ImmutableAccountAddress)
+        : AddressUnlockCondition{in}, UnlockCondition{UnlockConditionType::ImmutableAccountAddress}
     {
     }
 

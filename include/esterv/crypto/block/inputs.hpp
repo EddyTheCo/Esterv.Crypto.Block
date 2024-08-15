@@ -8,9 +8,10 @@ namespace esterv::crypto::block
 class Input: public C_Base<InputType>
 {
 protected:
-    Input(InputType typ): C_Base<InputType>(typ)
-    {
-    }
+  Input(InputType typ) : C_Base{typ}
+  {
+  }
+
   public:
     template <class from_type> static std::shared_ptr<const Input> from(from_type &val);
 

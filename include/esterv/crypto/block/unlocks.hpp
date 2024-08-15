@@ -2,14 +2,9 @@
 
 #include "block/carray.hpp"
 #include "block/qsignatures.hpp"
-#include <QByteArray>
-#include <QDataStream>
-#include <QJsonValue>
-namespace qiota
+namespace esterv::crypto::block
 {
-namespace qblocks
-{
-class Unlock
+class Unlock : public C_Base<OutputType>
 {
   public:
     enum types : quint8

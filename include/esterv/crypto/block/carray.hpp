@@ -26,6 +26,10 @@ enum ByteSizes
     token = 38,
     transactionId = 36
 };
+enum class SignatureType : quint8
+{
+    Ed25519 = 0,
+};
 enum class UnlockConditionType : quint8
 {
     Address = 0,
@@ -312,7 +316,10 @@ template <class size_type, class T> void serializeList(QDataStream &out, const T
     out << static_cast<size_type>(container.size());
     for (const auto &v : container)
     {
-        v->serialize(out);
+        if (v)
+        {
+            v->serialize(out);
+        }
     }
 }
 /*!

@@ -8,15 +8,16 @@ namespace esterv::crypto::block
 class TokenScheme : public C_Base<TokenSchemeType>
 {
   protected:
-    TokenScheme(TokenSchemeType typ) : C_Base<TokenSchemeType>(typ)
+    TokenScheme(TokenSchemeType typ) : C_Base{typ}
     {
     }
 
   public:
-    template <class from_type> static std::shared_ptr<TokenScheme> from(from_type &val);
+    template <class from_type> static std::shared_ptr<const TokenScheme> from(from_type &val);
 
-    [[nodiscard]] static std::shared_ptr<TokenScheme> Simple(const uint256 &mintedTokens, const uint256 &meltedTokens,
-                                                             const uint256 &maximumSupply);
+    [[nodiscard]] static std::shared_ptr<const TokenScheme> Simple(const uint256 &mintedTokens = 0,
+                                                                   const uint256 &meltedTokens = 0,
+                                                                   const uint256 &maximumSupply = 0);
 };
 
 class SimpleTokenScheme : public TokenScheme
