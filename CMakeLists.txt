@@ -37,9 +37,9 @@ if(Qt6_FOUND)
     block
 #    src/block.cpp
     src/carray.cpp
-#    src/signatures.cpp
+    src/signatures.cpp
 #    src/payloads.cpp
-#    src/unlocks.cpp
+    src/unlocks.cpp
 #    src/essences.cpp
     src/inputs.cpp
     src/outputs.cpp
@@ -57,10 +57,10 @@ if(Qt6_FOUND)
    include/esterv/crypto/block/outputs.hpp
 #    include/block/output_metadata_response.hpp
 #    include/block/payloads.hpp
-#    include/esterv/crypto/block/signatures.hpp
+    include/esterv/crypto/block/signatures.hpp
    include/esterv/crypto/block/token_scheme.hpp
     include/esterv/crypto/block/unlock_conditions.hpp
-#    include/esterv/crypto/block/unlocks.hpp
+    include/esterv/crypto/block/unlocks.hpp
 )
 
 add_library(Esterv::block ALIAS block)

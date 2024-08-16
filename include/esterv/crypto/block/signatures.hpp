@@ -12,33 +12,64 @@ class Signature : public C_Base<SignatureType>
     }
 
   public:
-    template <class from_type> static std::shared_ptr<const Signature> from_(from_type &val);
+    template <class from_type> static std::shared_ptr<const Signature> from(from_type &val);
 
-    static std::shared_ptr<const Signature> Ed25519(const public_key &public_key_m, const signature &signature_m);
-    virtual void serialize(QDataStream &out) const;
-    virtual QJsonObject get_Json(void) const;
-
-    types type(void) const
-    {
-        return type_m;
-    }
-
-  private:
-    const types type_m;
+    [[nodiscard]] static std::shared_ptr<const Signature> Ed25519(const c_array &publicKey, const c_array &signature);
 };
 
-class Ed25519_Signature : public Signature
+class Ed25519Signature : public Signature
 {
-  public:
-    Ed25519_Signature(const public_key &public_key_m, const signature &signature_m);
-    Ed25519_Signature(const QJsonValue &val);
-    Ed25519_Signature(QDataStream &in);
-    void serialize(QDataStream &out) const;
-    QJsonObject get_Json(void) const;
+    c_array m_publicKey;
+    c_array m_signature;
 
-  private:
-    public_key public_key_;
-    signature signature_;
+    Ed25519Signature(const c_array &publicKey, const c_array &signature)
+        : Signature{SignatureType::Ed25519}, m_publicKey{publicKey}, m_signature{signature}
+    {
+    }
+    Ed25519Signature(const QJsonValue &val)
+        : Signature{SignatureType::Ed25519}, m_publicKey{val.toObject()["publicKey"]},
+          m_signature{val.toObject()["signature"]}
+    {
+    }
+    Ed25519Signature(QDataStream &in) : Signature{SignatureType::Ed25519}
+    {
+        m_publicKey = c_array(ByteSizes::hash, 0);
+        in >> m_publicKey;
+        m_signature = c_array(ByteSizes::hash, 0);
+        in >> m_signature;
+    }
+
+  public:
+    void serialize(QDataStream &out) const override
+    {
+        C_Base::serialize(out);
+        out << m_publicKey;
+        out << m_signature;
+    }
+    void addJson(QJsonObject &var) const override
+    {
+        C_Base::addJson(var);
+        var.insert("publicKey", m_publicKey.toHexString());
+        var.insert("signature", m_signature.toHexString());
+    }
+    [[nodiscard]] auto publicKey(void) const
+    {
+        return m_publicKey;
+    }
+    [[nodiscard]] auto signature(void) const
+    {
+        return m_signature;
+    }
+    void setSignature(const c_array &signature)
+    {
+        m_signature = signature;
+    }
+    void setPublicKey(const c_array &publicKey)
+    {
+        m_publicKey = publicKey;
+    }
+
+    friend class Signature;
 };
 
 }; // namespace esterv::crypto::block

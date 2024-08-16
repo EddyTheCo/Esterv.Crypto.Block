@@ -24,7 +24,18 @@ enum ByteSizes
 {
     hash = 32,
     token = 38,
-    transactionId = 36
+    transactionId = 36,
+    signature = 64
+};
+enum class UnlockType : quint8
+{
+    Signature = 0,
+    Reference = 1,
+    Account = 2,
+    Anchor = 3,
+    NFT = 4,
+    Multi = 5,
+    Empty = 6
 };
 enum class SignatureType : quint8
 {
@@ -217,9 +228,6 @@ using Block_ID = c_array;
  */
 using TransactionID = c_array;
 
-using public_key = c_array;
-using signature = c_array;
-
 /*!
  * \brief BLAKE2b-256 hash of the Output ID that created the chain of outputs
  */
@@ -288,7 +296,7 @@ template <class T> pvector<const T> getTvec(const QJsonArray &val)
 {
     pvector<const T> var;
     for (const auto &v : val)
-        var.push_back(T::from_(v));
+        var.push_back(T::from(v));
     return var;
 }
 /*!
