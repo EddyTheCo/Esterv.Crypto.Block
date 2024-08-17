@@ -3,25 +3,10 @@
 namespace esterv::crypto::block
 {
 
-const QHash<AddressType, QString> Address::JsonStr{{AddressType::Anchor, "anchorId"},
-                                                   {AddressType::NFT, "nftId"},
-                                                   {AddressType::Account, "accountId"},
-                                                   {AddressType::Ed25519, "pubKeyHash"}};
-
-Address::Address(const AddressType typ, const c_array addrhash) : C_Base<AddressType>{typ}, m_addrHash{addrhash}
-{
-}
-
-Address::Address(const AddressType typ, QDataStream &in) : C_Base<AddressType>(typ)
-{
-    m_addrHash = c_array(ByteSizes::hash, 0);
-    in >> m_addrHash;
-}
-
-Address::Address(const AddressType typ, const QJsonValue &val)
-    : Address{typ, c_array{val.toObject()[JsonStr.value(typ)]}}
-{
-}
+const QHash<AddressType, QString> HashAddress::JsonStr{{AddressType::Anchor, "anchorId"},
+                                                       {AddressType::NFT, "nftId"},
+                                                       {AddressType::Account, "accountId"},
+                                                       {AddressType::Ed25519, "pubKeyHash"}};
 
 template <class fromType> std::shared_ptr<const Address> Address::from(fromType &val)
 {
@@ -36,6 +21,8 @@ template <class fromType> std::shared_ptr<const Address> Address::from(fromType 
         return std::shared_ptr<const Address>{new AnchorAddress(val)};
     case AddressType::Ed25519:
         return std::shared_ptr<const Address>{new Ed25519Address(val)};
+    case AddressType::Multi:
+        return std::shared_ptr<const Address>{new MultiAddress(val)};
     default:
         return nullptr;
     }

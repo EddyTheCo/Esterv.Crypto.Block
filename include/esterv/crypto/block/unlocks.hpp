@@ -33,7 +33,7 @@ class MultiUnlock : public Unlock
         : Unlock{UnlockType::Multi}, m_unlocks{getTvec<Unlock>(val.toObject()["unlocks"].toArray())}
     {
     }
-    MultiUnlock(QDataStream &in) : Unlock{UnlockType::Multi}, m_unlocks{Signature::from<QDataStream>(in)}
+    MultiUnlock(QDataStream &in) : Unlock{UnlockType::Multi}, m_unlocks{deserializeVector<quint8, Unlock>(in)}
     {
     }
 
@@ -46,22 +46,27 @@ class MultiUnlock : public Unlock
     void addJson(QJsonObject &var) const override
     {
         Unlock::addJson(var);
-        if (m_signature)
+        QJsonArray unlocks;
+        for (const auto &v : m_unlocks)
         {
-            QJsonObject signature;
-            m_signature->addJson(signature);
-            var.insert("signature", signature);
+            if (v)
+            {
+                QJsonObject unlock;
+                v->addJson(unlock);
+                unlocks.push_back(unlock);
+            }
         }
+        var.insert("unlocks", unlocks);
     }
-    [[nodiscard]] auto signature(void) const
+    [[nodiscard]] auto unlocks(void) const
     {
-        return m_signature;
+        return m_unlocks;
     }
-    void setSignature(const std::shared_ptr<const class Signature> &signature)
+    void setUnlock(const std::shared_ptr<const Unlock> &unlock)
     {
-        if (signature)
+        if (unlock)
         {
-            m_signature = signature;
+            m_unlocks.push_back(unlock);
         }
     }
     friend class Unlock;

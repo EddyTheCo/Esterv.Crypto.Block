@@ -78,6 +78,7 @@ enum class InputType : quint8
 };
 enum class AddressType : quint8
 {
+    Multi = 40,
     Anchor = 24,
     NFT = 16,
     Account = 8,
@@ -336,13 +337,25 @@ template <class size_type, class T> void serializeList(QDataStream &out, const T
 template <class size_type, class obj_type> pset<const obj_type> deserializeList(QDataStream &in)
 {
     pset<const obj_type> ptrSet;
-    size_type length;
-    in >> length;
-    for (auto i = 0; i < length; i++)
+    size_type count;
+    in >> count;
+    for (auto i = 0; i < count; i++)
     {
         ptrSet.insert(obj_type::template from<QDataStream>(in));
     }
     return ptrSet;
+}
+
+template <class size_type, class obj_type> pvector<const obj_type> deserializeVector(QDataStream &in)
+{
+    pvector<const obj_type> ptrVector;
+    size_type length;
+    in >> length;
+    for (auto i = 0; i < length; i++)
+    {
+        ptrVector.push_back(obj_type::template from<QDataStream>(in));
+    }
+    return ptrVector;
 }
 
 }; // namespace qblocks
