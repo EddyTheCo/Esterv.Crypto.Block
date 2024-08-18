@@ -51,4 +51,11 @@ std::shared_ptr<const Address> Address::Anchor(const c_array addrhash)
     return std::shared_ptr<const Address>{new AnchorAddress(addrhash)};
 }
 
+std::shared_ptr<const Address> Address::Multi(
+    const std::initializer_list<std::pair<std::shared_ptr<const Address>, quint8>> &weightedAddresses,
+    const quint16 &threshold)
+{
+    return std::shared_ptr<const Address>{new MultiAddress(weightedAddresses, threshold)};
+}
+
 } // namespace qiota::qblocks

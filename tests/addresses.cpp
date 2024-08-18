@@ -10,10 +10,31 @@ using namespace esterv::crypto::block;
 int main(int argc, char **argv)
 {
     const auto nftAddr =
-        Address::NFT(c_array::fromHexString("0xd45b3583d5f4075872753aee16fdf427a71cc86ea6debf867eef78c89f2ba88e"));
+        Address::NFT(c_array::fromHexString("0x56fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
     c_array binSer;
     binSer.fromObject(nftAddr);
     qDebug() << binSer.toHexString();
+
+    const auto Addr1 =
+        Address::Ed25519(c_array::fromHexString("0x52fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
+
+    const auto Addr2 =
+        Address::Ed25519(c_array::fromHexString("0x53fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
+
+    const auto Addr3 =
+        Address::Ed25519(c_array::fromHexString("0x54fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
+
+    const auto Addr4 =
+        Address::Account(c_array::fromHexString("0x55fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
+
+    const auto Addr5 =
+        Address::NFT(c_array::fromHexString("0x56fdfc072182654f163f5f0f9a621d729566c74d10037c4d7bbb0407d1e2c649"));
+
+    const auto multiAddr = Address::Multi({{Addr5, 3}, {Addr4, 2}, {Addr3, 1}, {Addr2, 1}, {Addr1, 1}}, 5);
+
+    QJsonObject multiAddrJson;
+    multiAddr->addJson(multiAddrJson);
+    qDebug() << "multiAddress:" << multiAddrJson;
 
     auto var = binSer.toObject<Address, Address::from>();
 

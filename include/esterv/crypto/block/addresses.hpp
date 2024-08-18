@@ -19,15 +19,23 @@ class Address : public C_Base<AddressType>
     [[nodiscard]] static std::shared_ptr<const Address> Account(const c_array addrhash);
     [[nodiscard]] static std::shared_ptr<const Address> Ed25519(const c_array addrhash);
     [[nodiscard]] static std::shared_ptr<const Address> Anchor(const c_array addrhash);
-    [[nodiscard]] static std::shared_ptr<const Address> Multi();
+    [[nodiscard]] static std::shared_ptr<const Address> Multi(
+        const std::initializer_list<std::pair<std::shared_ptr<const Address>, quint8>> &weightedAddresses,
+        const quint16 &threshold);
 
     [[nodiscard]] virtual c_array addrHash(void) const
     {
         return c_array();
     }
+    [[nodiscard]] c_array addr(void) const
+    {
+        c_array serialAddr = c_array(1, static_cast<char>(m_type));
+        serialAddr.append(addrHash());
+        return serialAddr;
+    }
 };
 
-class HashAddress : virtual public Address
+class HashAddress : public Address
 {
     c_array m_addrHash;
     QBLOCK_EXPORT static const QHash<AddressType, QString> JsonStr;
@@ -51,6 +59,7 @@ class HashAddress : virtual public Address
     {
         return m_addrHash;
     }
+
     void setAddrHash(const c_array addrHash)
     {
         m_addrHash = addrHash;
@@ -90,8 +99,17 @@ class MultiAddress : public Address
         : Address{AddressType::Multi}, m_addresses{addresses}, m_threshold{threshold}
     {
     }
-    MultiAddress(const QJsonValue &val) : Address{AddressType::Multi}, m_threshold{}
+    MultiAddress(const QJsonValue &val)
+        : Address{AddressType::Multi}, m_threshold{static_cast<quint16>(val.toObject()["threshold"].toString().toInt())}
     {
+        const auto addresses = val.toObject()["addresses"].toArray();
+        for (const auto &v : addresses)
+        {
+            const auto jsonAddress = v.toObject()["address"];
+            const auto address = Address::from(jsonAddress);
+            const auto weight = static_cast<quint8>(v.toObject()["weight"].toInt());
+            m_addresses.insert({address, weight});
+        }
     }
     MultiAddress(QDataStream &in) : Address{AddressType::Multi}
     {
@@ -105,6 +123,61 @@ class MultiAddress : public Address
             m_addresses.insert({address, weight});
         }
         in >> m_threshold;
+    }
+
+  public:
+    [[nodiscard]] virtual c_array addrHash(void) const override
+    {
+        c_array serialAddr;
+        auto buffer = QDataStream(&serialAddr, QIODevice::WriteOnly | QIODevice::Append);
+        buffer.setByteOrder(QDataStream::LittleEndian);
+        serialize(buffer);
+        return QCryptographicHash::hash(serialAddr, QCryptographicHash::Blake2b_256);
+    }
+    [[nodiscard]] auto threshold(void) const
+    {
+        return m_threshold;
+    }
+    void setThreshold(const quint16 threshold)
+    {
+        if (threshold > 0)
+        {
+            m_threshold = threshold;
+        }
+    }
+    void serialize(QDataStream &out) const override
+    {
+        Address::serialize(out);
+        quint8 count = m_addresses.size();
+        out << count;
+        for (const auto &v : m_addresses)
+        {
+            if (v.first)
+            {
+                v.first->serialize(out);
+                out << v.second;
+            }
+        }
+        out << m_threshold;
+    }
+    void addJson(QJsonObject &var) const override
+    {
+        Address::addJson(var);
+        QJsonArray addresses;
+        for (const auto &v : m_addresses)
+        {
+
+            if (v.first)
+            {
+                QJsonObject weightedAddress;
+                QJsonObject address;
+                v.first->addJson(address);
+                weightedAddress.insert("address", address);
+                weightedAddress.insert("weight", (int)v.second);
+                addresses.append(weightedAddress);
+            }
+        }
+        var.insert("addresses", addresses);
     }
 
     friend class Address;
