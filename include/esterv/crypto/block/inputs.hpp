@@ -15,9 +15,8 @@ protected:
   public:
     template <class from_type> static std::shared_ptr<const Input> from(from_type &val);
 
-    [[nodiscard]] static std::shared_ptr<const Input> UTXO(const TransactionID &transactionId,
-                                             const quint16 &transactionOutputIndex);
-
+    [[nodiscard]] static std::shared_ptr<const Input> UTXO(const ID &transactionId,
+                                                           const quint16 &transactionOutputIndex);
 };
 
 /*
@@ -26,23 +25,21 @@ protected:
  */
 class UTXOInput : public Input
 {
-    TransactionID m_transactionId;
+    ID m_transactionId;
     quint16 m_transactionOutputIndex;
 
-    UTXOInput(const TransactionID &transactionId,
-               const quint16 &transactionOutputIndex) : Input(InputType::UTXO),
-        m_transactionId{transactionId},
-        m_transactionOutputIndex{transactionOutputIndex}
+    UTXOInput(const ID &transactionId, const quint16 &transactionOutputIndex)
+        : Input(InputType::UTXO), m_transactionId{transactionId}, m_transactionOutputIndex{transactionOutputIndex}
     {
     }
     UTXOInput(const QJsonValue &val)
-        : Input{InputType::UTXO}, m_transactionId{TransactionID(val.toObject()["transactionId"])},
-        m_transactionOutputIndex(val.toObject()["transactionOutputIndex"].toInt())
+        : Input{InputType::UTXO}, m_transactionId{val.toObject()["transactionId"]},
+          m_transactionOutputIndex(val.toObject()["transactionOutputIndex"].toInt())
     {
     }
     UTXOInput(QDataStream &in) : Input{InputType::UTXO}
     {
-        m_transactionId = TransactionID(ByteSizes::transactionId, 0);
+        m_transactionId = ID(ByteSizes::transactionId, 0);
         in >> m_transactionId;
         in >> m_transactionOutputIndex;
     }
@@ -68,7 +65,7 @@ public:
     {
         return m_transactionId;
     }
-    void setTransactionId(const TransactionID &transactionId)
+    void setTransactionId(const ID &transactionId)
     {
         m_transactionId = transactionId;
     }

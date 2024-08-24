@@ -36,7 +36,7 @@ class Feature : public C_Base<FeatureType>
     [[nodiscard]] static std::shared_ptr<const Feature> Issuer(const std::shared_ptr<const Address> &issuer);
     [[nodiscard]] static std::shared_ptr<const Feature> Metadata(const MetadataEntries &entries);
     [[nodiscard]] static std::shared_ptr<const Feature> Tag(const tagF &tag);
-    [[nodiscard]] static std::shared_ptr<const Feature> NativeToken(const TokenID &tokenId, const uint256 &amount);
+    [[nodiscard]] static std::shared_ptr<const Feature> NativeToken(const ID &tokenId, const uint256 &amount);
 };
 
 class SenderFeature : public Feature
@@ -211,14 +211,14 @@ class TagFeature : public Feature
 
 class NativeTokenFeature : public Feature
 {
-    TokenID m_tokenId;
+    ID m_tokenId;
     uint256 m_amount;
-    NativeTokenFeature(const TokenID &tokenId, const uint256 &amount)
+    NativeTokenFeature(const ID &tokenId, const uint256 &amount)
         : Feature(FeatureType::NativeToken), m_tokenId{tokenId}, m_amount{amount}
     {
     }
     NativeTokenFeature(const QJsonValue &val)
-        : Feature(FeatureType::NativeToken), m_tokenId{TokenID(val.toObject()["id"])},
+        : Feature(FeatureType::NativeToken), m_tokenId{val.toObject()["id"]},
           m_amount{uint256(val.toObject()["amount"].toString())}
     {
     }
@@ -251,7 +251,7 @@ class NativeTokenFeature : public Feature
     {
         return m_amount;
     }
-    void setTokenId(const TokenID &tokenId)
+    void setTokenId(const ID &tokenId)
     {
         m_tokenId = tokenId;
     }

@@ -1,24 +1,18 @@
 #include <QCryptographicHash>
-#include <block/qessences.hpp>
-#include <block/qpayloads.hpp>
-namespace qiota
-{
-namespace qblocks
-{
-void Payload::serialize(QDataStream &out) const {};
-QJsonObject Payload::get_Json(void) const
-{
-    return QJsonObject();
-};
-Payload::Payload(types type_) : type_m(type_){};
-template <class from_type> std::shared_ptr<const Payload> Payload::from_(from_type &val)
+#include <esterv/crypto/block/essences.hpp>
+#include <esterv/crypto/block/payloads.hpp>
+
+namespace esterv::crypto::block
 {
 
-    const auto type_ = get_type<quint32>(val);
-    switch (type_)
+template <class from_type> std::shared_ptr<const Payload> Payload::from(from_type &val)
+{
+
+    const auto type = getType<PayloadType>(val);
+    switch (type)
     {
-    case Transaction_typ:
-        return std::shared_ptr<Payload>(new Transaction_Payload(val));
+    case PayloadType::SignedTransaction:
+        return std::shared_ptr<const Payload>(new SignedTransactionPayload(val));
     case Tagged_Data_typ:
         return std::shared_ptr<Payload>(new Tagged_Data_Payload(val));
     default:
@@ -30,39 +24,15 @@ template std::shared_ptr<const Payload> Payload::from_<const QJsonValue>(const Q
 template std::shared_ptr<const Payload> Payload::from_<QDataStream>(QDataStream &val);
 template std::shared_ptr<const Payload> Payload::from_<const QJsonValueRef>(const QJsonValueRef &val);
 
-std::shared_ptr<const Payload> Payload::Tagged_Data(const tagF &tag_m, const dataF &data_m)
+std::shared_ptr<const Payload> Payload::TaggedData(const tagF &tag, const dataF &data)
 {
-    return std::shared_ptr<Payload>(new Tagged_Data_Payload(tag_m, data_m));
+    return std::shared_ptr<const Payload>(new TaggedDataPayload(tag, data));
 }
 
-Tagged_Data_Payload::Tagged_Data_Payload(const tagF &tag_m, const dataF &data_m)
-    : Payload(Tagged_Data_typ), tag_(tag_m), data_(data_m){};
-Tagged_Data_Payload::Tagged_Data_Payload(const QJsonValue &val)
-    : Tagged_Data_Payload(tagF(val.toObject()["tag"]), dataF(val.toObject()["data"])){};
-Tagged_Data_Payload::Tagged_Data_Payload(QDataStream &in) : Payload(Tagged_Data_typ)
+std::shared_ptr<const Payload> Payload::SignedTransaction(const std::shared_ptr<const Essence> &essence_m,
+                                                          const pvector<const Unlock> &unlocks_m)
 {
-    in >> tag_;
-    in >> data_;
-}
-void Tagged_Data_Payload::serialize(QDataStream &out) const
-{
-    out << type();
-    out << tag_;
-    out << data_;
-}
-QJsonObject Tagged_Data_Payload::get_Json(void) const
-{
-    QJsonObject var;
-    var.insert("type", (int)type());
-    var.insert("tag", tag_.toHexString());
-    var.insert("data", data_.toHexString());
-    return var;
-}
-
-std::shared_ptr<const Payload> Payload::Transaction(const std::shared_ptr<const Essence> &essence_m,
-                                                    const pvector<const Unlock> &unlocks_m)
-{
-    return std::shared_ptr<Payload>(new Transaction_Payload(essence_m, unlocks_m));
+    return std::shared_ptr<Payload>(new SignedTransactionPayload(essence_m, unlocks_m));
 }
 
 Transaction_Payload::Transaction_Payload(const std::shared_ptr<const Essence> &essence_m,

@@ -38,10 +38,11 @@ if(Qt6_FOUND)
 #    src/block.cpp
     src/carray.cpp
     src/signatures.cpp
-#    src/payloads.cpp
+    src/payloads.cpp
     src/unlocks.cpp
-#    src/essences.cpp
+    src/essences.cpp
     src/inputs.cpp
+    src/context_inputs.cpp
     src/outputs.cpp
     src/unlock_conditions.cpp
     src/features.cpp
@@ -51,12 +52,13 @@ if(Qt6_FOUND)
     include/esterv/crypto/block/carray.hpp
     include/esterv/crypto/block/addresses.hpp
 #    include/block/block.hpp
-#    include/block/essences.hpp
+    include/esterv/crypto/block/essences.hpp
     include/esterv/crypto/block/features.hpp
     include/esterv/crypto/block/inputs.hpp
+    include/esterv/crypto/block/context_inputs.hpp
    include/esterv/crypto/block/outputs.hpp
 #    include/block/output_metadata_response.hpp
-#    include/block/payloads.hpp
+    include/esterv/crypto/block/payloads.hpp
     include/esterv/crypto/block/signatures.hpp
    include/esterv/crypto/block/token_scheme.hpp
     include/esterv/crypto/block/unlock_conditions.hpp

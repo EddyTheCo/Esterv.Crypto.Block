@@ -1,77 +1,106 @@
 #pragma once
 
-#include "block/carray.hpp"
-#include "block/qunlocks.hpp"
-#include <QByteArray>
-#include <QDataStream>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QJsonValue>
-namespace qiota
-{
-namespace qblocks
+#include "esterv/crypto/block/carray.hpp"
+#include "esterv/crypto/block/context_inputs.hpp"
+#include "esterv/crypto/block/inputs.hpp"
+#include "esterv/crypto/block/outputs.hpp"
+#include "esterv/crypto/block/unlocks.hpp"
+
+namespace esterv::crypto::block
 {
 class Essence;
-class Payload
+class Payload : public C_Base<PayloadType>
 {
-  public:
-    enum types : quint32
+  protected:
+    Payload(PayloadType typ) : C_Base{typ}
     {
-        Tagged_Data_typ = 5,
-        Transaction_typ = 6
-    };
-    Payload(types type_);
-    template <class from_type> static std::shared_ptr<const Payload> from_(from_type &val);
+    }
 
-    static std::shared_ptr<const Payload> Tagged_Data(const tagF &tag_m, const dataF &data_m);
-    static std::shared_ptr<const Payload> Transaction(const std::shared_ptr<const Essence> &essence_m,
-                                                      const pvector<const Unlock> &unlocks_m);
+  public:
+    template <class from_type> static std::shared_ptr<const Payload> from(from_type &val);
 
-    virtual void serialize(QDataStream &out) const;
-    virtual QJsonObject get_Json(void) const;
+    [[nodiscard]] static std::shared_ptr<const Payload> TaggedData(const tagF &tag, const dataF &data);
+    [[nodiscard]] static std::shared_ptr<const Payload> SignedTransaction(
+        const std::shared_ptr<const Essence> &essence_m, const pvector<const Unlock> &unlocks_m);
+
     virtual c_array get_id(void) const
     {
         return c_array(32, 0);
     };
-    types type(void) const
+};
+
+class TaggedDataPayload : public Payload
+{
+    tagF m_tag;
+    dataF m_data;
+
+    TaggedDataPayload(const tagF &tag, const dataF &data) : Payload{PayloadType::TaggedData}, m_tag{tag}, m_data{data}
     {
-        return type_m;
+    }
+    TaggedDataPayload(const QJsonValue &val)
+        : Payload{PayloadType::TaggedData}, m_tag{val.toObject()["tag"]}, m_data{val.toObject()["data"]}
+    {
+    }
+    TaggedDataPayload(QDataStream &in) : Payload{PayloadType::TaggedData}
+    {
+        in >> m_tag;
+        in >> m_data;
     }
 
-  private:
-    const types type_m;
-};
-
-class Tagged_Data_Payload : public Payload
-{
   public:
-    Tagged_Data_Payload(const tagF &tag_m, const dataF &data_m);
-    Tagged_Data_Payload(const QJsonValue &val);
-    Tagged_Data_Payload(QDataStream &in);
-    void serialize(QDataStream &out) const;
+    void serialize(QDataStream &out) const override
+    {
+        Payload::serialize(out);
+        out << m_tag;
+        out << m_data;
+    }
+    void addJson(QJsonObject &var) const override
+    {
+        Payload::addJson(var);
+        var.insert("tag", m_tag.toHexString());
+        var.insert("data", m_data.toHexString());
+    }
+    [[nodiscard]] auto tag() const
+    {
+        return m_tag;
+    }
+    [[nodiscard]] auto data() const
+    {
+        return m_data;
+    }
+    void setTag(const tagF &tag)
+    {
+        m_tag = tag;
+    }
+    void setData(const dataF &data)
+    {
+        m_data = data;
+    }
 
-    QJsonObject get_Json(void) const;
-
-  private:
-    tagF tag_;
-    dataF data_;
+    friend class Payload;
 };
 
-class Transaction_Payload : public Payload
+class SignedTransactionPayload : public Payload
 {
+    std::map<ID, quint64> m_allotments;
+    quint64 m_networkId;
+    quint32 m_creationSlot;
+    pvector<const Input> m_inputs;
+    pvector<const Output> m_outputs;
+    pvector<const ContextInput> m_conxtextInputs;
+    std::shared_ptr<const TaggedDataPayload> m_payload;
+    pvector<const Unlock> m_unlocks;
+
+    SignedTransactionPayload(const std::shared_ptr<const Essence> &essence_m, const pvector<const Unlock> &unlocks_m);
+    SignedTransactionPayload(const QJsonValue &val);
+    SignedTransactionPayload(QDataStream &in);
+
   public:
-    Transaction_Payload(const std::shared_ptr<const Essence> &essence_m, const pvector<const Unlock> &unlocks_m);
-    Transaction_Payload(const QJsonValue &val);
-    Transaction_Payload(QDataStream &in);
-
-    void serialize(QDataStream &out) const;
-
-    QJsonObject get_Json(void) const;
-    c_array get_id(void) const;
-
-  private:
-    std::shared_ptr<const Essence> essence_;
-    pvector<const Unlock> unlocks_;
+    void serialize(QDataStream &out) const override
+    {
+    }
+    void addJson(QJsonObject &var) const override
+    {
+    }
 };
-}; // namespace qblocks
-}; // namespace qiota
+}; // namespace esterv::crypto::block

@@ -19,4 +19,9 @@ template <class from_type> std::shared_ptr<const Input> Input::from(from_type &v
 template std::shared_ptr<const Input> Input::from<const QJsonValue>(const QJsonValue &val);
 template std::shared_ptr<const Input> Input::from<QDataStream>(QDataStream &val);
 
+std::shared_ptr<const Input> Input::UTXO(const ID &transactionId, const quint16 &transactionOutputIndex)
+{
+    return std::shared_ptr<const Input>(new UTXOInput(transactionId, transactionOutputIndex));
+}
+
 }; // namespace qblocks

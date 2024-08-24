@@ -51,6 +51,12 @@ enum class UnlockConditionType : quint8
     GovernorAddress = 5,
     ImmutableAccountAddress = 6
 };
+enum class PayloadType : quint8
+{
+    TaggedData = 0,
+    SignedTransaction = 1,
+    CandidacyAnnouncement = 2
+};
 enum class OutputType : quint8
 {
     Basic = 0,
@@ -71,6 +77,12 @@ enum class FeatureType : quint8
     Metadata = 2,
     Tag = 4,
     NativeToken = 5
+};
+enum class ContextInputType : quint8
+{
+    Commitment = 0,
+    BlockIssuanceCredit = 1,
+    Reward = 2
 };
 enum class InputType : quint8
 {
@@ -220,27 +232,7 @@ template <typename max_lenght> class fl_array : public c_array
     }
 };
 
-/*!
- * \brief Is the BLAKE2b-256 hash of the entire serialized block.
- */
-using Block_ID = c_array;
-/*!
- * \brief Is the BLAKE2b-256 hash of the transaction payload.
- */
-using TransactionID = c_array;
-
-/*!
- * \brief BLAKE2b-256 hash of the Output ID that created the chain of outputs
- */
 using ID = c_array;
-/*!
- * \brief Concatenation of Transaction_ID || outputIndex
- */
-using OutputID = c_array;
-/*!
- * \brief The concatenation of Address || Serial Number || Token Scheme Type = Foundry ID
- */
-using TokenID = c_array;
 
 /*!
  * \brief Binary data. A leading uint16 denotes its length. Used in
