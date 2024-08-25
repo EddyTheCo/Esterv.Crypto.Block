@@ -323,6 +323,25 @@ template <class size_type, class T> void serializeList(QDataStream &out, const T
         }
     }
 }
+
+/*!
+ *  \brief append to the datastream the serialized form of objects in a container
+ */
+template <class T> QJsonArray jsonList(const T &container)
+{
+    QJsonArray array;
+    for (const auto &v : container)
+    {
+        if (v)
+        {
+            QJsonObject element;
+            v->addJson(element);
+            array.push_back(element);
+        }
+    }
+    return array;
+}
+
 /*!
  *  \return A container of objects from datastream. The lenght of the container is read from the datastream.
  */
